@@ -18,17 +18,15 @@ const Login: React.FC = () => {
         try {
             const response = await fetch('/api/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
 
             if (response.ok) {
-                navigate('/profile');
+                navigate('/profile', { state: { loginSuccess: true } });
             } else {
                 const data = await response.json();
-                setError(data.message || 'Ошибка при входе');
+                setError(data.error || 'Ошибка при входе');
             }
         } catch {
             setError('Ошибка сети');
@@ -41,10 +39,17 @@ const Login: React.FC = () => {
         <div className="flex flex-col min-h-screen bg-base-100 text-base-content">
             <Navbar />
             <main className="flex-grow flex flex-col items-center justify-center px-4">
-                <div className="w-full max-w-md shadow-lg rounded-box bg-base-200 p-8">
+                <div className="w-full max-w-md shadow-lg rounded-box bg-base-200 p-8 relative">
                     <h1 className="text-3xl font-bold mb-6 text-center">
                         Вход в систему
                     </h1>
+
+                    {loading && (
+                        <div className="flex justify-center mb-4">
+                            <span className="loading loading-spinner text-primary scale-125"></span>
+                        </div>
+                    )}
+
                     <form className="space-y-4" onSubmit={handleSubmit} noValidate>
                         <label className="form-control w-full">
                             <div className="label m-2">
@@ -61,6 +66,7 @@ const Login: React.FC = () => {
                                 required
                             />
                         </label>
+
                         <label className="form-control w-full">
                             <div className="label m-2">
                                 <span className="label-text">Пароль</span>
@@ -85,12 +91,13 @@ const Login: React.FC = () => {
 
                         <button
                             type="submit"
-                            className={`btn btn-primary w-full mt-4 ${loading ? 'loading' : ''}`}
+                            className="btn btn-primary w-full mt-4"
                             disabled={loading}
                         >
-                            Войти
+                            {loading ? 'Входим...' : 'Войти'}
                         </button>
                     </form>
+
                     <div className="mt-6 text-center text-sm">
                         <span>Ещё нет аккаунта?</span>{' '}
                         <Link to="/register" className="link link-primary">

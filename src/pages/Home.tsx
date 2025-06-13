@@ -1,8 +1,8 @@
 import React, {useEffect, useRef} from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import Hero from '../components/Home/Hero';
-import Faq from '../components/Home/Faq';
+import Navbar from '@components/Navbar';
+import Footer from '@components/Footer';
+import Hero from '@components/Home/Hero';
+import Faq from '@components/Home/Faq';
 
 
 const Home: React.FC = () => {
@@ -56,6 +56,7 @@ const Home: React.FC = () => {
                         />
 
                         <kbd className="kbd kbd-sm">ctrl</kbd>
+                        <kbd className="kbd kbd-sm">alt</kbd>
                         <kbd className="kbd kbd-sm">K</kbd>
                     </label>
                 </div>

@@ -36,8 +36,8 @@ const Home: React.FC = () => {
             <Navbar />
             <Hero />
             <main className="flex-grow p-6 flex flex-col items-center justify-center text-center">
-                <h1 className="text-3xl font-bold mb-4">Поиск врачей в районе</h1>
-                <p className="mb-6">Найдите проверенного врача и запишитесь на приём</p>
+                <h1 className="text-3xl font-bold mb-4">Поиск специалиста или организации</h1>
+                <p className="mb-6">Найдите специалиста или организацию и оставьте отзыв</p>
 
                 {/*поисковый бар*/}
                 <div className="w-full px-4 mb-10">
@@ -81,19 +81,7 @@ const Home: React.FC = () => {
                     ))}
                 </div>
             </main>
-            <div className="flex w-full gap-4 p-6 items-start">
-                <div className="card bg-gray-600 rounded-box grow p-4">
-                    <p className="text-xl">Здесь может быть другой контент</p>
-                </div>
-
-                <div className="divider divider-horizontal">OR</div>
-
-                <div className="card bg-gray-600 rounded-box p-4">
-                    <Faq />
-                </div>
-            </div>
-
-
+            <Faq />
             <Footer/>
         </div>
     );

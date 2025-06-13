@@ -8,10 +8,10 @@ import (
 	"reviews-back/controllers"
 	"reviews-back/database"
 	"reviews-back/routes"
+	"reviews-back/storage"
 )
 
 func main() {
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
@@ -23,11 +23,12 @@ func main() {
 	}
 
 	database.InitDB()
+	storage.InitMinio()
 
 	r := gin.Default()
 	routes.RegisterRoutes(r)
-	err = r.Run(":8080")
-	if err != nil {
+
+	if err := r.Run(":8000"); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }

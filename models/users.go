@@ -40,10 +40,11 @@ type OrganizationProfile struct {
 }
 
 type Confirmation struct {
-	UserID         uint `json:"user_id" gorm:"primaryKey"`
-	User           User `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-	EmailConfirmed bool `json:"email_confirmed" gorm:"default:false;not null"`
-	PhoneConfirmed bool `json:"phone_confirmed" gorm:"default:false;not null"`
+	UserID         uint   `json:"user_id" gorm:"primaryKey"`
+	User           User   `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	EmailConfirmed bool   `json:"email_confirmed" gorm:"default:false;not null"`
+	PhoneConfirmed bool   `json:"phone_confirmed" gorm:"default:false;not null"`
+	Token          string `json:"token" gorm:"uniqueIndex;not null"`
 }
 
 func (Role) TableName() string {

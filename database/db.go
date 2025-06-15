@@ -62,5 +62,22 @@ func InitDB() {
 	if err != nil {
 		log.Fatalf("Error running migrations: %v", err)
 	}
+	SeedRoles()
+
 	log.Println("Migrations completed successfully")
+}
+func SeedRoles() {
+	roles := []string{"user", "specialist", "organization"}
+
+	for _, name := range roles {
+		var role models.Role
+		if err := DB.Where("name = ?", name).First(&role).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				DB.Create(&models.Role{Name: name})
+				log.Printf("Создана роль: %s", name)
+			} else {
+				log.Printf("Ошибка при поиске роли %s: %v", name, err)
+			}
+		}
+	}
 }

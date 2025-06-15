@@ -107,9 +107,8 @@ func Logout(c *gin.Context) {
 
 func ChangePassword(c *gin.Context) {
 	var req struct {
-		Username        string `json:"username" binding:"required"`
-		CurrentPassword string `json:"currentPassword" binding:"required"`
-		NewPassword     string `json:"newPassword" binding:"required"`
+		CurrentPassword string `json:"current_password" binding:"required"`
+		NewPassword     string `json:"new_password" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -117,9 +116,21 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Неавторизован"})
+		return
+	}
+
+	claims, err := ValidateJWT(cookie)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Недействительный токен"})
+		return
+	}
+
 	var user models.User
-	if err := database.DB.Where("username = ?", req.Username).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный логин"})
+	if err := database.DB.First(&user, claims.UserID).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не найден"})
 		return
 	}
 

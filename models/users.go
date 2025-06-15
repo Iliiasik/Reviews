@@ -10,12 +10,13 @@ type Role struct {
 type User struct {
 	ID           uint      `json:"id" gorm:"primaryKey"`
 	Name         string    `json:"name" gorm:"type:varchar(100);not null"`
-	Email        string    `json:"email" gorm:"type:varchar(100);uniqueIndex;not null"`
+	Email        string    `json:"email" gorm:"type:varchar(100);uniqueIndex"`
 	Phone        string    `json:"phone" gorm:"type:varchar(20);uniqueIndex"`
-	Username     string    `json:"username" gorm:"type:varchar(20);uniqueIndex;not null"`
+	Username     string    `json:"username" gorm:"type:varchar(20);uniqueIndex"`
 	PasswordHash string    `json:"-" gorm:"not null"`
 	RoleID       uint      `json:"role_id" gorm:"not null"`
 	Role         Role      `json:"role" gorm:"foreignKey:RoleID;constraint:OnDelete:RESTRICT"`
+	AvatarURL    string    `json:"avatar_url" gorm:"type:varchar(255)"`
 	CreatedAt    time.Time `json:"created_at"`
 }
 

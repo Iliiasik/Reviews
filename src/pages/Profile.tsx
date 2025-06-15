@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import Toast from '../components/Toast';
+import Navbar from '@components/general/Navbar.tsx';
+import Footer from '@components/general/Footer.tsx';
+import Toast from '@components/general/Toast.tsx';
+import ChangePasswordModal from '@components/Profile/ChangePasswordModal.tsx';
+import EditProfileModal from '@components/Profile/EditProfileModal.tsx';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import UserInfo from '@components/Profile/UserInfo.tsx';
+import SpecialistInfo from '@components/Profile/SpecialistInfo.tsx';
+import OrganizationInfo from '@components/Profile/OrganizationInfo.tsx';
 
 const Profile: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [showChangePassword, setShowChangePassword] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const [profile, setProfile] = useState<{
         name: string;
         email: string;
         username: string;
+        phone?: string;
         role: string;
         experience_years?: number;
         about?: string;
@@ -22,7 +32,13 @@ const Profile: React.FC = () => {
 
     useEffect(() => {
         if (location.state?.loginSuccess) {
+            setToastMessage('Успешный вход!');
             setShowToast(true);
+            navigate(location.pathname, { replace: true, state: {} });
+        } else if (location.state?.alreadyLoggedIn) {
+            setToastMessage('Вы уже вошли в систему');
+            setShowToast(true);
+            navigate(location.pathname, { replace: true, state: {} });
         }
 
         const fetchProfile = async () => {
@@ -41,7 +57,7 @@ const Profile: React.FC = () => {
         };
 
         fetchProfile();
-    }, [location.state]);
+    }, [location, navigate]);
 
     const handleLogout = async () => {
         try {
@@ -56,16 +72,48 @@ const Profile: React.FC = () => {
         }
     };
 
+    const handleProfileUpdate = async () => {
+        try {
+            const res = await fetch("/api/profile", { credentials: "include" });
+            const data = await res.json();
+            if (res.ok) {
+                setProfile(data);
+                setToastMessage('Профиль успешно обновлён');
+                setShowToast(true);
+            }
+        } catch (err) {
+            console.error('Ошибка при обновлении профиля:', err);
+        }
+    };
+
     return (
         <div className="flex flex-col min-h-screen bg-base-100 text-base-content">
             <Navbar />
 
             {showToast && (
                 <Toast
-                    message="Успешный вход!"
+                    message={toastMessage}
                     type="success"
                     duration={3000}
                     onClose={() => setShowToast(false)}
+                />
+            )}
+
+            {showChangePassword && (
+                <ChangePasswordModal
+                    onClose={() => setShowChangePassword(false)}
+                    onSuccess={() => {
+                        setToastMessage('Пароль успешно изменён');
+                        setShowToast(true);
+                    }}
+                />
+            )}
+
+            {showEditModal && profile && (
+                <EditProfileModal
+                    profile={profile}
+                    onClose={() => setShowEditModal(false)}
+                    onSuccess={handleProfileUpdate}
                 />
             )}
 
@@ -79,7 +127,6 @@ const Profile: React.FC = () => {
                             {!profile && 'Профиль'}
                         </h2>
 
-
                         <div className="flex flex-col md:flex-row items-center gap-6">
                             <div className="avatar">
                                 <div className="w-32 rounded-full overflow-hidden">
@@ -89,32 +136,63 @@ const Profile: React.FC = () => {
                                     />
                                 </div>
                             </div>
+
                             <div className="flex-1 space-y-3 text-lg">
-                                <div><span className="font-semibold">ФИО:</span> {profile?.name ?? '...'}</div>
-                                <div><span className="font-semibold">Логин:</span> {profile?.username ?? '...'}</div>
-                                <div><span className="font-semibold">Роль:</span> {profile?.role ?? '...'}</div>
-                                <div><span className="font-semibold">Email:</span> {profile?.email ?? '...'}</div>
+                                {profile?.role === 'user' && (
+                                    <UserInfo
+                                        name={profile.name}
+                                        username={profile.username}
+                                        email={profile.email}
+                                        phone={profile.phone}
+                                    />
+                                )}
 
                                 {profile?.role === 'specialist' && (
                                     <>
-                                        <div><span className="font-semibold">Опыт:</span> {profile.experience_years ?? '-'} лет</div>
-                                        <div><span className="font-semibold">О себе:</span> {profile.about ?? '-'}</div>
+                                        <UserInfo
+                                            name={profile.name}
+                                            username={profile.username}
+                                            email={profile.email}
+                                            phone={profile.phone}
+                                        />
+                                        <SpecialistInfo
+                                            experience_years={profile.experience_years}
+                                            about={profile.about}
+                                            phone={profile.phone}
+                                        />
                                     </>
                                 )}
 
                                 {profile?.role === 'organization' && (
                                     <>
-                                        <div><span className="font-semibold">Сайт:</span> {profile.website ?? '-'}</div>
-                                        <div><span className="font-semibold">Адрес:</span> {profile.address ?? '-'}</div>
-                                        <div><span className="font-semibold">О нас:</span> {profile.about ?? '-'}</div>
+                                        <div><span className="font-semibold">Название:</span> {profile.name}</div>
+                                        <OrganizationInfo
+                                            website={profile.website}
+                                            address={profile.address}
+                                            about={profile.about}
+                                            phone={profile.phone}
+                                        />
                                     </>
                                 )}
                             </div>
                         </div>
 
-                        <div className="mt-6 flex justify-end gap-4">
-                            <button className="btn btn-outline btn-warning">Сменить пароль</button>
-                            <button className="btn btn-error text-white" onClick={handleLogout}>Выйти</button>
+                        <div className="mt-6 flex justify-end gap-4 flex-wrap">
+                            <button
+                                className="btn btn-outline btn-info"
+                                onClick={() => setShowEditModal(true)}
+                            >
+                                Редактировать
+                            </button>
+                            <button
+                                className="btn btn-outline btn-warning"
+                                onClick={() => setShowChangePassword(true)}
+                            >
+                                Сменить пароль
+                            </button>
+                            <button className="btn btn-error text-white" onClick={handleLogout}>
+                                Выйти
+                            </button>
                         </div>
                     </div>
                 </div>

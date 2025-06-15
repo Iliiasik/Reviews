@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import React, {useEffect, useState} from 'react';
+import Navbar from '@components/general/Navbar.tsx';
+import Footer from '@components/general/Footer.tsx';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
@@ -34,6 +34,21 @@ const Login: React.FC = () => {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const res = await fetch("/api/profile", { credentials: "include" });
+                if (res.ok) {
+                    // если залогинен, редиректим
+                    navigate("/profile", { state: { alreadyLoggedIn: true } });
+                }
+            } catch (err) {
+                console.error("Ошибка при проверке логина:", err);
+            }
+        };
+
+        checkLoginStatus();
+    }, []);
 
     return (
         <div className="flex flex-col min-h-screen bg-base-100 text-base-content">
@@ -96,6 +111,17 @@ const Login: React.FC = () => {
                         >
                             {loading ? 'Входим...' : 'Войти'}
                         </button>
+                        <div className="divider text-sm">или</div>
+
+                        <button
+                            type="button"
+                            onClick={() => window.location.href = '/api/auth/google'}
+                            className="btn btn-outline btn-neutral w-full flex items-center gap-2"
+                        >
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+                            Войти через Google
+                        </button>
+
                     </form>
 
                     <div className="mt-6 text-center text-sm">

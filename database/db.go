@@ -58,6 +58,7 @@ func InitDB() {
 		&models.Review{},
 		&models.ReviewCollection{},
 		&models.ReviewCollectionAccess{},
+		&models.QRCode{},
 	)
 	if err != nil {
 		log.Fatalf("Error running migrations: %v", err)

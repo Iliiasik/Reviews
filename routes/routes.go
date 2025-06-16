@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"reviews-back/controllers"
-	"reviews-back/database" // если db лежит там — поправь под твой путь
+	"reviews-back/database"
 )
 
 func RegisterRoutes(r *gin.Engine) {
@@ -13,7 +13,6 @@ func RegisterRoutes(r *gin.Engine) {
 		api.POST("/logout", controllers.Logout)
 		api.POST("/change-password", controllers.ChangePassword)
 
-		// Новый маршрут для регистрации
 		api.POST("/register", controllers.RegisterHandler(database.DB))
 		api.GET("/profile", controllers.GetProfileHandler(database.DB))
 		api.GET("/auth/google", controllers.GoogleLogin)

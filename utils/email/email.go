@@ -1,4 +1,3 @@
-// ./utils/email/email.go
 package email
 
 import (
@@ -49,7 +48,6 @@ func SendEmail(data EmailData) error {
 	smtpUser := os.Getenv("SMTP_USER")
 	smtpPass := os.Getenv("SMTP_PASS")
 
-	// 🔍 Логирование перед отправкой
 	fmt.Println("Отправка email...")
 	fmt.Printf("To: %s\nSubject: %s\n", data.To, data.Subject)
 	fmt.Println("SMTP_HOST:", smtpHost)

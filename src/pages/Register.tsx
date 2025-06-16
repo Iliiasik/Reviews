@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Navbar from '@components/general/Navbar';
-import Footer from '@components/general/Footer';
+import Navbar from '@components/navigation/Navbar.tsx';
+import Footer from '@components/navigation/Footer.tsx';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import StepSelectType from '@components/Register/SelectType';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ThemeSwitcher from '../utils/ThemeSwitcher.tsx';
+import ThemeSwitcher from '@shared/ui/ThemeSwitcher.tsx';
 
 const Navbar: React.FC = () => {
     return (

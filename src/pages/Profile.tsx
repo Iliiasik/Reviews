@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { gsap } from 'gsap';
-import Navbar from '@components/navigation/Navbar';
-import Footer from '@components/navigation/Footer';
-import Toast from '@components/alerts/Toast';
+import Navbar from '@shared/ui/Navbar.tsx';
+import Footer from '@shared/ui/Footer.tsx';
+import Toast from '@shared/ui/Toast.tsx';
 import ChangePasswordModal from '@components/Profile/ChangePasswordModal';
 import EditProfileModal from '@components/Profile/EditProfileModal';
 import { useLocation, useNavigate } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import Navbar from '@components/general/Navbar.tsx';
-import Footer from '@components/general/Footer.tsx';
+import Navbar from '@components/navigation/Navbar.tsx';
+import Footer from '@components/navigation/Footer.tsx';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
@@ -116,11 +116,16 @@ const Login: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => window.location.href = '/api/auth/google'}
-                            className="btn btn-outline btn-neutral w-full flex items-center gap-2"
+                            className="btn btn-outline w-full flex items-center justify-center gap-2"
                         >
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                            Войти через Google
+                            <img
+                                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                alt="Google"
+                                className="w-5 h-5"
+                            />
+                            <span className="text-base-content">Войти через Google</span>
                         </button>
+
 
                     </form>
 

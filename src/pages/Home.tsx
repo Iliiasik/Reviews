@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from 'react';
-import Navbar from '@components/general/Navbar.tsx';
-import Footer from '@components/general/Footer.tsx';
+import Navbar from '@components/navigation/Navbar.tsx';
+import Footer from '@components/navigation/Footer.tsx';
 import Hero from '@components/Home/Hero';
 import Faq from '@components/Home/Faq';
 

@@ -1,10 +1,38 @@
-const SpecialistInfo = ({ experience_years, about,phone }: any) => (
-    <>
-        <div><span className="font-semibold">Опыт:</span> {experience_years ?? '-'} лет</div>
-        <div><span className="font-semibold">О себе:</span> {about ?? '-'}</div>
-        <div><span className="font-semibold">Телефон:</span> {phone ?? '-'}</div>
+import { FiAward, FiInfo } from 'react-icons/fi';
+import type { IconType } from 'react-icons'; // ✅ Добавляем
 
-    </>
+interface SpecialistInfoProps {
+    experience_years?: number;
+    about?: string;
+}
+
+const InfoItem = ({ icon: Icon, label, value }: { icon: IconType, label: string, value: React.ReactNode }) => (
+    <div className="flex items-start gap-3 py-2">
+        <Icon className="flex-shrink-0 mt-1 text-base-content/70" />
+        <div>
+            <div className="text-sm font-medium text-base-content/70">{label}</div>
+            <div className="mt-1">{value || '-'}</div>
+        </div>
+    </div>
+);
+
+const SpecialistInfo = ({ experience_years, about }: SpecialistInfoProps) => (
+    <div className="space-y-3">
+        <InfoItem
+            icon={FiAward}
+            label="Опыт работы"
+            value={
+                experience_years
+                    ? `${experience_years} ${experience_years === 1
+                        ? 'год'
+                        : experience_years < 5
+                            ? 'года'
+                            : 'лет'}`
+                    : null
+            }
+        />
+        <InfoItem icon={FiInfo} label="О себе" value={about} />
+    </div>
 );
 
 export default SpecialistInfo;

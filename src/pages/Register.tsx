@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '@components/general/Navbar';
-import Footer from '@components/general/Footer';
+import Navbar from '@components/navigation/Navbar';
+import Footer from '@components/navigation/Footer';
 import { useNavigate } from 'react-router-dom';
 import StepSelectType from '@components/Register/SelectType';
 import StepForm from '@components/Register/StepForm';

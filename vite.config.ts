@@ -13,6 +13,7 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, 'src/shared'),
       '@features': path.resolve(__dirname, 'src/features'),
       '@widgets': path.resolve(__dirname, 'src/widgets'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
     },
   },
   server: {

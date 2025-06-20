@@ -21,9 +21,9 @@ export const Step2 = ({ formData, accountType, handleChange, onNext, onBack }: S
             </>
         )}
 
-        <div className="flex justify-between gap-4 mt-4">
-            <button type="button" className="btn w-1/2" onClick={onBack}>Назад</button>
-            <button type="button" className="btn btn-primary w-1/2" onClick={onNext}>Далее</button>
+        <div className="flex justify-end gap-4 mt-4">
+            <button type="button" className="btn" onClick={onBack}>Назад</button>
+            <button type="button" className="btn btn-primary" onClick={onNext}>Далее</button>
         </div>
     </>
 );

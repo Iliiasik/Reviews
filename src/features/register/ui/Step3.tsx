@@ -31,13 +31,9 @@ export const Step3 = ({ avatarPreview, handleAvatarChange, onBack }: Step3Props)
             </div>
         )}
 
-        <div className="flex justify-between gap-4 mt-4">
-            <button type="button" className="btn w-1/2" onClick={onBack}>Назад</button>
-            <button type="submit" className="btn btn-primary w-1/2">Зарегистрироваться</button>
+        <div className="flex justify-center gap-4 mt-4">
+            <button type="button" className="btn" onClick={onBack}>Назад</button>
+            <button type="submit" className="btn btn-primary">Зарегистрироваться</button>
         </div>
-
-        <p className="text-center mt-2 text-sm">
-            <button type="submit" className="link link-primary">Пропустить загрузку фото</button>
-        </p>
     </>
 );

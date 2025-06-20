@@ -32,7 +32,7 @@ export const RegisterForm = () => {
                         damping: 25,
                         mass: 0.6,
                     }}
-                    className="w-full max-w-4xl h-[500px] flex bg-base-200 shadow-lg rounded-box overflow-hidden"
+                    className="w-full max-w-lg flex bg-base-200 shadow-lg rounded-box overflow-hidden"
                 >
                     <div className="hidden lg:flex w-1/2 bg-base-300 items-center justify-center">
                         <div className="text-center text-xl text-base-content/60 px-8">
@@ -63,8 +63,8 @@ export const RegisterForm = () => {
                         accountType={accountType}
                         formData={formData}
                         formStep={formStep}
-                        onChange={handleChange}
-                        onSubmit={handleSubmit}
+                        handleChange={handleChange}
+                        handleSubmit={handleSubmit}
                         onBack={handleBackToType}
                         setFormStep={setFormStep}
                         error={error}

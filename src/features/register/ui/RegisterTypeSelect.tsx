@@ -6,7 +6,6 @@ interface Props {
 
 export const RegisterTypeSelect: React.FC<Props> = ({ onSelect }) => (
     <div className="space-y-4">
-        <p className="text-center mb-4">Выберите тип аккаунта:</p>
         <button className="btn w-full" onClick={() => onSelect('user')}>
             Пользователь
         </button>

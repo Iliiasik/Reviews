@@ -6,18 +6,21 @@ import { Step3 } from './Step3';
 import { StepsMockup } from './StepsMockup';
 import { useToast } from '../lib/useToast';
 import { validateStep } from '../lib/useStepValidator';
+import type {StepFormData} from "@features/register/types/StepForm.ts";
 
 interface StepFormProps {
     accountType: 'user' | 'specialist' | 'organization' | null;
-    formData: Record<string, string>;
+    formData: StepFormData;
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     handleSubmit: (e: React.FormEvent) => void;
     onBack: () => void;
     formStep: 1 | 2 | 3;
     setFormStep: (step: 1 | 2 | 3) => void;
+    error?: string;
+    loading?: boolean;
 }
 
-export const Form: React.FC<StepFormProps> = ({
+export const RegisterStepsForm: React.FC<StepFormProps> = ({
                                                   accountType,
                                                   formData,
                                                   handleChange,
@@ -67,7 +70,7 @@ export const Form: React.FC<StepFormProps> = ({
     };
 
     return (
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row lg:divide-x-2 divide-base-content/30 gap-8">
             <div className="w-full lg:w-1/2">
                 <div className="flex items-center mb-4">
                     <button
@@ -106,6 +109,7 @@ export const Form: React.FC<StepFormProps> = ({
                             {formStep === 1 && (
                                 <Step1
                                     formData={formData}
+                                    accountType={accountType}
                                     handleChange={handleChange}
                                     onNext={handleNext}
                                 />

@@ -1,5 +1,5 @@
-import { Input, Textarea } from '../FormFields';
-import type {StepComponentProps} from '../../../types/StepForm';
+import { Input, Textarea } from './FormFields.tsx';
+import type {StepComponentProps} from '../types/StepForm.ts';
 
 export const Step2 = ({ formData, accountType, handleChange, onNext, onBack }: StepComponentProps) => (
     <>

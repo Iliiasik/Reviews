@@ -1,6 +1,6 @@
-import { Input } from '../FormFields';
+import { Input } from './FormFields.tsx';
 import { useState } from 'react';
-import type {StepComponentProps} from '../../../types/StepForm';
+import type {StepComponentProps} from '../types/StepForm.ts';
 
 export const Step1 = ({ formData, handleChange, onNext }: StepComponentProps) => {
     const [errors, setErrors] = useState<{ email?: string; phone?: string }>({});

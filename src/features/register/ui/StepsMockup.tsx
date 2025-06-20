@@ -1,5 +1,4 @@
-// components/StepForm/StepPreview.tsx
-import type {StepFormData, AccountType} from '../../../types/StepForm';
+import type {StepFormData, AccountType} from '../types/StepForm.ts';
 
 interface StepsMockupProps {
     formStep: 1 | 2 | 3;

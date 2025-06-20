@@ -1,12 +1,11 @@
-// StepForm.tsx
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Step1 } from '@components/Register/StepForm/Step1';
-import { Step2 } from '@components/Register/StepForm/Step2';
-import { Step3 } from '@components/Register/StepForm/Step3';
-import { StepsMockup } from '@components/Register/StepForm/StepsMockup.tsx';
-import { useToast } from '@hooks/useToast';
-import { validateStep } from '@hooks/useStepValidator';
+import { Step1 } from './Step1';
+import { Step2 } from './Step2';
+import { Step3 } from './Step3';
+import { StepsMockup } from './StepsMockup';
+import { useToast } from '../lib/useToast';
+import { validateStep } from '../lib/useStepValidator';
 
 interface StepFormProps {
     accountType: 'user' | 'specialist' | 'organization' | null;
@@ -19,14 +18,14 @@ interface StepFormProps {
 }
 
 export const Form: React.FC<StepFormProps> = ({
-                                                      accountType,
-                                                      formData,
-                                                      handleChange,
-                                                      handleSubmit,
-                                                      onBack,
-                                                      formStep,
-                                                      setFormStep
-                                                  }) => {
+                                                  accountType,
+                                                  formData,
+                                                  handleChange,
+                                                  handleSubmit,
+                                                  onBack,
+                                                  formStep,
+                                                  setFormStep
+                                              }) => {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const toast = useToast();
 
@@ -71,9 +70,25 @@ export const Form: React.FC<StepFormProps> = ({
         <div className="flex flex-col lg:flex-row gap-8">
             <div className="w-full lg:w-1/2">
                 <div className="flex items-center mb-4">
-                    <button type="button" onClick={onBack} className="btn btn-ghost btn-sm p-2" aria-label="Назад к выбору">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 stroke-base-content">
-                            <path d="M15 6L9 12L15 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="btn btn-ghost btn-sm p-2"
+                        aria-label="Назад к выбору"
+                    >
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-6 h-6 stroke-base-content"
+                        >
+                            <path
+                                d="M15 6L9 12L15 18"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
                         </svg>
                     </button>
                 </div>
@@ -88,9 +103,29 @@ export const Form: React.FC<StepFormProps> = ({
                             transition={{ duration: 0.15, ease: 'easeInOut' }}
                             className="space-y-4"
                         >
-                            {formStep === 1 && <Step1 formData={formData} handleChange={handleChange} onNext={handleNext} />}
-                            {formStep === 2 && <Step2 formData={formData} accountType={accountType} handleChange={handleChange} onNext={handleNext} onBack={handleBack} />}
-                            {formStep === 3 && <Step3 avatarPreview={avatarPreview} handleAvatarChange={handleAvatarChange} onBack={handleBack} />}
+                            {formStep === 1 && (
+                                <Step1
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                    onNext={handleNext}
+                                />
+                            )}
+                            {formStep === 2 && (
+                                <Step2
+                                    formData={formData}
+                                    accountType={accountType}
+                                    handleChange={handleChange}
+                                    onNext={handleNext}
+                                    onBack={handleBack}
+                                />
+                            )}
+                            {formStep === 3 && (
+                                <Step3
+                                    avatarPreview={avatarPreview}
+                                    handleAvatarChange={handleAvatarChange}
+                                    onBack={handleBack}
+                                />
+                            )}
                         </motion.div>
                     </AnimatePresence>
 
@@ -106,7 +141,11 @@ export const Form: React.FC<StepFormProps> = ({
             </div>
 
             <div className="hidden lg:block w-1/2">
-                <StepsMockup formStep={formStep} formData={formData} accountType={accountType} />
+                <StepsMockup
+                    formStep={formStep}
+                    formData={formData}
+                    accountType={accountType}
+                />
             </div>
         </div>
     );

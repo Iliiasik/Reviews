@@ -3,7 +3,7 @@ import { Home } from '@pages/Home';
 import { Login } from '@pages/Login';
 import Profile from '@pages/Profile';
 import NotFound from '@pages/NotFound';
-import Register from "@pages/Register.tsx";
+import { Register } from "@pages/Register.tsx";
 import ConfirmEmail from "@pages/ConfirmEmail.tsx";
 
 function App() {

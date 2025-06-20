@@ -1,4 +1,3 @@
-// hooks/useToast.ts
 export const useToast = () => {
     return (message: string) => {
         const toast = document.createElement("div");

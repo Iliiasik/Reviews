@@ -1,56 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useChangePassword } from '../model/useChangePassword';
 
-interface Props {
+interface ChangePasswordModalProps {
     onClose: () => void;
-    onSuccess: (message: string) => void;
+    onSuccess: () => void;
 }
 
-const ChangePasswordModal: React.FC<Props> = ({ onClose, onSuccess }) => {
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClose, onSuccess }) => {
+    const [currentPassword, setCurrentPassword] = React.useState('');
+    const [newPassword, setNewPassword] = React.useState('');
+    const [confirmPassword, setConfirmPassword] = React.useState('');
+    const { isLoading, error, handleChangePassword } = useChangePassword();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
+        const success = await handleChangePassword({
+            currentPassword,
+            newPassword,
+            confirmPassword,
+        });
 
-        if (newPassword.length < 6) {
-            setError('Пароль должен быть не менее 6 символов');
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            setError('Пароли не совпадают');
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            const res = await fetch('/api/change-password', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    current_password: currentPassword,
-                    new_password: newPassword,
-                }),
-            });
-
-            const data = await res.json();
-            setLoading(false);
-
-            if (res.ok) {
-                onSuccess(data.message || 'Пароль успешно изменён');
-                onClose();
-            } else {
-                setError(data.error || 'Ошибка смены пароля');
-            }
-        } catch (err) {
-            setLoading(false);
-            setError('Ошибка сети при смене пароля');
+        if (success) {
+            onSuccess();
+            onClose();
         }
     };
 
@@ -86,8 +58,8 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose, onSuccess }) => {
                     {error && <div className="text-error text-sm">{error}</div>}
                     <div className="flex justify-end gap-4">
                         <button type="button" className="btn" onClick={onClose}>Отмена</button>
-                        <button type="submit" className="btn btn-primary" disabled={loading}>
-                            {loading ? 'Сохраняем...' : 'Сменить'}
+                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                            {isLoading ? 'Сохраняем...' : 'Сменить'}
                         </button>
                     </div>
                 </form>
@@ -95,5 +67,3 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose, onSuccess }) => {
         </div>
     );
 };
-
-export default ChangePasswordModal;

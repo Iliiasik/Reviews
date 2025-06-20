@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import {updateProfile} from "@features/profile/api/profile.ts";
 
-interface Props {
+interface EditProfileModalProps {
     profile: any;
     onClose: () => void;
-    onSuccess: (message: string) => void;
+    onSuccess: () => void;
 }
 
-const EditProfileModal: React.FC<Props> = ({ profile, onClose, onSuccess }) => {
+export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileModalProps) => {
     const [form, setForm] = useState({
         name: '',
         email: '',
@@ -52,22 +53,10 @@ const EditProfileModal: React.FC<Props> = ({ profile, onClose, onSuccess }) => {
         };
 
         try {
-            const res = await fetch('/api/profile/update', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                onSuccess(data.message || 'Профиль обновлён');
-                onClose();
-            } else {
-                setError(data.error || 'Ошибка при сохранении');
-            }
-        } catch {
-            setError('Ошибка сети');
+            await updateProfile(payload);
+            onSuccess();
+        } catch (error) {
+            setError(error instanceof Error ? error.message : 'Ошибка при сохранении');
         } finally {
             setLoading(false);
         }
@@ -110,5 +99,3 @@ const EditProfileModal: React.FC<Props> = ({ profile, onClose, onSuccess }) => {
         </div>
     );
 };
-
-export default EditProfileModal;

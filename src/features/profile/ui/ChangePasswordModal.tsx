@@ -27,39 +27,73 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="bg-base-100 p-6 rounded-lg w-full max-w-sm shadow-lg">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-base-100/70 backdrop-blur-md p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40">
                 <h3 className="text-xl font-bold mb-4">Смена пароля</h3>
                 <form className="space-y-4" onSubmit={handleSubmit}>
-                    <input
-                        type="password"
-                        className="input input-bordered w-full"
-                        placeholder="Текущий пароль"
-                        value={currentPassword}
-                        onChange={e => setCurrentPassword(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="password"
-                        className="input input-bordered w-full"
-                        placeholder="Новый пароль"
-                        value={newPassword}
-                        onChange={e => setNewPassword(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="password"
-                        className="input input-bordered w-full"
-                        placeholder="Подтверждение пароля"
-                        value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
-                        required
-                    />
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text font-semibold">Текущий пароль</span>
+                        </label>
+                        <input
+                            type="password"
+                            className="input input-bordered w-full opacity-75"
+                            placeholder="Текущий пароль"
+                            value={currentPassword}
+                            onChange={e => setCurrentPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text font-semibold">Новый пароль</span>
+                        </label>
+                        <input
+                            type="password"
+                            className="input input-bordered w-full opacity-75"
+                            placeholder="Новый пароль"
+                            value={newPassword}
+                            onChange={e => setNewPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text font-semibold">Подтверждение пароля</span>
+                        </label>
+                        <input
+                            type="password"
+                            className="input input-bordered w-full opacity-75"
+                            placeholder="Подтверждение пароля"
+                            value={confirmPassword}
+                            onChange={e => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
                     {error && <div className="text-error text-sm">{error}</div>}
-                    <div className="flex justify-end gap-4">
-                        <button type="button" className="btn" onClick={onClose}>Отмена</button>
-                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                            {isLoading ? 'Сохраняем...' : 'Сменить'}
+
+                    <div className="flex justify-end gap-3 pt-2">
+                        <button
+                            type="button"
+                            className="btn btn-ghost bg-opacity-5 hover:bg-opacity-10"
+                            onClick={onClose}
+                        >
+                            Отмена
+                        </button>
+                        <button
+                            type="submit"
+                            className="btn bg-opacity-10 hover:bg-opacity-20"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <span className="flex items-center justify-center gap-2">
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Сохраняем...
+                        </span>
+                            ) : 'Сменить'}
                         </button>
                     </div>
                 </form>

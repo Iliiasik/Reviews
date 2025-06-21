@@ -63,39 +63,142 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="bg-base-100 p-6 rounded-lg w-full max-w-md shadow-lg">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-base-100/70 backdrop-blur-md p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40">
                 <h3 className="text-xl font-bold mb-4">Редактирование профиля</h3>
-                <form onSubmit={handleSubmit} className="space-y-3">
-                    <input name="name" value={form.name} onChange={handleChange} placeholder="Имя / Название" className="input input-bordered w-full" required />
-                    <input name="email" value={form.email} onChange={handleChange} placeholder="Email" className="input input-bordered w-full" type="email" required />
-                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="Телефон" className="input input-bordered w-full" />
+                <form onSubmit={handleSubmit} className="space-y-4">
+
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text font-semibold">Имя / Название</span>
+                        </label>
+                        <input
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            className="input input-bordered w-full opacity-75"
+                            placeholder="Имя / Название"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text font-semibold">Email</span>
+                        </label>
+                        <input
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            type="email"
+                            className="input input-bordered w-full opacity-75 "
+                            placeholder="Email"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-control">
+                        <label className="label">
+                            <span className="label-text font-semibold">Телефон</span>
+                        </label>
+                        <input
+                            name="phone"
+                            value={form.phone}
+                            onChange={handleChange}
+                            className="input input-bordered w-full opacity-75 "
+                            placeholder="Телефон"
+                        />
+                    </div>
 
                     {(profile.role === 'specialist' || profile.role === 'organization') && (
-                        <textarea name="about" value={form.about} onChange={handleChange} placeholder="О себе / О нас" className="textarea textarea-bordered w-full" />
+                        <div className="form-control">
+                            <label className="label">
+            <span className="label-text font-semibold">
+              {profile.role === 'specialist' ? 'О себе' : 'О нас'}
+            </span>
+                            </label>
+                            <textarea
+                                name="about"
+                                value={form.about}
+                                onChange={handleChange}
+                                className="textarea textarea-bordered w-full opacity-75"
+                                placeholder={profile.role === 'specialist' ? 'О себе' : 'О нас'}
+                            />
+                        </div>
                     )}
 
                     {profile.role === 'organization' && (
                         <>
-                            <input name="website" value={form.website} onChange={handleChange} placeholder="Сайт" className="input input-bordered w-full" />
-                            <input name="address" value={form.address} onChange={handleChange} placeholder="Адрес" className="input input-bordered w-full" />
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">Сайт</span>
+                                </label>
+                                <input
+                                    name="website"
+                                    value={form.website}
+                                    onChange={handleChange}
+                                    className="input input-bordered w-full opacity-75 "
+                                    placeholder="Сайт"
+                                />
+                            </div>
+
+                            <div className="form-control">
+                                <label className="label">
+                                    <span className="label-text font-semibold">Адрес</span>
+                                </label>
+                                <input
+                                    name="address"
+                                    value={form.address}
+                                    onChange={handleChange}
+                                    className="input input-bordered w-full opacity-75 "
+                                    placeholder="Адрес"
+                                />
+                            </div>
                         </>
                     )}
 
                     {profile.role === 'specialist' && (
-                        <input name="experience_years" value={form.experience_years} onChange={handleChange} placeholder="Опыт (лет)" type="number" className="input input-bordered w-full" />
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text font-semibold">Опыт (лет)</span>
+                            </label>
+                            <input
+                                name="experience_years"
+                                value={form.experience_years}
+                                onChange={handleChange}
+                                type="number"
+                                className="input input-bordered w-full opacity-75 "
+                                placeholder="Опыт (лет)"
+                            />
+                        </div>
                     )}
 
                     {error && <div className="text-error text-sm">{error}</div>}
 
-                    <div className="flex justify-end gap-4">
-                        <button type="button" className="btn" onClick={onClose}>Отмена</button>
-                        <button type="submit" className="btn btn-primary" disabled={loading}>
-                            {loading ? 'Сохраняем...' : 'Сохранить'}
+                    <div className="flex justify-end gap-3 pt-2">
+                        <button
+                            type="button"
+                            className="btn btn-ghost bg-opacity-5 hover:bg-opacity-10"
+                            onClick={onClose}
+                        >
+                            Отмена
+                        </button>
+                        <button
+                            type="submit"
+                            className="btn bg-opacity-10 hover:bg-opacity-20"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <span className="flex items-center justify-center gap-2">
+              <span className="loading loading-spinner loading-sm"></span>
+              Сохраняем...
+            </span>
+                            ) : 'Сохранить'}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+
     );
 };

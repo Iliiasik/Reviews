@@ -6,7 +6,7 @@ import { Step3 } from './Step3';
 import { StepsMockup } from './StepsMockup';
 import { useToast } from '../lib/useToast';
 import { validateStep } from '../lib/useStepValidator';
-import type {StepFormData} from "@features/register/types/StepForm.ts";
+import type { StepFormData } from "@features/register/types/StepForm.ts";
 
 interface StepFormProps {
     accountType: 'user' | 'specialist' | 'organization' | null;
@@ -21,14 +21,16 @@ interface StepFormProps {
 }
 
 export const RegisterStepsForm: React.FC<StepFormProps> = ({
-                                                  accountType,
-                                                  formData,
-                                                  handleChange,
-                                                  handleSubmit,
-                                                  onBack,
-                                                  formStep,
-                                                  setFormStep
-                                              }) => {
+                                                               accountType,
+                                                               formData,
+                                                               handleChange,
+                                                               handleSubmit,
+                                                               onBack,
+                                                               formStep,
+                                                               setFormStep,
+                                                               error,
+                                                               loading,
+                                                           }) => {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const toast = useToast();
 
@@ -128,11 +130,30 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                                     avatarPreview={avatarPreview}
                                     handleAvatarChange={handleAvatarChange}
                                     onBack={handleBack}
+                                    loading={loading}
                                 />
                             )}
                         </motion.div>
                     </AnimatePresence>
 
+                    {error && (
+                        <div className="alert alert-error shadow-md mt-2 mb-3 max-w-md mx-auto py-1.5 px-3 rounded-md flex items-center gap-2 text-xs">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="stroke-current flex-shrink-0 h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
+                                />
+                            </svg>
+                            <span>{error}</span>
+                        </div>
+                    )}
                     <div className="w-full flex flex-col items-center mb-6">
                         <div className="w-full max-w-md h-1 bg-base-300 rounded-full overflow-hidden">
                             <div

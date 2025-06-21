@@ -11,7 +11,6 @@ const Navbar: React.FC = () => {
                 </Link>
             </div>
             <div className="flex-none lg:hidden">
-                {/* Мобильное меню */}
                 <div className="dropdown dropdown-end">
                     <label tabIndex={0} className="btn btn-ghost btn-circle">
                         <svg

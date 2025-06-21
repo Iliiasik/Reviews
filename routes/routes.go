@@ -21,5 +21,7 @@ func RegisterRoutes(r *gin.Engine) {
 		api.GET("/confirm-email", auth.ConfirmEmailHandler(database.DB))
 		api.POST("/profile/update", controllers.UpdateProfileHandler(database.DB))
 
+		api.GET("/search", controllers.SearchHandler(database.DB))
+		api.GET("/explore", controllers.ExploreHandler(database.DB))
 	}
 }

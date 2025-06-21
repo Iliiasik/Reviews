@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"reviews-back/controllers/auth"
 	"reviews-back/models"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ func GetProfileHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		claims, err := ValidateJWT(token)
+		claims, err := auth.ValidateJWT(token)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Невалидный токен"})
 			return
@@ -62,7 +63,7 @@ func UpdateProfileHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		claims, err := ValidateJWT(token)
+		claims, err := auth.ValidateJWT(token)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Невалидный токен"})
 			return

@@ -5,7 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
-	"reviews-back/controllers"
+	"reviews-back/controllers/auth"
 	"reviews-back/database"
 	"reviews-back/routes"
 )
@@ -16,8 +16,8 @@ func main() {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	controllers.JwtKey = []byte(os.Getenv("JWT_SECRET"))
-	if len(controllers.JwtKey) == 0 {
+	auth.JwtKey = []byte(os.Getenv("JWT_SECRET"))
+	if len(auth.JwtKey) == 0 {
 		log.Fatal("JWT_SECRET is not set in .env")
 	}
 

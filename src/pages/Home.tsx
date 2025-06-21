@@ -2,7 +2,7 @@ import { MainLayout } from '@widgets/layout/MainLayout';
 import  Hero  from '@features/home/ui/Hero';
 import  Faq  from '@features/home/ui/Faq';
 import { SearchBar } from '@features/search/ui/SearchBar';
-import { SearchResultsSkeleton } from '@features/search/ui/SearchResultsSkeleton';
+import { MainHomeCards } from '@features/search/ui/MainHomeCards.tsx';
 
 export const Home = () => {
     return (
@@ -13,7 +13,7 @@ export const Home = () => {
                 <p className="mb-6">Найдите специалиста или организацию и оставьте отзыв</p>
 
                 <SearchBar />
-                <SearchResultsSkeleton />
+                <MainHomeCards />
             </main>
             <Faq />
         </MainLayout>

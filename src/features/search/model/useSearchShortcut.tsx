@@ -7,13 +7,14 @@ export const useSearchShortcut = () => {
         const handleKeyDown = (event: KeyboardEvent) => {
             const isMac = navigator.platform.toUpperCase().includes('MAC');
             const isSearchShortcut =
-                (isMac && event.metaKey && event.altKey && event.key.toLowerCase() === 'k') ||
-                (!isMac && event.ctrlKey && event.altKey && event.key.toLowerCase() === 'k');
+                (isMac && event.metaKey && event.altKey && event.code === 'KeyK') ||
+                (!isMac && event.ctrlKey && event.altKey && event.code === 'KeyK');
 
-            if (isSearchShortcut) {
-                const activeTag = document.activeElement?.tagName;
-                if (['INPUT', 'TEXTAREA'].includes(activeTag ?? '') || (document.activeElement as HTMLElement)?.isContentEditable) return;
-
+            const activeTag = document.activeElement?.tagName;
+            if (isSearchShortcut &&
+                !['INPUT', 'TEXTAREA'].includes(activeTag ?? '') &&
+                !(document.activeElement as HTMLElement)?.isContentEditable
+            ) {
                 event.preventDefault();
                 searchInputRef.current?.focus();
             }

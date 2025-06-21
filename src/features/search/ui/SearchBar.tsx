@@ -1,27 +1,43 @@
+// SearchBar.tsx
 import { useSearchShortcut } from '../model/useSearchShortcut';
+import { useSearch } from '@features/search/lib/useSearch';
+import { SearchResultsDropdown } from '@features/search/ui/SearchResultDropdown';
+import { SearchInput } from '@features/search/ui/SearchInput';
 
 export const SearchBar = () => {
-    const searchInputRef = useSearchShortcut();
+    const searchInputRef = useSearchShortcut(); // тип — RefObject<HTMLInputElement | null>
+    const {
+        query,
+        results,
+        isFocused,
+        setQuery,
+        setIsFocused,
+    } = useSearch();
 
     return (
-        <div className="w-full px-4 mb-10">
-            <label className="input input-bordered w-full flex items-center gap-2">
-                <svg className="h-5 w-5 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.3-4.3"></path>
-                    </g>
-                </svg>
-                <input
-                    ref={searchInputRef}
-                    type="search"
-                    className="grow"
-                    placeholder="Введите имя врача, специализацию или район"
+        <div className="w-full px-4 mb-10 relative max-w-2xl">
+            <SearchInput
+                value={query}
+                onChange={setQuery}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                inputRef={searchInputRef}
+            />
+
+            {isFocused && results.length > 0 && (
+                <SearchResultsDropdown
+                    results={results}
+                    onSelect={(id) => {
+                        console.log('Переход к ID:', id);
+                    }}
                 />
-                <kbd className="kbd kbd-sm">ctrl</kbd>
-                <kbd className="kbd kbd-sm">alt</kbd>
-                <kbd className="kbd kbd-sm">K</kbd>
-            </label>
+            )}
+
+            {isFocused && results.length === 0 && query.length > 0 && (
+                <div className="absolute top-full z-50 mt-1 text-gray-700 text-sm bg-white border rounded-md shadow p-3 w-full">
+                    Ничего не найдено
+                </div>
+            )}
         </div>
     );
 };

@@ -4,7 +4,7 @@ import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 import { Step3 } from './Step3';
 import { StepsMockup } from './StepsMockup';
-import { useToast } from '../lib/useToast';
+import { useWarnToast } from '../lib/useWarnToast.ts';
 import { validateStep } from '../lib/useStepValidator';
 import type { StepFormData } from "@features/register/types/StepForm.ts";
 
@@ -32,7 +32,7 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                                                                loading,
                                                            }) => {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-    const toast = useToast();
+    const toast = useWarnToast();
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

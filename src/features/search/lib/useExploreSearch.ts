@@ -12,12 +12,11 @@ export const useExploreSearch = () => {
 
     useEffect(() => {
         fetchExploreData(type, null, page, limit).then((data) => {
-            setResults(data.results);
-            setTotalPages(Math.ceil(data.total / limit));
+            setResults(data?.results ?? []);
+            setTotalPages(Math.ceil((data?.total ?? 0) / limit));
         });
     }, [page, type]);
 
-    // 🔽 Фронтенд-фильтрация по округлённому рейтингу
     const filteredResults = results.filter((item) => {
         if (rating === null) return true;
         return Math.round(item.rating) === rating;

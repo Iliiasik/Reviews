@@ -9,6 +9,8 @@ export const useRegister = () => {
     const [accountType, setAccountType] = useState<'user' | 'specialist' | 'organization' | null>(null);
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     const [formData, setFormData] = useState({
         username: '',
@@ -48,8 +50,14 @@ export const useRegister = () => {
                 experience_years: formData.experienceYears ? parseInt(formData.experienceYears) : undefined,
             };
 
-            await register(payload);
-            navigate('/profile', { state: { registerSuccess: true } });
+            const response = await register(payload);
+
+            setToastMessage(response.message || 'Регистрация прошла успешно');
+            setShowToast(true);
+
+            setTimeout(() => {
+                navigate('/login');
+            }, 3000);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Ошибка регистрации');
         } finally {
@@ -64,6 +72,9 @@ export const useRegister = () => {
         formData,
         error,
         loading,
+        showToast,
+        toastMessage,
+        setShowToast,
         handleAccountTypeSelect,
         handleBackToType,
         handleChange,

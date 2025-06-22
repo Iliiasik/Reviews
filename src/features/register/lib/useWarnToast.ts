@@ -1,4 +1,4 @@
-export const useToast = () => {
+export const useWarnToast = () => {
     return (message: string) => {
         const toast = document.createElement("div");
         toast.className = "toast toast-center z-50 bottom-14";

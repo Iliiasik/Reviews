@@ -1,4 +1,3 @@
-// lib/useSearch.ts
 import { useState, useEffect } from 'react';
 import { useDebounce } from './useDebounce';
 import { fetchSearchResults } from '../api/search';

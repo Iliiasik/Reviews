@@ -18,6 +18,7 @@ interface RegisterResponse {
         username: string;
         account_type: string;
     };
+    message?: string;
 }
 
 export const register = async (payload: RegisterPayload): Promise<RegisterResponse> => {

@@ -1,3 +1,13 @@
+export class LoginError extends Error {
+    code?: string;
+
+    constructor(message: string, code?: string) {
+        super(message);
+        this.name = 'LoginError';
+        this.code = code;
+    }
+}
+
 export const login = async (credentials: { username: string; password: string }) => {
     const response = await fetch('/api/login', {
         method: 'POST',
@@ -7,7 +17,7 @@ export const login = async (credentials: { username: string; password: string })
 
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Ошибка авторизации');
+        throw new LoginError(error.error || 'Ошибка авторизации', error.error_code);
     }
 
     return response.json();

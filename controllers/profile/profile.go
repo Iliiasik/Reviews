@@ -1,4 +1,4 @@
-package controllers
+package profile
 
 import (
 	"net/http"

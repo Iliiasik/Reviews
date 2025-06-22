@@ -244,3 +244,38 @@ func confirmEmailByToken(db *gorm.DB, token string) error {
 	}
 	return nil
 }
+
+func ResendConfirmationHandler(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req struct {
+			Username string `json:"username" binding:"required"`
+		}
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "username обязателен"})
+			return
+		}
+
+		// Найти пользователя
+		var user models.User
+		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Пользователь не найден"})
+			return
+		}
+
+		// Удалить старую запись confirmation (если есть)
+		db.Where("user_id = ?", user.ID).Delete(&models.Confirmation{})
+
+		// Создать новую запись подтверждения
+		confirmation, err := createConfirmation(db, user.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось создать подтверждение"})
+			return
+		}
+
+		// Отправить письмо
+		go sendConfirmationEmail(user, confirmation.Token) // асинхронно
+
+		c.JSON(http.StatusOK, gin.H{"message": "Письмо с подтверждением отправлено"})
+	}
+}

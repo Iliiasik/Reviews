@@ -84,6 +84,19 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// Проверка подтверждения email
+	var confirmation models.Confirmation
+	if err := database.DB.Where("user_id = ?", user.ID).First(&confirmation).Error; err == nil {
+		if !confirmation.EmailConfirmed {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error":      "Подтвердите почту, чтобы войти в профиль",
+				"error_code": "EMAIL_NOT_CONFIRMED",
+			})
+			return
+		}
+	}
+
+	// Генерация JWT токена
 	token, err := GenerateJWT(user.ID, user.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка генерации токена"})

@@ -36,6 +36,7 @@ type OrganizationProfile struct {
 	Website     string    `json:"website" gorm:"type:varchar(100)"`
 	Address     string    `json:"address" gorm:"type:varchar(200)"`
 	About       string    `json:"about" gorm:"type:text"`
+	Rating      float64   `json:"rating" gorm:"default:0"`
 	IsConfirmed bool      `json:"is_confirmed" gorm:"default:false"`
 	CreatedAt   time.Time `json:"created_at"`
 }

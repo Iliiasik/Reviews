@@ -1,5 +1,4 @@
 interface AvatarUploadResponse {
-    upload_url: string;
     avatar_url: string;
     error?: string;
 }

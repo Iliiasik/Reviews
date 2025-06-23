@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../api/register';
+import { register as apiRegister, type RegisterPayload } from '../api/register';
 import { uploadAvatar } from '../api/avatar';
 
 interface RegisterFormData {
@@ -91,22 +91,23 @@ export const useRegister = () => {
             }
 
             // Подготовка данных для регистрации
-            const payload = {
+            const ext = avatarFile ? `.${avatarFile.name.split('.').pop()?.toLowerCase() || 'jpg'}` : undefined;
+            const payload: RegisterPayload = {
                 ...formData,
                 account_type: accountType,
                 experience_years: formData.experienceYears ? parseInt(formData.experienceYears) : undefined,
-                avatar_ext: avatarFile ? `.${avatarFile.name.split('.').pop()?.toLowerCase() || 'jpg'}` : undefined,
+                avatar_ext: ext,
             };
 
             // 1. Регистрация пользователя
-            const response = await register(payload);
+            const registerResponse = await apiRegister(payload);
 
-            // 2. Если есть аватар, загружаем его после успешной регистрации
-            if (avatarFile) {
-                await uploadAvatar(response.user.id, accountType, avatarFile);
+            // 2. Если есть аватар, загружаем его
+            if (avatarFile && registerResponse.user.id) {
+                await uploadAvatar(registerResponse.user.id, accountType, avatarFile);
             }
 
-            setToastMessage(response.message || 'Регистрация прошла успешно');
+            setToastMessage(registerResponse.message || 'Регистрация прошла успешно');
             setShowToast(true);
 
             setTimeout(() => {

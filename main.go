@@ -8,6 +8,7 @@ import (
 	"reviews-back/controllers/auth"
 	"reviews-back/database"
 	"reviews-back/routes"
+	"reviews-back/storage"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 	}
 
 	database.InitDB()
-	//storage.InitMinio()
+	storage.InitMinio()
 
 	r := gin.Default()
 	routes.RegisterRoutes(r)

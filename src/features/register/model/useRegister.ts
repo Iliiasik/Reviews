@@ -1,22 +1,11 @@
 import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register as apiRegister } from '../api/register';
-import { uploadAvatar } from '../api/avatar';
-
-interface RegisterFormData {
-    username: string;
-    password: string;
-    name: string;
-    email: string;
-    phone: string;
-    experienceYears: string;
-    about: string;
-    website: string;
-    address: string;
-}
+import { useWarnToast } from '../lib/useWarnToast';
 
 export const useRegister = () => {
     const navigate = useNavigate();
+    const toast = useWarnToast();
     const [step, setStep] = useState<1 | 2>(1);
     const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
     const [accountType, setAccountType] = useState<'user' | 'specialist' | 'organization' | null>(null);
@@ -27,7 +16,7 @@ export const useRegister = () => {
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-    const [formData, setFormData] = useState<RegisterFormData>({
+    const [formData, setFormData] = useState({
         username: '',
         password: '',
         name: '',
@@ -57,6 +46,7 @@ export const useRegister = () => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
 
+            // Валидация файла
             if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
                 setError('Только JPG/PNG изображения');
                 return;
@@ -70,6 +60,7 @@ export const useRegister = () => {
             setAvatarFile(file);
             setError('');
 
+            // Превью аватара
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target?.result) {
@@ -86,34 +77,50 @@ export const useRegister = () => {
         setLoading(true);
 
         try {
-            if (!accountType) throw new Error('Выберите тип аккаунта');
-
-            // Подготовка данных
-            const payload = {
-                ...formData,
-                account_type: accountType,
-                experience_years: formData.experienceYears ? parseInt(formData.experienceYears) : undefined,
-                avatar_ext: avatarFile ? `.${avatarFile.name.split('.').pop()?.toLowerCase()}` : undefined,
-            };
-
-            // 1. Регистрация
-            const response = await apiRegister(payload);
-
-            // 2. Загрузка аватара
-            if (avatarFile && response.user_id) {
-                await uploadAvatar(
-                    response.user_id.toString(),
-                    accountType,
-                    avatarFile
-                );
+            if (!accountType) {
+                throw new Error('Выберите тип аккаунта');
             }
+
+            // Создаем FormData
+            const formDataToSend = new FormData();
+
+            // Добавляем основные поля
+            formDataToSend.append('username', formData.username);
+            formDataToSend.append('password', formData.password);
+            formDataToSend.append('name', formData.name);
+            formDataToSend.append('email', formData.email);
+            formDataToSend.append('phone', formData.phone);
+            formDataToSend.append('account_type', accountType);
+
+            // Добавляем опциональные поля
+            if (formData.experienceYears) {
+                formDataToSend.append('experience_years', formData.experienceYears);
+            }
+            if (formData.about) {
+                formDataToSend.append('about', formData.about);
+            }
+            if (formData.website) {
+                formDataToSend.append('website', formData.website);
+            }
+            if (formData.address) {
+                formDataToSend.append('address', formData.address);
+            }
+
+            // Добавляем аватар, если есть
+            if (avatarFile) {
+                formDataToSend.append('avatar', avatarFile);
+            }
+
+            // Отправляем запрос
+            const response = await apiRegister(formDataToSend);
 
             setToastMessage(response.message || 'Регистрация успешна');
             setShowToast(true);
             setTimeout(() => navigate('/login'), 2000);
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Ошибка');
+            setError(err instanceof Error ? err.message : 'Ошибка регистрации');
+            toast('Ошибка при регистрации');
         } finally {
             setLoading(false);
         }

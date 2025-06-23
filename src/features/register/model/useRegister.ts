@@ -84,7 +84,7 @@ export const useRegister = () => {
             // Создаем FormData
             const formDataToSend = new FormData();
 
-            // Добавляем основные поля
+            // Добавляем основные поля (обязательные для всех)
             formDataToSend.append('username', formData.username);
             formDataToSend.append('password', formData.password);
             formDataToSend.append('name', formData.name);
@@ -92,21 +92,33 @@ export const useRegister = () => {
             formDataToSend.append('phone', formData.phone);
             formDataToSend.append('account_type', accountType);
 
-            // Добавляем опциональные поля
-            if (formData.experienceYears) {
-                formDataToSend.append('experience_years', formData.experienceYears);
-            }
-            if (formData.about) {
-                formDataToSend.append('about', formData.about);
-            }
-            if (formData.website) {
-                formDataToSend.append('website', formData.website);
-            }
-            if (formData.address) {
-                formDataToSend.append('address', formData.address);
+            // Добавляем поля только для специалистов
+            if (accountType === 'specialist') {
+                if (formData.experienceYears) {
+                    const expYears = parseInt(formData.experienceYears);
+                    if (!isNaN(expYears)) {
+                        formDataToSend.append('experience_years', expYears.toString());
+                    }
+                }
+                if (formData.about) {
+                    formDataToSend.append('about', formData.about);
+                }
             }
 
-            // Добавляем аватар, если есть
+            // Добавляем поля только для организаций
+            if (accountType === 'organization') {
+                if (formData.website) {
+                    formDataToSend.append('website', formData.website);
+                }
+                if (formData.address) {
+                    formDataToSend.append('address', formData.address);
+                }
+                if (formData.about) {
+                    formDataToSend.append('about', formData.about);
+                }
+            }
+
+            // Добавляем аватар, если есть (для всех типов)
             if (avatarFile) {
                 formDataToSend.append('avatar', avatarFile);
             }
@@ -125,7 +137,6 @@ export const useRegister = () => {
             setLoading(false);
         }
     };
-
     return {
         step,
         formStep,

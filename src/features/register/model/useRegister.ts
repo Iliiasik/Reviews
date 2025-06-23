@@ -1,6 +1,19 @@
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../api/register.ts';
+import { register } from '../api/register';
+import { uploadAvatar } from '../api/avatar';
+
+interface RegisterFormData {
+    username: string;
+    password: string;
+    name: string;
+    email: string;
+    phone: string;
+    experienceYears: string;
+    about: string;
+    website: string;
+    address: string;
+}
 
 export const useRegister = () => {
     const navigate = useNavigate();
@@ -11,8 +24,10 @@ export const useRegister = () => {
     const [loading, setLoading] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<RegisterFormData>({
         username: '',
         password: '',
         name: '',
@@ -34,8 +49,35 @@ export const useRegister = () => {
         setAccountType(null);
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+
+            if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                setError('Поддерживаются только JPG и PNG изображения');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                setError('Размер изображения не должен превышать 5MB');
+                return;
+            }
+
+            setAvatarFile(file);
+            setError('');
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target?.result) {
+                    setAvatarPreview(event.target.result as string);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -44,13 +86,25 @@ export const useRegister = () => {
         setLoading(true);
 
         try {
+            if (!accountType) {
+                throw new Error('Тип аккаунта не выбран');
+            }
+
+            // Подготовка данных для регистрации
             const payload = {
                 ...formData,
-                account_type: accountType!,
+                account_type: accountType,
                 experience_years: formData.experienceYears ? parseInt(formData.experienceYears) : undefined,
+                avatar_ext: avatarFile ? `.${avatarFile.name.split('.').pop()?.toLowerCase() || 'jpg'}` : undefined,
             };
 
+            // 1. Регистрация пользователя
             const response = await register(payload);
+
+            // 2. Если есть аватар, загружаем его после успешной регистрации
+            if (avatarFile) {
+                await uploadAvatar(response.user.id, accountType, avatarFile);
+            }
 
             setToastMessage(response.message || 'Регистрация прошла успешно');
             setShowToast(true);
@@ -58,6 +112,7 @@ export const useRegister = () => {
             setTimeout(() => {
                 navigate('/login');
             }, 3000);
+
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Ошибка регистрации');
         } finally {
@@ -74,10 +129,12 @@ export const useRegister = () => {
         loading,
         showToast,
         toastMessage,
+        avatarPreview,
         setShowToast,
         handleAccountTypeSelect,
         handleBackToType,
         handleChange,
+        handleAvatarChange,
         handleSubmit,
         setFormStep,
     };

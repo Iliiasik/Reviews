@@ -5,6 +5,7 @@ interface RegisterPayload {
     email: string;
     phone: string;
     account_type: 'user' | 'specialist' | 'organization';
+    avatar_ext?: string;
     experience_years?: number;
     about?: string;
     website?: string;

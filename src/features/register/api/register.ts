@@ -13,13 +13,9 @@ export interface RegisterPayload {
 }
 
 export interface RegisterResponse {
-    token: string;
-    user: {
-        id: string;
-        username: string;
-        account_type: string;
-    };
-    message?: string;
+    message: string;
+    user_id: number;
+    avatar_upload_url?: string;
 }
 
 export const register = async (payload: RegisterPayload): Promise<RegisterResponse> => {

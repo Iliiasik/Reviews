@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register as apiRegister, type RegisterPayload } from '../api/register';
+import { register as apiRegister } from '../api/register';
 import { uploadAvatar } from '../api/avatar';
 
 interface RegisterFormData {
@@ -58,12 +58,12 @@ export const useRegister = () => {
             const file = e.target.files[0];
 
             if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
-                setError('Поддерживаются только JPG и PNG изображения');
+                setError('Только JPG/PNG изображения');
                 return;
             }
 
             if (file.size > 5 * 1024 * 1024) {
-                setError('Размер изображения не должен превышать 5MB');
+                setError('Максимальный размер 5MB');
                 return;
             }
 
@@ -86,36 +86,34 @@ export const useRegister = () => {
         setLoading(true);
 
         try {
-            if (!accountType) {
-                throw new Error('Тип аккаунта не выбран');
-            }
+            if (!accountType) throw new Error('Выберите тип аккаунта');
 
-            // Подготовка данных для регистрации
-            const ext = avatarFile ? `.${avatarFile.name.split('.').pop()?.toLowerCase() || 'jpg'}` : undefined;
-            const payload: RegisterPayload = {
+            // Подготовка данных
+            const payload = {
                 ...formData,
                 account_type: accountType,
                 experience_years: formData.experienceYears ? parseInt(formData.experienceYears) : undefined,
-                avatar_ext: ext,
+                avatar_ext: avatarFile ? `.${avatarFile.name.split('.').pop()?.toLowerCase()}` : undefined,
             };
 
-            // 1. Регистрация пользователя
-            const registerResponse = await apiRegister(payload);
+            // 1. Регистрация
+            const response = await apiRegister(payload);
 
-            // 2. Если есть аватар, загружаем его
-            if (avatarFile && registerResponse.user.id) {
-                await uploadAvatar(registerResponse.user.id, accountType, avatarFile);
+            // 2. Загрузка аватара
+            if (avatarFile && response.user_id) {
+                await uploadAvatar(
+                    response.user_id.toString(),
+                    accountType,
+                    avatarFile
+                );
             }
 
-            setToastMessage(registerResponse.message || 'Регистрация прошла успешно');
+            setToastMessage(response.message || 'Регистрация успешна');
             setShowToast(true);
-
-            setTimeout(() => {
-                navigate('/login');
-            }, 3000);
+            setTimeout(() => navigate('/login'), 2000);
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Ошибка регистрации');
+            setError(err instanceof Error ? err.message : 'Ошибка');
         } finally {
             setLoading(false);
         }

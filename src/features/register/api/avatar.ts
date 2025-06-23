@@ -1,13 +1,8 @@
-interface AvatarUploadResponse {
-    avatar_url: string;
-    error?: string;
-}
-
 export const uploadAvatar = async (
     userId: string,
     accountType: 'user' | 'specialist' | 'organization',
     file: File
-): Promise<AvatarUploadResponse> => {
+): Promise<void> => {
     const formData = new FormData();
     formData.append('avatar', file);
 
@@ -18,8 +13,6 @@ export const uploadAvatar = async (
 
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Ошибка при загрузке аватара');
+        throw new Error(error.error || 'Ошибка загрузки аватара');
     }
-
-    return response.json();
 };

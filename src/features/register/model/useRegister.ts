@@ -137,5 +137,6 @@ export const useRegister = () => {
         handleAvatarChange,
         handleSubmit,
         setFormStep,
+
     };
 };

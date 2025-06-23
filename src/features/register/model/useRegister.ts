@@ -1,3 +1,4 @@
+// useRegister.ts
 import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register as apiRegister } from '../api/register';
@@ -46,7 +47,6 @@ export const useRegister = () => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
 
-            // Валидация файла
             if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
                 setError('Только JPG/PNG изображения');
                 return;
@@ -60,7 +60,6 @@ export const useRegister = () => {
             setAvatarFile(file);
             setError('');
 
-            // Превью аватара
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target?.result) {
@@ -77,14 +76,9 @@ export const useRegister = () => {
         setLoading(true);
 
         try {
-            if (!accountType) {
-                throw new Error('Выберите тип аккаунта');
-            }
+            if (!accountType) throw new Error('Выберите тип аккаунта');
 
-            // Создаем FormData для всех данных
             const formDataToSend = new FormData();
-
-            // Основные обязательные поля
             formDataToSend.append('username', formData.username);
             formDataToSend.append('password', formData.password);
             formDataToSend.append('name', formData.name);
@@ -92,41 +86,31 @@ export const useRegister = () => {
             formDataToSend.append('phone', formData.phone);
             formDataToSend.append('account_type', accountType);
 
-            // Добавляем аватар, если есть
             if (avatarFile) {
                 formDataToSend.append('avatar', avatarFile);
             }
 
-            // Специфичные поля для специалиста
             if (accountType === 'specialist') {
-                if (formData.experienceYears) {
+                if (formData.experienceYears)
                     formDataToSend.append('experience_years', formData.experienceYears);
-                }
-                if (formData.about) {
+                if (formData.about)
                     formDataToSend.append('about', formData.about);
-                }
             }
 
-            // Специфичные поля для организации
             if (accountType === 'organization') {
-                if (formData.website) {
+                if (formData.website)
                     formDataToSend.append('website', formData.website);
-                }
-                if (formData.address) {
+                if (formData.address)
                     formDataToSend.append('address', formData.address);
-                }
-                if (formData.about) {
+                if (formData.about)
                     formDataToSend.append('about', formData.about);
-                }
             }
 
-            // Используем ваш существующий API метод
             const response = await apiRegister(formDataToSend);
 
             setToastMessage(response.message || 'Регистрация успешна');
             setShowToast(true);
             setTimeout(() => navigate('/login'), 2000);
-
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Ошибка регистрации');
             toast('Ошибка при регистрации');
@@ -145,6 +129,7 @@ export const useRegister = () => {
         showToast,
         toastMessage,
         avatarPreview,
+        setAvatarPreview,
         setShowToast,
         handleAccountTypeSelect,
         handleBackToType,

@@ -2,6 +2,7 @@ import { useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register as apiRegister } from '../api/register';
 import { useWarnToast } from '../lib/useWarnToast';
+import {uploadAvatar} from "@features/register/api/avatar.ts";
 
 export const useRegister = () => {
     const navigate = useNavigate();
@@ -81,10 +82,8 @@ export const useRegister = () => {
                 throw new Error('Выберите тип аккаунта');
             }
 
-            // Создаем FormData
+            // Создаем FormData только для основных данных
             const formDataToSend = new FormData();
-
-            // Добавляем основные поля (обязательные для всех)
             formDataToSend.append('username', formData.username);
             formDataToSend.append('password', formData.password);
             formDataToSend.append('name', formData.name);
@@ -92,20 +91,16 @@ export const useRegister = () => {
             formDataToSend.append('phone', formData.phone);
             formDataToSend.append('account_type', accountType);
 
-            // Добавляем поля только для специалистов
+            // Добавляем дополнительные поля в зависимости от типа аккаунта
             if (accountType === 'specialist') {
                 if (formData.experienceYears) {
-                    const expYears = parseInt(formData.experienceYears);
-                    if (!isNaN(expYears)) {
-                        formDataToSend.append('experience_years', expYears.toString());
-                    }
+                    formDataToSend.append('experience_years', formData.experienceYears);
                 }
                 if (formData.about) {
                     formDataToSend.append('about', formData.about);
                 }
             }
 
-            // Добавляем поля только для организаций
             if (accountType === 'organization') {
                 if (formData.website) {
                     formDataToSend.append('website', formData.website);
@@ -118,13 +113,16 @@ export const useRegister = () => {
                 }
             }
 
-            // Добавляем аватар, если есть (для всех типов)
-            if (avatarFile) {
-                formDataToSend.append('avatar', avatarFile);
-            }
-
-            // Отправляем запрос
             const response = await apiRegister(formDataToSend);
+
+            if (avatarFile) {
+                try {
+                    await uploadAvatar(response.user_id.toString(), accountType, avatarFile);
+                } catch (uploadError) {
+                    console.error('Ошибка загрузки аватара:', uploadError);
+                    // Можно продолжить, даже если аватар не загрузился
+                }
+            }
 
             setToastMessage(response.message || 'Регистрация успешна');
             setShowToast(true);

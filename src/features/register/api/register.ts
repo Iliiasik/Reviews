@@ -8,7 +8,6 @@ export const register = async (formData: FormData): Promise<RegisterResponse> =>
     const response = await fetch('/api/register', {
         method: 'POST',
         body: formData,
-        // Не устанавливаем Content-Type вручную - браузер сам добавит с boundary
     });
 
     if (!response.ok) {

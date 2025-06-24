@@ -9,10 +9,11 @@ import (
 )
 
 type ExploreResult struct {
-	ID     uint    `json:"id"`
-	Name   string  `json:"name"`
-	Type   string  `json:"type"`
-	Rating float64 `json:"rating"`
+	ID          uint    `json:"id"`
+	Name        string  `json:"name"`
+	Type        string  `json:"type"`
+	Rating      float64 `json:"rating"`
+	IsConfirmed bool    `json:"is_confirmed"`
 }
 
 type ExploreResponse struct {
@@ -22,7 +23,6 @@ type ExploreResponse struct {
 	HasMore bool            `json:"hasMore"`
 }
 
-// Основной обработчик
 func ExploreHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		params, err := parseQueryParams(c)
@@ -50,7 +50,6 @@ type ExploreQuery struct {
 	Offset int
 }
 
-// Чтение параметров и валидация
 func parseQueryParams(c *gin.Context) (*ExploreQuery, error) {
 	queryType := strings.ToLower(c.DefaultQuery("type", "all"))
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -80,24 +79,25 @@ func parseQueryParams(c *gin.Context) (*ExploreQuery, error) {
 		Offset: offset,
 	}, nil
 }
+
 func queryExploreResults(db *gorm.DB, q *ExploreQuery) ([]ExploreResult, int64) {
 	var results []ExploreResult
 	var total int64
 	tx := db.Session(&gorm.Session{})
 
 	specQuery := tx.Table("users").
-		Select("users.id, users.name, 'specialist' as type, specialist_profiles.rating").
-		Joins("JOIN specialist_profiles ON users.id = specialist_profiles.user_id").
-		Where("specialist_profiles.is_confirmed = true")
-
+		Select("users.id, users.name, 'specialist' as type, specialist_profiles.rating, specialist_profiles.is_confirmed").
+		Joins("JOIN specialist_profiles ON users.id = specialist_profiles.user_id")
 	if q.Rating != nil {
 		specQuery = specQuery.Where("specialist_profiles.rating >= ?", *q.Rating)
 	}
 
 	orgQuery := tx.Table("users").
-		Select("users.id, users.name, 'organization' as type, 0 as rating").
-		Joins("JOIN organization_profiles ON users.id = organization_profiles.user_id").
-		Where("organization_profiles.is_confirmed = true")
+		Select("users.id, users.name, 'organization' as type, organization_profiles.rating, organization_profiles.is_confirmed").
+		Joins("JOIN organization_profiles ON users.id = organization_profiles.user_id")
+	if q.Rating != nil {
+		orgQuery = orgQuery.Where("organization_profiles.rating >= ?", *q.Rating)
+	}
 
 	switch q.Type {
 	case "specialist":
@@ -110,47 +110,45 @@ func queryExploreResults(db *gorm.DB, q *ExploreQuery) ([]ExploreResult, int64) 
 		subSQL := `
 			(SELECT users.id FROM users
 			JOIN specialist_profiles ON users.id = specialist_profiles.user_id
-			WHERE specialist_profiles.is_confirmed = true
-			` + ratingCondition(q) + `)
+			` + ratingCondition(q, "specialist_profiles") + `)
 			UNION ALL
 			(SELECT users.id FROM users
 			JOIN organization_profiles ON users.id = organization_profiles.user_id
-			WHERE organization_profiles.is_confirmed = true)
+			` + ratingCondition(q, "organization_profiles") + `)
 		`
-		countArgs := ratingArgs(q)
+		countArgs := ratingArgsUnion(q)
 		db.Raw("SELECT COUNT(*) FROM ("+subSQL+") AS total", countArgs...).Scan(&total)
 
 		unionSQL := `
-			(SELECT users.id, users.name, 'specialist' AS type, specialist_profiles.rating
+			(SELECT users.id, users.name, 'specialist' AS type, specialist_profiles.rating, specialist_profiles.is_confirmed
 			FROM users
 			JOIN specialist_profiles ON users.id = specialist_profiles.user_id
-			WHERE specialist_profiles.is_confirmed = true
-			` + ratingCondition(q) + `)
+			` + ratingCondition(q, "specialist_profiles") + `)
 			UNION ALL
-			(SELECT users.id, users.name, 'organization' AS type, 0
+			(SELECT users.id, users.name, 'organization' AS type, organization_profiles.rating, organization_profiles.is_confirmed
 			FROM users
 			JOIN organization_profiles ON users.id = organization_profiles.user_id
-			WHERE organization_profiles.is_confirmed = true)
+			` + ratingCondition(q, "organization_profiles") + `)
 			ORDER BY name ASC
 			LIMIT ? OFFSET ?
 		`
-		args := append(ratingArgs(q), q.Limit, q.Offset)
+		args := append(ratingArgsUnion(q), q.Limit, q.Offset)
 		db.Raw(unionSQL, args...).Scan(&results)
 	}
 
 	return results, total
 }
 
-func ratingCondition(q *ExploreQuery) string {
+func ratingCondition(q *ExploreQuery, table string) string {
 	if q.Rating != nil {
-		return " AND specialist_profiles.rating >= ?"
+		return " WHERE " + table + ".rating >= ?"
 	}
 	return ""
 }
 
-func ratingArgs(q *ExploreQuery) []interface{} {
+func ratingArgsUnion(q *ExploreQuery) []interface{} {
 	if q.Rating != nil {
-		return []interface{}{*q.Rating}
+		return []interface{}{*q.Rating, *q.Rating}
 	}
 	return []interface{}{}
 }

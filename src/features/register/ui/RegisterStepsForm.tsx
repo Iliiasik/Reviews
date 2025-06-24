@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+// RegisterStepsForm.tsx
+import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 import { Step3 } from './Step3';
 import { StepsMockup } from './StepsMockup';
-import { useWarnToast } from '../lib/useWarnToast.ts';
+import { useWarnToast } from '../lib/useWarnToast';
 import { validateStep } from '../lib/useStepValidator';
-import type { StepFormData } from "@features/register/types/StepForm.ts";
+import type { StepFormData } from '@features/register/types/StepForm';
 
 interface StepFormProps {
     accountType: 'user' | 'specialist' | 'organization' | null;
@@ -18,6 +19,9 @@ interface StepFormProps {
     setFormStep: (step: 1 | 2 | 3) => void;
     error?: string;
     loading?: boolean;
+    avatarPreview: string | null; //
+    handleAvatarChange: (e: React.ChangeEvent<HTMLInputElement>) => void; //
+    setAvatarPreview: (value: string | null) => void; //
 }
 
 export const RegisterStepsForm: React.FC<StepFormProps> = ({
@@ -30,19 +34,10 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                                                                setFormStep,
                                                                error,
                                                                loading,
+                                                               avatarPreview,
+                                                               handleAvatarChange,
                                                            }) => {
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const toast = useWarnToast();
-
-    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setAvatarPreview(reader.result as string);
-            reader.readAsDataURL(file);
-        }
-        handleChange(e);
-    };
 
     const handleNext = () => {
         if (!validateStep(formStep, formData, accountType)) {

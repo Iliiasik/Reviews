@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { RegisterTypeSelect } from './RegisterTypeSelect.tsx';
 import { RegisterStepsForm } from './RegisterStepsForm.tsx';
 import { useRegister } from '../model/useRegister.ts';
-import  Toast  from '@shared/ui/Toast';
+import Toast from '@shared/ui/Toast';
 
 export const RegisterForm = () => {
     const {
@@ -20,6 +20,9 @@ export const RegisterForm = () => {
         handleChange,
         handleSubmit,
         setFormStep,
+        avatarPreview,                // добавлено
+        handleAvatarChange,          // добавлено
+        setAvatarPreview,            // добавлено
     } = useRegister();
 
     return (
@@ -74,6 +77,9 @@ export const RegisterForm = () => {
                             setFormStep={setFormStep}
                             error={error}
                             loading={loading}
+                            avatarPreview={avatarPreview}
+                            handleAvatarChange={handleAvatarChange}
+                            setAvatarPreview={setAvatarPreview}
                         />
                     </motion.div>
                 )}

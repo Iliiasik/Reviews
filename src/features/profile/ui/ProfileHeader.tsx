@@ -10,7 +10,7 @@ export const ProfileHeader = ({ profile, activeTab, onTabChange }: ProfileHeader
             <div className="avatar">
                 <div className="w-24 md:w-32 rounded-full overflow-hidden ring ring-primary ring-offset-base-100 ring-offset-2">
                     <img
-                        src="https://api.dicebear.com/7.x/initials/svg?seed=user"
+                        src={profile?.avatar_url || "https://api.dicebear.com/7.x/initials/svg?seed=user"}
                         alt="Аватар"
                     />
                 </div>

@@ -5,6 +5,9 @@ import { Profile } from '@pages/Profile';
 import NotFound from '@pages/NotFound';
 import { Register } from "@pages/Register.tsx";
 import ConfirmEmail from "@pages/ConfirmEmail.tsx";
+import {SpecialistProfile} from "@pages/SpecialistProfile.tsx";
+import {OrganizationProfile} from "@pages/OrganisationProfile.tsx";
+import {AddReviewPage} from "@pages/AddReviewPage.tsx";
 
 function App() {
     return (
@@ -16,6 +19,10 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/confirm-email" element={<ConfirmEmail />} />
                 <Route path="*" element={<NotFound />} />
+                <Route path="/specialist/:id" element={<SpecialistProfile />} />
+                <Route path="/organization/:id" element={<OrganizationProfile />} />
+                <Route path="/specialist/:id/add-review" element={<AddReviewPage />} />
+
             </Routes>
         </BrowserRouter>
     );

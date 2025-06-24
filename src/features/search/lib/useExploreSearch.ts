@@ -1,29 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { fetchExploreData } from '@features/search/api/explore';
 import type { ExploreResult } from '@features/search/types/ExploreResult';
 
 export const useExploreSearch = () => {
-    const [results, setResults] = useState<ExploreResult[]>([]);
+    const [rawResults, setRawResults] = useState<ExploreResult[]>([]);
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
     const [type, setType] = useState<'all' | 'specialist' | 'organization'>('all');
     const [rating, setRating] = useState<number | null>(null);
     const limit = 6;
 
     useEffect(() => {
-        fetchExploreData(type, null, page, limit).then((data) => {
-            setResults(data?.results ?? []);
-            setTotalPages(Math.ceil((data?.total ?? 0) / limit));
+        fetchExploreData(type, null, 1, 1000).then((data) => {
+            setRawResults(data?.results ?? []);
         });
-    }, [page, type]);
+    }, [type]);
 
-    const filteredResults = results.filter((item) => {
-        if (rating === null) return true;
-        return Math.round(item.rating) === rating;
-    });
+    const filteredResults = useMemo(() => {
+        return rawResults.filter((item) => {
+            if (rating !== null && Math.round(item.rating) !== rating) return false;
+            return true;
+        });
+    }, [rawResults, rating]);
+
+    const totalPages = Math.ceil(filteredResults.length / limit);
+
+    // сбрасываем page, если он выходит за пределы
+    useEffect(() => {
+        if (page > totalPages) {
+            setPage(1);
+        }
+    }, [page, totalPages]);
+
+    const paginatedResults = useMemo(() => {
+        const start = (page - 1) * limit;
+        return filteredResults.slice(start, start + limit);
+    }, [filteredResults, page]);
 
     return {
-        results: filteredResults,
+        results: paginatedResults,
         page,
         setPage,
         totalPages,

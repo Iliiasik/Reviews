@@ -13,9 +13,23 @@ export default {
       },
     },
   },
-  plugins: [daisyui],
+  plugins: [
+    daisyui,
+    function ({ addUtilities }) {
+      addUtilities({
+        '.hide-scrollbar': {
+          /* для WebKit */
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+          /* для Firefox */
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+        },
+      });
+    },
+  ],
   daisyui: {
     themes: ['light', 'dark'],
   },
-
 }

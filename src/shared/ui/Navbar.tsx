@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ThemeSwitcher from '@shared/ui/ThemeSwitcher.tsx';
+import { useUser } from '@shared/context/UserContext';
 
 const Navbar: React.FC = () => {
+    const { user } = useUser();
+
     return (
         <div className="navbar fixed top-0 left-0 right-0 bg-base-100/70 backdrop-blur-md shadow-md z-50">
             <div className="flex-1">
@@ -10,6 +13,8 @@ const Navbar: React.FC = () => {
                     Отзывы
                 </Link>
             </div>
+
+            {/* Mobile Dropdown */}
             <div className="flex-none lg:hidden">
                 <div className="dropdown dropdown-end">
                     <label tabIndex={0} className="btn btn-ghost btn-circle">
@@ -31,17 +36,35 @@ const Navbar: React.FC = () => {
                         <li><Link to="/">Главная</Link></li>
                         <li><Link to="/about">О нас</Link></li>
                         <li><Link to="/contacts">Контакты</Link></li>
-                        <li><Link to="/login">Логин</Link></li>
+                        {user ? (
+                            <li>
+                                <Link to="/profile">Профиль</Link>
+                            </li>
+                        ) : (
+                            <li>
+                                <Link to="/login">Логин</Link>
+                            </li>
+                        )}
                     </ul>
                 </div>
             </div>
+
+            {/* Desktop Menu */}
             <div className="hidden lg:flex flex-none">
                 <ul className="menu menu-horizontal px-1 gap-2 items-center">
                     <li><ThemeSwitcher /></li>
                     <li><Link to="/">Главная</Link></li>
                     <li><Link to="/about">О нас</Link></li>
                     <li><Link to="/contacts">Контакты</Link></li>
-                    <li><Link to="/login">Логин</Link></li>
+                    {user ? (
+                        <li>
+                            <Link to="/profile">Профиль</Link>
+                        </li>
+                    ) : (
+                        <li>
+                            <Link to="/login">Логин</Link>
+                        </li>
+                    )}
                 </ul>
             </div>
         </div>

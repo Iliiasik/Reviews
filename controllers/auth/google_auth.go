@@ -64,9 +64,8 @@ func GoogleCallback(c *gin.Context) {
 	}
 	fmt.Printf("UserInfo от Google: %+v\n", info)
 
-	// проверка пользователя по email
 	var user models.User
-	result := database.DB.Where("email = ?", info.Email).First(&user)
+	result := database.DB.Preload("Role").Where("email = ?", info.Email).First(&user)
 
 	if result.Error != nil {
 		fmt.Println("Пользователь не найден, создаём нового")
@@ -87,6 +86,7 @@ func GoogleCallback(c *gin.Context) {
 			Username:     username,
 			PasswordHash: "Oauth",
 			RoleID:       role.ID,
+			Role:         role,
 		}
 
 		if err := database.DB.Create(&user).Error; err != nil {
@@ -98,15 +98,15 @@ func GoogleCallback(c *gin.Context) {
 		fmt.Println("Пользователь уже существует:", user.Username)
 	}
 
-	jwt, err := GenerateJWT(user.ID, user.Username)
+	jwtToken, err := GenerateJWT(user.ID, user.Username, user.Role.Name)
 	if err != nil {
 		fmt.Println("Ошибка генерации JWT:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка JWT"})
 		return
 	}
-	fmt.Println("JWT сгенерирован:", jwt)
+	fmt.Println("JWT сгенерирован:", jwtToken)
 
-	c.SetCookie("token", jwt, 3600*24, "/", "localhost", false, true)
+	c.SetCookie("token", jwtToken, 3600*24, "/", "localhost", false, true)
 	fmt.Println("Кука token установлена")
 
 	c.Redirect(http.StatusTemporaryRedirect, "http://localhost:5173/profile")

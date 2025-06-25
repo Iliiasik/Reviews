@@ -17,6 +17,7 @@ var JwtKey []byte
 type Claims struct {
 	UserID   uint   `json:"user_id"`
 	Username string `json:"username"`
+	Role     string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -37,11 +38,12 @@ func ValidateJWT(tokenStr string) (*Claims, error) {
 	return claims, nil
 }
 
-func GenerateJWT(userID uint, username string) (string, error) {
+func GenerateJWT(userID uint, username string, role string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
 		UserID:   userID,
 		Username: username,
+		Role:     role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -96,8 +98,14 @@ func Login(c *gin.Context) {
 		}
 	}
 
-	// Генерация JWT токена
-	token, err := GenerateJWT(user.ID, user.Username)
+	// Получаем название роли из БД
+	var role models.Role
+	if err := database.DB.First(&role, user.RoleID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка определения роли"})
+		return
+	}
+
+	token, err := GenerateJWT(user.ID, user.Username, role.Name)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка генерации токена"})
 		return

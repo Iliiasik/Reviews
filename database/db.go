@@ -2,6 +2,8 @@ package database
 
 import (
 	"fmt"
+	"github.com/casbin/casbin/v2"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -63,12 +65,15 @@ func InitDB() {
 	if err != nil {
 		log.Fatalf("Error running migrations: %v", err)
 	}
+
 	SeedRoles()
+	SeedCasbinPolicies()
 
 	log.Println("Migrations completed successfully")
 }
+
 func SeedRoles() {
-	roles := []string{"user", "specialist", "organization"}
+	roles := []string{"user", "specialist", "organization", "admin", "moderator"}
 
 	for _, name := range roles {
 		var role models.Role
@@ -81,4 +86,71 @@ func SeedRoles() {
 			}
 		}
 	}
+}
+
+func SeedCasbinPolicies() {
+	adapter, err := gormadapter.NewAdapterByDBWithCustomTable(DB, nil, "casbin_rules")
+	if err != nil {
+		log.Fatalf("Failed to create casbin adapter: %v", err)
+	}
+
+	enforcer, err := casbin.NewEnforcer("casbin/model.conf", adapter)
+	if err != nil {
+		log.Fatalf("Failed to create casbin enforcer: %v", err)
+	}
+
+	enforcer.ClearPolicy()
+
+	policies := []struct {
+		sub string
+		obj string
+		act string
+	}{
+		// Админские права
+		{"admin", "/api/profile", "GET"},
+		{"admin", "/api/profile", "POST"},
+		{"admin", "/api/profile/update", "POST"},
+		{"admin", "/api/specialist/:id", "GET"},
+		{"admin", "/api/reviews", "GET"},
+		{"admin", "/api/reviews", "POST"},
+		{"admin", "/api/aspects", "GET"},
+
+		// Модераторские права
+		{"moderator", "/api/profile", "GET"},
+		{"moderator", "/api/specialist/:id", "GET"},
+		{"moderator", "/api/reviews", "GET"},
+
+		// Права специалиста
+		{"specialist", "/api/profile", "GET"},
+		{"specialist", "/api/profile", "POST"},
+		{"specialist", "/api/profile/update", "POST"},
+		{"specialist", "/api/reviews", "GET"},
+
+		// Права организации
+		{"organization", "/api/profile", "GET"},
+		{"organization", "/api/profile", "POST"},
+		{"organization", "/api/profile/update", "POST"},
+		{"organization", "/api/reviews", "GET"},
+
+		// Базовые права пользователя
+		{"user", "/api/profile", "GET"},
+		{"user", "/api/specialist/:id", "GET"},
+		{"user", "/api/reviews", "GET"},
+	}
+
+	for _, policy := range policies {
+		if _, err := enforcer.AddPolicy(policy.sub, policy.obj, policy.act); err != nil {
+			log.Printf("Failed to add policy: %v", err)
+		}
+	}
+
+	if _, err := enforcer.AddGroupingPolicy("admin", "moderator"); err != nil {
+		log.Printf("Failed to add role hierarchy: %v", err)
+	}
+
+	if err := enforcer.SavePolicy(); err != nil {
+		log.Fatalf("Failed to save casbin policies: %v", err)
+	}
+
+	log.Println("Casbin policies seeded successfully")
 }

@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 	"reviews-back/controllers/auth"
+	"reviews-back/controllers/rbac"
 	"reviews-back/database"
 	"reviews-back/routes"
-	"reviews-back/storage"
 )
 
 func main() {
@@ -23,10 +23,15 @@ func main() {
 	}
 
 	database.InitDB()
-	storage.InitMinio()
+	//storage.InitMinio()
 
 	r := gin.Default()
-	routes.RegisterRoutes(r)
+
+	enforcer, err := rbac.NewEnforcer(database.DB)
+	if err != nil {
+		log.Fatalf("Failed to initialize Casbin: %v", err)
+	}
+	routes.RegisterRoutes(r, enforcer)
 
 	if err := r.Run(":8000"); err != nil {
 		log.Fatalf("Server failed to start: %v", err)

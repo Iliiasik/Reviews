@@ -20,6 +20,13 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		public.GET("/auth/google/callback", auth.GoogleCallback)
 		public.GET("/confirm-email", auth.ConfirmEmailHandler(database.DB))
 		public.POST("/register", auth.RegisterHandler(database.DB))
+		public.GET("/search", search.SearchHandler(database.DB))
+		public.GET("/explore", search.ExploreHandler(database.DB))
+		public.POST("/resend-confirmation", auth.ResendConfirmationHandler(database.DB))
+		public.POST("/reviews", reviews.CreateReview(database.DB))
+		public.GET("/reviews", reviews.GetReviews(database.DB))
+		public.GET("/aspects", reviews.GetReviewAspects(database.DB))
+		public.GET("/specialist/:id", profile.GetSpecialistProfile(database.DB))
 	}
 
 	// Защищенные роуты
@@ -31,12 +38,5 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		protected.POST("/change-password", auth.ChangePassword)
 		protected.GET("/profile", profile.GetProfileHandler(database.DB))
 		protected.POST("/profile/update", profile.UpdateProfileHandler(database.DB))
-		protected.POST("/resend-confirmation", auth.ResendConfirmationHandler(database.DB))
-		protected.GET("/specialist/:id", profile.GetSpecialistProfile(database.DB))
-		protected.GET("/search", search.SearchHandler(database.DB))
-		protected.GET("/explore", search.ExploreHandler(database.DB))
-		protected.POST("/reviews", reviews.CreateReview(database.DB))
-		protected.GET("/reviews", reviews.GetReviews(database.DB))
-		protected.GET("/aspects", reviews.GetReviewAspects(database.DB))
 	}
 }

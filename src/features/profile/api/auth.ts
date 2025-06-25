@@ -1,13 +1,3 @@
-export const logout = async () => {
-    const response = await fetch('/api/logout', {
-        method: 'POST',
-        credentials: 'include',
-    });
-    if (!response.ok) {
-        throw new Error('Failed to logout');
-    }
-};
-
 export const changePassword = async (data: {
     current_password: string;
     new_password: string;

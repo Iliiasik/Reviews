@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, LoginError } from '../api/login';
+import { useUser } from "@shared/context/UserContext";
 
 export const useLogin = () => {
     const navigate = useNavigate();
@@ -9,6 +10,7 @@ export const useLogin = () => {
     const [error, setError] = useState('');
     const [errorCode, setErrorCode] = useState('');
     const [loading, setLoading] = useState(false);
+    const {setUser} = useUser();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,7 +19,8 @@ export const useLogin = () => {
         setLoading(true);
 
         try {
-            await login({ username, password });
+            const user = await login({ username, password });
+            setUser(user);
             navigate('/profile', { state: { loginSuccess: true } });
         } catch (err) {
             if (err instanceof LoginError) {

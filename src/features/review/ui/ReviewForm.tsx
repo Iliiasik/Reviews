@@ -79,35 +79,36 @@ export const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
     }
 
     return (
+        <div className="w-full px-4">
         <form onSubmit={handleSubmit} className="mb-6 space-y-4">
-            <h3 className="text-lg font-semibold">Оставить отзыв</h3>
 
-            {error && <div className="alert alert-error">{error}</div>}
+                {error && <div className="alert alert-error">{error}</div>}
 
-            <RatingInput value={rating} onChange={setRating} />
-            <CommentTextarea value={text} onChange={setText} />
+                <RatingInput value={rating} onChange={setRating} />
 
-            {user && (
-                <AnonymousCheckbox value={isAnonymous} onChange={setIsAnonymous} />
-            )}
 
-            <AspectCheckboxList
-                label="Плюсы"
-                aspects={aspects.filter((a) => a.positive)}
-                selectedIds={pros}
-                onToggle={(id) => toggleAspect(id, "pros")}
-            />
+                {user && (
+                    <AnonymousCheckbox value={isAnonymous} onChange={setIsAnonymous} />
+                )}
 
-            <AspectCheckboxList
-                label="Минусы"
-                aspects={aspects.filter((a) => !a.positive)}
-                selectedIds={cons}
-                onToggle={(id) => toggleAspect(id, "cons")}
-            />
+                <AspectCheckboxList
+                    label="Что вам больше всего понравилось в специалисте?"
+                    aspects={aspects.filter((a) => a.positive)}
+                    selectedIds={pros}
+                    onToggle={(id) => toggleAspect(id, "pros")}
+                />
 
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Отправка..." : "Оставить отзыв"}
-            </button>
-        </form>
+                <AspectCheckboxList
+                    label="Что вам не понравилось, и над чем нам стоит поработать?"
+                    aspects={aspects.filter((a) => !a.positive)}
+                    selectedIds={cons}
+                    onToggle={(id) => toggleAspect(id, "cons")}
+                />
+                <CommentTextarea value={text} onChange={setText} />
+                <button type="submit" className="btn btn-primary w-full sm:w-auto self-center" disabled={loading}>
+                    {loading ? "Отправка..." : "Оставить отзыв"}
+                </button>
+            </form>
+        </div>
     );
 };

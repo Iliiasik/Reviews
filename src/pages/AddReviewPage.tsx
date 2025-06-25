@@ -32,7 +32,7 @@ export const AddReviewPage = () => {
                     <p className="mb-4 text-red-500">{error}</p>
                 ) : (
                     <h1 className="text-2xl font-bold mb-4">
-                        Отзыв для: <span className="text-primary">{name}</span>
+                        Оставить отзыв для: <span className="text-primary">{name}</span>
                     </h1>
                 )}
 

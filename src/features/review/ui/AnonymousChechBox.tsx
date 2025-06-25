@@ -4,7 +4,7 @@ interface AnonymousCheckboxProps {
 }
 
 export const AnonymousCheckbox = ({ value, onChange }: AnonymousCheckboxProps) => (
-    <div className="form-control">
+    <div className="form-control mb-2">
         <label className="cursor-pointer label">
             <span className="label-text">Оставить отзыв анонимно</span>
             <input

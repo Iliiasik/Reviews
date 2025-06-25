@@ -39,11 +39,12 @@ export const SpecialistReviews = () => {
             .finally(() => setLoading(false));
     }, [id]);
 
-
     return (
         <section className="w-full mt-12 px-4">
             <div className="max-w-full mx-auto bg-base-100 rounded-xl shadow p-6">
-                <h2 className="text-xl font-semibold mb-4 border-b pb-2">Отзывы</h2>
+                <h2 className="text-xl font-semibold mb-4 border-b border-base-300 pb-2 text-base-content">
+                    Отзывы
+                </h2>
                 <div className="mb-4">
                     <a href={`/specialist/${id}/add-review`} className="btn btn-primary">
                         Оставить отзыв
@@ -51,15 +52,15 @@ export const SpecialistReviews = () => {
                 </div>
 
                 {loading && (
-                    <p className="text-center text-gray-500">Загрузка отзывов...</p>
+                    <p className="text-center text-base-content/60">Загрузка отзывов...</p>
                 )}
 
                 {error && (
-                    <p className="text-center text-red-500">Ошибка: {error}</p>
+                    <p className="text-center text-error">Ошибка: {error}</p>
                 )}
 
                 {!loading && !error && reviews.length === 0 && (
-                    <p className="text-center text-gray-500">Пока нет отзывов.</p>
+                    <p className="text-center text-base-content/60">Пока нет отзывов.</p>
                 )}
 
                 {!loading && !error && reviews.length > 0 && (
@@ -67,7 +68,7 @@ export const SpecialistReviews = () => {
                         {reviews.map((review) => (
                             <div
                                 key={review.id}
-                                className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm"
+                                className="p-4 bg-base-200 border border-base-300 rounded-lg shadow-sm"
                             >
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="flex items-center gap-2">
@@ -76,21 +77,23 @@ export const SpecialistReviews = () => {
                                                 <img
                                                     src={review.author.avatar_url || "https://api.dicebear.com/7.x/initials/svg?seed=user"}
                                                     alt={review.author.name}
-                                                    className="w-8 h-8 rounded-full object-cover border"
+                                                    className="w-8 h-8 rounded-full object-cover border border-base-300"
                                                 />
-                                                <span className="font-medium">{review.author.name}</span>
+                                                <span className="font-medium text-base-content">
+                                                    {review.author.name}
+                                                </span>
                                             </>
                                         ) : (
-                                            <span className="text-gray-500 italic">Аноним</span>
+                                            <span className="text-base-content/60 italic">Аноним</span>
                                         )}
                                     </div>
-                                    <span className="text-yellow-500 font-semibold">{review.rating}⭐</span>
+                                    <span className="text-warning font-semibold">{review.rating}⭐</span>
                                 </div>
 
-                                <p className="text-gray-700 whitespace-pre-line">{review.text}</p>
+                                <p className="text-base-content whitespace-pre-line">{review.text}</p>
 
                                 {(review.pros.length > 0 || review.cons.length > 0) && (
-                                    <div className="mt-2 text-sm text-gray-600 space-y-1">
+                                    <div className="mt-2 text-sm text-base-content/80 space-y-1">
                                         {review.pros.length > 0 && (
                                             <p><strong>Плюсы:</strong> {review.pros.map(p => p.description).join(", ")}</p>
                                         )}
@@ -100,15 +103,15 @@ export const SpecialistReviews = () => {
                                     </div>
                                 )}
 
-                                <p className="text-sm text-gray-400 mt-2">
+                                <p className="text-sm text-base-content/50 mt-2">
                                     {new Date(review.created_at).toLocaleDateString()}
                                 </p>
                             </div>
                         ))}
-
                     </div>
                 )}
             </div>
         </section>
     );
 };
+

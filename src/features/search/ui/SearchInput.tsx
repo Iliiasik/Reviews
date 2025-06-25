@@ -22,7 +22,7 @@ export const SearchInput = ({ value, onChange, onFocus, onBlur, inputRef }: Prop
             ref={inputRef}
             type="search"
             className="grow"
-            placeholder="Введите имя врача, специализацию или район"
+            placeholder="Введите имя врача, специализацию или организацию"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onFocus={onFocus}

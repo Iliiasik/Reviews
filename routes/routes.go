@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"reviews-back/controllers/auth"
 	"reviews-back/controllers/profile"
+	"reviews-back/controllers/qr"
 	"reviews-back/controllers/reviews"
 	"reviews-back/controllers/search"
 	"reviews-back/database"
@@ -38,5 +39,6 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		protected.POST("/change-password", auth.ChangePassword)
 		protected.GET("/profile", profile.GetProfileHandler(database.DB))
 		protected.POST("/profile/update", profile.UpdateProfileHandler(database.DB))
+		protected.GET("/generate-qr", qr.GenerateQR(database.DB))
 	}
 }

@@ -114,28 +114,38 @@ func SeedCasbinPolicies() {
 		{"admin", "/api/reviews", "GET"},
 		{"admin", "/api/reviews", "POST"},
 		{"admin", "/api/aspects", "GET"},
+		{"admin", "/api/logout", "POST"},
+		{"admin", "/api/change-password", "POST"},
 
 		// Модераторские права
 		{"moderator", "/api/profile", "GET"},
 		{"moderator", "/api/specialist/:id", "GET"},
 		{"moderator", "/api/reviews", "GET"},
+		{"moderator", "/api/logout", "POST"},
+		{"moderator", "/api/change-password", "POST"},
 
 		// Права специалиста
 		{"specialist", "/api/profile", "GET"},
 		{"specialist", "/api/profile", "POST"},
 		{"specialist", "/api/profile/update", "POST"},
 		{"specialist", "/api/reviews", "GET"},
+		{"specialist", "/api/generate-qr", "GET"},
+		{"specialist", "/api/logout", "POST"},
+		{"specialist", "/api/change-password", "POST"},
 
 		// Права организации
 		{"organization", "/api/profile", "GET"},
 		{"organization", "/api/profile", "POST"},
 		{"organization", "/api/profile/update", "POST"},
 		{"organization", "/api/reviews", "GET"},
+		{"organization", "/api/generate-qr", "GET"},
+		{"organization", "/api/logout", "POST"},
+		{"organization", "/api/change-password", "POST"},
 
 		// Базовые права пользователя
 		{"user", "/api/profile", "GET"},
-		{"user", "/api/specialist/:id", "GET"},
-		{"user", "/api/reviews", "GET"},
+		{"user", "/api/logout", "POST"},
+		{"user", "/api/change-password", "POST"},
 	}
 
 	for _, policy := range policies {

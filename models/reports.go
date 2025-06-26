@@ -6,7 +6,7 @@ type ReviewReport struct {
 	ID         uint           `gorm:"primaryKey"`
 	ReviewID   uint           `gorm:"not null"`
 	Review     Review         `gorm:"foreignKey:ReviewID;constraint:OnDelete:CASCADE"`
-	ReporterID *uint          `gorm:"index"` // Может быть null, если жалоба от гостя
+	ReporterID *uint          `gorm:"index"`
 	Reporter   *User          `gorm:"foreignKey:ReporterID"`
 	CategoryID uint           `gorm:"not null"`
 	Category   ReportCategory `gorm:"foreignKey:CategoryID"`

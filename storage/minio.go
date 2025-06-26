@@ -9,6 +9,7 @@ import (
 	"os"
 )
 
+// посложнее надо поставить бакет
 var (
 	MinioClient    *minio.Client
 	MinioPublicURL string
@@ -84,51 +85,3 @@ func GetAvatarURL(userType UserType, userID uint, ext string) string {
 	objectName := fmt.Sprintf("%s/%d/avatar%s", userType, userID, ext)
 	return fmt.Sprintf("%s/%s/%s", MinioPublicURL, BucketName, objectName)
 }
-
-// Отключенные функции
-
-//const (
-//	presignedExpiry = time.Hour * 24 * 7
-//)
-// DeleteAvatar удаляет аватар пользователя
-//func DeleteAvatar(userType UserType, userID uint) error {
-//	if MinioClient == nil {
-//		return fmt.Errorf("MinIO клиент не инициализирован")
-//	}
-//
-//	// Пытаемся удалить все возможные форматы
-//	formats := []string{".jpg", ".jpeg", ".png"}
-//	for _, ext := range formats {
-//		objectName := fmt.Sprintf("%s/%d/avatar%s", userType, userID, ext)
-//		err := MinioClient.RemoveObject(context.Background(), BucketName, objectName, minio.RemoveObjectOptions{})
-//		if err != nil {
-//			if minio.ToErrorResponse(err).Code != "NoSuchKey" {
-//				return fmt.Errorf("ошибка при удалении аватара: %v", err)
-//			}
-//		}
-//	}
-//
-//	return nil
-//}
-//
-//// GenerateAvatarUploadURL генерирует URL для загрузки аватара
-//func GenerateAvatarUploadURL(userType UserType, userID uint, filename string) (string, error) {
-//	if MinioClient == nil {
-//		return "", fmt.Errorf("MinIO клиент не инициализирован")
-//	}
-//
-//	// Проверяем расширение файла
-//	ext := filepath.Ext(filename)
-//	if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
-//		return "", fmt.Errorf("неподдерживаемый формат изображения")
-//	}
-//
-//	objectName := fmt.Sprintf("%s/%d/avatar%s", userType, userID, ext)
-//
-//	url, err := MinioClient.PresignedPutObject(context.Background(), BucketName, objectName, presignedExpiry)
-//	if err != nil {
-//		return "", fmt.Errorf("ошибка при генерации URL для загрузки: %v", err)
-//	}
-//
-//	return url.String(), nil
-//}

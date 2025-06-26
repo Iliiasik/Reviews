@@ -26,7 +26,6 @@ func CreateReview(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// вместо user := c.Get("user")
 		var userID *uint
 		if val, exists := c.Get("user_id"); exists {
 			if id, ok := val.(uint); ok {
@@ -34,7 +33,6 @@ func CreateReview(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
-		// 🔍 Добавь лог перед использованием userID
 		fmt.Println("Middleware user:", userID)
 		isAnonymous := req.IsAnonymous
 		if userID == nil {
@@ -51,13 +49,11 @@ func CreateReview(db *gorm.DB) gin.HandlerFunc {
 			UpdatedAt:     time.Now(),
 		}
 
-		// создаём запись
 		if err := db.Create(&review).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create review"})
 			return
 		}
 
-		// добавляем аспекты (pros/cons)
 		if len(req.Pros) > 0 {
 			var pros []models.ReviewAspect
 			if err := db.Where("id IN ?", req.Pros).Find(&pros).Error; err == nil {
@@ -99,7 +95,6 @@ func GetReviews(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// формируем ответ с учётом анонимности
 		response := make([]gin.H, 0, len(reviews))
 		for _, r := range reviews {
 			var author interface{}

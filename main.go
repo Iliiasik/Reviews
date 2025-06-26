@@ -21,18 +21,17 @@ func main() {
 	if len(auth.JwtKey) == 0 {
 		log.Fatal("JWT_SECRET is not set in .env")
 	}
-
 	database.InitDB()
 	//storage.InitMinio()
+	r := gin.New()
+	r.Use(gin.Logger(), gin.Recovery())
 
-	r := gin.Default()
-
+	r.RedirectTrailingSlash = false
 	enforcer, err := rbac.NewEnforcer(database.DB)
 	if err != nil {
 		log.Fatalf("Failed to initialize Casbin: %v", err)
 	}
 	routes.RegisterRoutes(r, enforcer)
-
 	if err := r.Run(":8000"); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}

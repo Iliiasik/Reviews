@@ -32,7 +32,7 @@ func ValidateJWT(tokenStr string) (*Claims, error) {
 
 	claims, ok := token.Claims.(*Claims)
 	if !ok {
-		return nil, fmt.Errorf("неверные claims")
+		return nil, fmt.Errorf("Неверные claims")
 	}
 
 	return claims, nil
@@ -86,7 +86,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Проверка подтверждения email
 	var confirmation models.Confirmation
 	if err := database.DB.Where("user_id = ?", user.ID).First(&confirmation).Error; err == nil {
 		if !confirmation.EmailConfirmed {

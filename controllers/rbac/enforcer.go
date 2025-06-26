@@ -17,7 +17,6 @@ func NewEnforcer(db *gorm.DB) (*casbin.Enforcer, error) {
 		return nil, err
 	}
 
-	// Автоматическое обновление политик
 	enforcer.EnableAutoSave(true)
 
 	if err := enforcer.LoadPolicy(); err != nil {

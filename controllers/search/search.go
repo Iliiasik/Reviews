@@ -23,6 +23,7 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 
 		var results []SearchResult
 
+		// убрать lower,
 		searchQuery := `
 			(SELECT users.id, users.name, 'specialist' AS type
 			 FROM users

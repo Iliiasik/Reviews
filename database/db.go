@@ -106,7 +106,7 @@ func SeedCasbinPolicies() {
 		obj string
 		act string
 	}{
-		// Админские права
+		// Админские права ПЕРЕДЕЛАТЬ
 		{"admin", "/api/profile", "GET"},
 		{"admin", "/api/profile", "POST"},
 		{"admin", "/api/profile/update", "POST"},

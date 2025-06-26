@@ -52,21 +52,18 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 
 		log.Printf("Начало регистрации пользователя: %s (%s)\n", req.Username, req.Email)
 
-		// Валидация пароля
 		if err := validatePassword(req.Password); err != nil {
 			log.Printf("Ошибка валидации пароля: %v\n", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Проверка уникальности полей
 		if err := checkUniqueFields(db, req); err != nil {
 			log.Printf("Ошибка уникальности данных: %v\n", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Хеширование пароля
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
 			log.Println("Ошибка хеширования пароля:", err)
@@ -74,7 +71,6 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Получаем роль
 		role, err := findRole(db, req.AccountType)
 		if err != nil {
 			log.Printf("Ошибка поиска роли '%s': %v\n", req.AccountType, err)
@@ -82,7 +78,7 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Определяем тип пользователя для MinIO
+		//  minio
 		userType := storage.UserTypeUser
 		switch req.AccountType {
 		case "specialist":
@@ -113,7 +109,7 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 			userID = user.ID
 			log.Printf("Пользователь создан с ID %d\n", userID)
 
-			// Обработка аватара
+			// аватарка
 			if req.Avatar != nil {
 				log.Printf("Обработка аватара: имя файла — %s, размер — %d байт\n", req.Avatar.Filename, req.Avatar.Size)
 
@@ -353,25 +349,21 @@ func ResendConfirmationHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Найти пользователя
 		var user models.User
 		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Пользователь не найден"})
 			return
 		}
 
-		// Удалить старую запись confirmation (если есть)
 		db.Where("user_id = ?", user.ID).Delete(&models.Confirmation{})
 
-		// Создать новую запись подтверждения
 		confirmation, err := createConfirmation(db, user.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось создать подтверждение"})
 			return
 		}
 
-		// Отправить письмо
-		go sendConfirmationEmail(user, confirmation.Token) // асинхронно
+		go sendConfirmationEmail(user, confirmation.Token)
 
 		c.JSON(http.StatusOK, gin.H{"message": "Письмо с подтверждением отправлено"})
 	}

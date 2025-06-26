@@ -9,7 +9,6 @@ import (
 
 func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Пропускаем OPTIONS запросы (для CORS)
 		if c.Request.Method == "OPTIONS" {
 			c.Next()
 			return
@@ -24,11 +23,9 @@ func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 			return
 		}
 
-		// Получаем путь и метод
-		path := c.FullPath() // Используем FullPath для точного соответствия
+		path := c.FullPath()
 		method := c.Request.Method
 
-		// Проверяем разрешения
 		allowed, err := enforcer.Enforce(role, path, method)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

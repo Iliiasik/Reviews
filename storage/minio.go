@@ -9,6 +9,7 @@ import (
 	"os"
 )
 
+// посложнее надо поставить бакет
 var (
 	MinioClient    *minio.Client
 	MinioPublicURL string

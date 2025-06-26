@@ -21,8 +21,9 @@ type User struct {
 }
 
 type SpecialistProfile struct {
-	UserID          uint      `json:"user_id" gorm:"primaryKey"`
-	User            User      `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	ID              uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	UserID          uint      `json:"user_id" gorm:"not null;uniqueIndex"`
+	User            User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user"`
 	ExperienceYears int       `json:"experience_years" gorm:"not null"`
 	About           string    `json:"about" gorm:"type:text"`
 	Rating          float64   `json:"rating" gorm:"default:0"`
@@ -31,8 +32,9 @@ type SpecialistProfile struct {
 }
 
 type OrganizationProfile struct {
-	UserID      uint      `json:"user_id" gorm:"primaryKey"`
-	User        User      `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	ID          uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	UserID      uint      `json:"user_id" gorm:"not null;uniqueIndex"`
+	User        User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user"`
 	Website     string    `json:"website" gorm:"type:varchar(100)"`
 	Address     string    `json:"address" gorm:"type:varchar(200)"`
 	About       string    `json:"about" gorm:"type:text"`
@@ -42,8 +44,9 @@ type OrganizationProfile struct {
 }
 
 type Confirmation struct {
-	UserID         uint   `json:"user_id" gorm:"primaryKey"`
-	User           User   `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	ID             uint   `gorm:"primaryKey;autoIncrement" json:"id"`
+	UserID         uint   `json:"user_id" gorm:"not null;uniqueIndex"`
+	User           User   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user"`
 	EmailConfirmed bool   `json:"email_confirmed" gorm:"default:false;not null"`
 	PhoneConfirmed bool   `json:"phone_confirmed" gorm:"default:false;not null"`
 	Token          string `json:"token" gorm:"uniqueIndex;not null"`

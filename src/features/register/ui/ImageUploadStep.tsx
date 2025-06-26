@@ -8,7 +8,7 @@ interface Step3Props {
     loading?: boolean;
 }
 
-export const Step3 = ({ avatarPreview, handleAvatarChange, onBack, loading }: Step3Props) => {
+export const ImageUploadStep = ({ avatarPreview, handleAvatarChange, onBack, loading }: Step3Props) => {
     return (
         <>
             <div className="form-control w-full">

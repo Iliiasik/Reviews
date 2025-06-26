@@ -3,7 +3,7 @@ import { Input, Textarea } from './FormFields.tsx';
 import type { StepComponentProps } from '../types/StepForm.ts';
 import { usePasswordStrength } from '../lib/usePasswordStrength';
 
-export const Step2 = ({ formData, accountType, handleChange, onNext, onBack }: StepComponentProps) => {
+export const TypeBasedFormFieldsStep = ({ formData, accountType, handleChange, onNext, onBack }: StepComponentProps) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const { strength, evaluateStrength } = usePasswordStrength();
 

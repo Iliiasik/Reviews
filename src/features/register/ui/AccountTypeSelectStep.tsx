@@ -3,7 +3,7 @@ import { Input } from './FormFields.tsx';
 import { useState } from 'react';
 import type { StepComponentProps } from '../types/StepForm.ts';
 
-export const Step1 = ({
+export const AccountTypeSelectStep = ({
                           formData,
                           handleChange,
                           onNext,

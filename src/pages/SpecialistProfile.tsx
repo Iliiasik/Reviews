@@ -1,10 +1,10 @@
 import { MainLayout } from '@widgets/layout/MainLayout';
-import { SpecialistPage } from '@features/specialist/ui/SpecialistPage.tsx';
+import { SpecialistContent } from '@features/specialist/ui/SpecialistContent.tsx';
 
 export const SpecialistProfile = () => {
     return (
         <MainLayout>
-            <SpecialistPage />
+            <SpecialistContent />
         </MainLayout>
     );
 };

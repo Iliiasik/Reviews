@@ -8,6 +8,7 @@ import ConfirmEmail from "@pages/ConfirmEmail.tsx";
 import {SpecialistProfile} from "@pages/SpecialistProfile.tsx";
 import {OrganizationProfile} from "@pages/OrganisationProfile.tsx";
 import {AddReviewPage} from "@pages/AddReviewPage.tsx";
+import {CreateUnverifiedPage} from "@pages/CreateUnverifiedPage.tsx";
 
 function App() {
     return (
@@ -22,7 +23,7 @@ function App() {
                 <Route path="/specialist/:id" element={<SpecialistProfile />} />
                 <Route path="/organization/:id" element={<OrganizationProfile />} />
                 <Route path="/specialist/:id/add-review" element={<AddReviewPage />} />
-
+                <Route path="/new-unverified" element={<CreateUnverifiedPage />} />
             </Routes>
         </BrowserRouter>
     );

@@ -6,7 +6,7 @@ import type {SpecialistProfile} from "@features/specialist/types/SpecialistProfi
 import { SpecialistProfileView } from "@features/specialist/ui/SpecialistProfileView";
 import { SpecialistReviews } from "@features/specialist/ui/SpecialistReviews";
 
-export const SpecialistPage = () => {
+export const SpecialistContent = () => {
     const { id } = useParams();
     const [data, setData] = useState<SpecialistProfile | null>(null);
     const [loading, setLoading] = useState(true);

@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 export const OrganizationProfile = () => {
     const { id } = useParams();
 
-    // Аналогично: useEffect(() => fetch(`/api/organization/${id}`).then(...), [id])
 
     return (
         <div className="max-w-4xl mx-auto p-6">

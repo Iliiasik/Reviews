@@ -20,7 +20,7 @@ export const MainHomeCards = () => {
 
     return (
         <div className="w-full max-w-6xl flex flex-col gap-6 transition-all duration-300 ease-in-out">
-            {/* 🔍 Фильтры */}
+
             <div className="flex flex-wrap items-center justify-start gap-4 transition-all duration-200">
                 <FilterType
                     type={type}
@@ -31,7 +31,6 @@ export const MainHomeCards = () => {
                 />
             </div>
 
-            {/* 💠 Карточки */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={`${type}-${rating}-${page}`}
@@ -47,7 +46,6 @@ export const MainHomeCards = () => {
                 </motion.div>
             </AnimatePresence>
 
-            {/* 📄 Пагинация и фильтр по рейтингу */}
             <div className="flex justify-between items-end mt-4 flex-wrap gap-4 transition-all duration-200">
                 <Pagination page={page} totalPages={totalPages} onChange={setPage} />
                 <FilterRating

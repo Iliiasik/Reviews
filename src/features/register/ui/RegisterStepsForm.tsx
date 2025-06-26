@@ -1,9 +1,9 @@
 // RegisterStepsForm.tsx
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Step1 } from './Step1';
-import { Step2 } from './Step2';
-import { Step3 } from './Step3';
+import { AccountTypeSelectStep } from './AccountTypeSelectStep.tsx';
+import { TypeBasedFormFieldsStep } from './TypeBasedFormFieldsStep.tsx';
+import { ImageUploadStep } from './ImageUploadStep.tsx';
 import { StepsMockup } from './StepsMockup';
 import { useWarnToast } from '../lib/useWarnToast';
 import { validateStep } from '../lib/useStepValidator';
@@ -104,7 +104,7 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                             className="space-y-4"
                         >
                             {formStep === 1 && (
-                                <Step1
+                                <AccountTypeSelectStep
                                     formData={formData}
                                     accountType={accountType}
                                     handleChange={handleChange}
@@ -112,7 +112,7 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                                 />
                             )}
                             {formStep === 2 && (
-                                <Step2
+                                <TypeBasedFormFieldsStep
                                     formData={formData}
                                     accountType={accountType}
                                     handleChange={handleChange}
@@ -121,7 +121,7 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                                 />
                             )}
                             {formStep === 3 && (
-                                <Step3
+                                <ImageUploadStep
                                     avatarPreview={avatarPreview}
                                     handleAvatarChange={handleAvatarChange}
                                     onBack={handleBack}

@@ -23,24 +23,22 @@ export const SearchBar = () => {
                     value={query}
                     onChange={setQuery}
                     onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    inputRef={searchInputRef}
+                    onBlur={() => {
+                        setTimeout(() => {
+                            setIsFocused(false);
+                        }, 150); // 100–150мс хватает
+                    }}                    inputRef={searchInputRef}
                 />
 
-                {isFocused && results.length > 0 && (
+                {isFocused && query.length > 0 && (
                     <SearchResultsDropdown
                         results={results}
-                        onSelect={(id,type) => {
+                        onSelect={(id, type) => {
                             navigate(`/${type}/${id}`);
                         }}
                     />
                 )}
 
-                {isFocused && results.length === 0 && query.length > 0 && (
-                    <div className="absolute top-full z-50 mt-1 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-base-300 border border-gray-300 dark:border-gray-600 rounded-md shadow p-3 w-full">
-                        Ничего не найдено
-                    </div>
-                )}
             </div>
         </div>
     );

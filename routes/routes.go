@@ -15,6 +15,7 @@ import (
 func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 	// Публичные роуты, не требующие авторизации
 	public := r.Group("/api")
+	public.Use(middlewares.AuthMiddleware(database.DB))
 	{
 		public.POST("/login", auth.Login)
 		public.GET("/auth/google", auth.GoogleLogin)
@@ -28,6 +29,7 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		public.GET("/reviews", reviews.GetReviews(database.DB))
 		public.GET("/aspects", reviews.GetReviewAspects(database.DB))
 		public.GET("/specialist/:id", profile.GetSpecialistProfile(database.DB))
+		public.POST("/unverified-profile", profile.CreateUnverifiedProfile(database.DB))
 	}
 
 	// Защищенные роуты

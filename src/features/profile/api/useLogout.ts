@@ -7,7 +7,7 @@ export const useLogout = () => {
     const logout = async (): Promise<void> => {
         try {
             await axios.post("/api/logout", {}, { withCredentials: true });
-            setUser(null); // обнуляем пользователя в контексте
+            setUser(null);
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 throw new Error(error.response?.data?.error || "Ошибка выхода");

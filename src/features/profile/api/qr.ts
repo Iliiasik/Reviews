@@ -1,3 +1,13 @@
-export const generateQrCode = async () => {
-    return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=example';
+import axios from 'axios';
+
+export const generateQrCode = async (): Promise<Blob> => {
+    try {
+        const response = await axios.get('/api/generate-qr', {
+            responseType: 'blob',
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.error || 'Ошибка генерации QR-кода');
+    }
 };

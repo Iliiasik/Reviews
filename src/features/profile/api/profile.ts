@@ -1,22 +1,22 @@
-export const fetchProfile = async () => {
-    const response = await fetch("/api/profile", { credentials: "include" });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch profile');
+import axios from 'axios';
+
+export const updateProfile = async (data: any): Promise<any> => {
+    try {
+        const response = await axios.post('/api/profile/update', data, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.error || 'Ошибка обновления профиля');
     }
-    return response.json();
 };
 
-export const updateProfile = async (data: any) => {
-    const response = await fetch('/api/profile/update', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to update profile');
+export const fetchProfile = async (): Promise<any> => {
+    try {
+        const response = await axios.get('/api/profile', { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.error || 'Ошибка загрузки профиля');
     }
-    return response.json();
 };

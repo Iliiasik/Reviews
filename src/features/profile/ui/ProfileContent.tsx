@@ -13,7 +13,7 @@ import { EditProfileModal } from './EditProfileModal';
 export const ProfileContent = () => {
     const { profile, isLoading, handleProfileUpdate } = useProfile();
     const { handleLogout } = useProfileActions();
-    const { qrCode, generate, download } = useQrCode();
+    const { qrUrl, generate, download } = useQrCode();
     const [activeTab, setActiveTab] = useState('profile');
     const [showEditModal, setShowEditModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
@@ -65,7 +65,7 @@ export const ProfileContent = () => {
                 {(activeTab === 'qr' && (profile?.role === 'specialist' || profile?.role === 'organization')) && (
                     <QrTab
                         ref={qrRef}
-                        qrCode={qrCode}
+                        qrCode={qrUrl}
                         onGenerate={generate}
                         onDownload={download}
                     />

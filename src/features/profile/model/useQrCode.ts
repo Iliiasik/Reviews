@@ -1,35 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateQrCode } from '../api/qr';
-import { useToast } from '@features/profile/model/useToast';
 
 export const useQrCode = () => {
-    const [qrCode, setQrCode] = useState<string | null>(null);
-    const { showToast } = useToast();
+    const [qrUrl, setQrUrl] = useState<string | null>(null);
 
     const generate = async () => {
         try {
-            const code = await generateQrCode();
-            setQrCode(code);
-            showToast('QR-код успешно сгенерирован', 'success');
-        } catch (error) {
-            console.error('Ошибка при генерации QR-кода:', error);
-            showToast('Ошибка при генерации QR-кода', 'error');
+            const blob = await generateQrCode();
+            const url = URL.createObjectURL(blob);
+            setQrUrl(prev => {
+                if (prev) URL.revokeObjectURL(prev);
+                return url;
+            });
+        } catch (err) {
+            console.error('Ошибка генерации QR:', err);
         }
     };
 
     const download = () => {
-        if (!qrCode) return;
+        if (!qrUrl) return;
         const link = document.createElement('a');
-        link.href = qrCode;
-        link.download = 'my-qr-code.png';
-        document.body.appendChild(link);
+        link.href = qrUrl;
+        link.download = 'qr-code.png';
         link.click();
-        document.body.removeChild(link);
     };
 
-    return {
-        qrCode,
-        generate,
-        download,
-    };
+    useEffect(() => {
+        return () => {
+            if (qrUrl) URL.revokeObjectURL(qrUrl);
+        };
+    }, [qrUrl]);
+
+    return { qrUrl, generate, download };
 };

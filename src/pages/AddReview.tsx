@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import { MainLayout } from "@widgets/layout/MainLayout.tsx";
 import { ReviewForm } from "@features/review/ui/ReviewForm.tsx";
 
-export const AddReviewPage = () => {
+export const AddReview = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -24,7 +23,7 @@ export const AddReviewPage = () => {
     }, [id]);
 
     return (
-        <MainLayout>
+        <>
             <div className="max-w-2xl mx-auto p-6">
                 {loading ? (
                     <p className="mb-4 text-gray-500">Загрузка специалиста...</p>
@@ -40,6 +39,6 @@ export const AddReviewPage = () => {
                     <ReviewForm onSubmitSuccess={() => navigate(-1)} />
                 )}
             </div>
-        </MainLayout>
+        </>
     );
 };

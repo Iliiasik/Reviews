@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import { getSpecialistById } from "@features/specialist/api/getSpecialistById";
-import type {SpecialistProfile} from "@features/specialist/types/SpecialistProfile";
-import { SpecialistProfileView } from "@features/specialist/ui/SpecialistProfileView";
-import { SpecialistReviews } from "@features/specialist/ui/SpecialistReviews";
+import { getSpecialistById } from "@features/specialist/api/getSpecialistById.ts";
+import type {SpecialistProfile} from "@features/specialist/types/SpecialistProfile.ts";
+import { SpecialistProfileView } from "@features/specialist/ui/SpecialistProfileView.tsx";
+import { SpecialistReviews } from "@features/specialist/ui/SpecialistReviews.tsx";
 
-export const SpecialistContent = () => {
+export const Specialist = () => {
     const { id } = useParams();
     const [data, setData] = useState<SpecialistProfile | null>(null);
     const [loading, setLoading] = useState(true);

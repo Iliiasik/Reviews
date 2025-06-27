@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 
-export const OrganizationProfile = () => {
+export const OrganizationPage = () => {
     const { id } = useParams();
 
 

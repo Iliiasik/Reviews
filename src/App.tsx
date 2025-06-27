@@ -5,25 +5,29 @@ import { Profile } from '@pages/Profile';
 import NotFound from '@pages/NotFound';
 import { Register } from "@pages/Register.tsx";
 import ConfirmEmail from "@pages/ConfirmEmail.tsx";
-import {SpecialistProfile} from "@pages/SpecialistProfile.tsx";
-import {OrganizationProfile} from "@pages/OrganisationProfile.tsx";
-import {AddReviewPage} from "@pages/AddReviewPage.tsx";
-import {CreateUnverifiedPage} from "@pages/CreateUnverifiedPage.tsx";
+import {OrganizationPage} from "@pages/OrganisationPage.tsx";
+import {AddReview} from "@pages/AddReview.tsx";
+import {MainLayout} from "@widgets/layout/MainLayout.tsx";
+import {Specialist} from "@pages/Specialist.tsx";
+import {UnverifiedProfileCreation} from "@pages/UnverifiedProfileCreation.tsx";
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<MainLayout />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/specialist/:id" element={<Specialist />} />
+                    <Route path="/specialist/:id/add-review" element={<AddReview />} />
+                    <Route path="/new-unverified" element={<UnverifiedProfileCreation />} />
+                    <Route path="/organization/:id" element={<OrganizationPage />} />
+                </Route>
+
                 <Route path="/login" element={<Login />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/confirm-email" element={<ConfirmEmail />} />
                 <Route path="*" element={<NotFound />} />
-                <Route path="/specialist/:id" element={<SpecialistProfile />} />
-                <Route path="/organization/:id" element={<OrganizationProfile />} />
-                <Route path="/specialist/:id/add-review" element={<AddReviewPage />} />
-                <Route path="/new-unverified" element={<CreateUnverifiedPage />} />
             </Routes>
         </BrowserRouter>
     );

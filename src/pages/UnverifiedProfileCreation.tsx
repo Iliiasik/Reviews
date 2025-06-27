@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RatingInput } from '@features/review/ui/RatingInput';
-import { AspectCheckboxList } from '@features/review/ui/AspectCheckBoxList';
-import { AnonymousCheckbox } from '@features/review/ui/AnonymousChechBox';
-import { CommentTextarea } from '@features/review/ui/CommentTextArea';
-import { getReviewAspects } from '@features/review/api/getReviewAspects';
-import type { ReviewAspect } from '@features/review/types/ReviewAspect';
+import { RatingInput } from '@features/review/ui/RatingInput.tsx';
+import { AspectCheckboxList } from '@features/review/ui/AspectCheckBoxList.tsx';
+import { AnonymousCheckbox } from '@features/review/ui/AnonymousChechBox.tsx';
+import { CommentTextarea } from '@features/review/ui/CommentTextArea.tsx';
+import { getReviewAspects } from '@features/review/api/getReviewAspects.ts';
+import type { ReviewAspect } from '@features/review/types/ReviewAspect.ts';
 import axios from 'axios';
-import { useUser } from '@shared/context/UserContext';
+import { useUser } from '@shared/context/UserContext.tsx';
 
-export const UnverifiedContent = () => {
+export const UnverifiedProfileCreation = () => {
     const { user } = useUser();
 
     const [name, setName] = useState('');

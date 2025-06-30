@@ -1,34 +1,13 @@
 import { IMaskInput } from 'react-imask';
 import { Input } from './FormFields.tsx';
-import { useState } from 'react';
-import type { StepComponentProps } from '../types/StepForm.ts';
+import type { StepComponentProps } from '../types/StepForm';
 
-export const AccountTypeSelectStep = ({
-                          formData,
-                          handleChange,
-                          onNext,
-                      }: StepComponentProps) => {
-    const [errors, setErrors] = useState<{ email?: string; phone?: string }>(
-        {}
-    );
-
-    const validateFields = () => {
-        const newErrors: typeof errors = {};
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailRegex.test(formData.email)) {
-            newErrors.email = 'Введите корректный Email';
-        }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleNextClick = () => {
-        if (validateFields()) {
-            onNext?.();
-        }
-    };
-
+export const BaseInfoStep = ({
+                                 formData,
+                                 handleChange,
+                                 errors,
+                                 onNext,
+                             }: Omit<StepComponentProps, 'accountType'>) => {
     return (
         <>
             <Input
@@ -36,19 +15,16 @@ export const AccountTypeSelectStep = ({
                 label="Имя / Название"
                 value={formData.name}
                 onChange={handleChange}
+                error={errors.name}
             />
 
-            <div className="space-y-1">
-                <Input
-                    name="email"
-                    label="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                />
-                {errors.email && (
-                    <span className="text-error text-sm">{errors.email}</span>
-                )}
-            </div>
+            <Input
+                name="email"
+                label="Email"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+            />
 
             <div className="space-y-1">
                 <label className="label">
@@ -67,7 +43,7 @@ export const AccountTypeSelectStep = ({
                     placeholder="+996 (XXX)-XX-XX-XX"
                     type="tel"
                     name="phone"
-                    className="input input-bordered w-full"
+                    className={`input input-bordered w-full ${errors.phone ? 'input-error' : ''}`}
                 />
 
                 {errors.phone && (
@@ -79,7 +55,7 @@ export const AccountTypeSelectStep = ({
                 <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={handleNextClick}
+                    onClick={onNext}
                 >
                     Далее
                 </button>

@@ -1,13 +1,9 @@
-// RegisterStepsForm.tsx
-import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AccountTypeSelectStep } from './AccountTypeSelectStep.tsx';
-import { TypeBasedFormFieldsStep } from './TypeBasedFormFieldsStep.tsx';
-import { ImageUploadStep } from './ImageUploadStep.tsx';
+import { BaseInfoStep } from './BaseInfoStep.tsx';
+import { AdditionalInfoStep } from './AdditionalInfoStep.tsx';
 import { StepsMockup } from './StepsMockup';
-import { useWarnToast } from '../lib/useWarnToast';
-import { validateStep } from '../lib/useStepValidator';
 import type { StepFormData } from '@features/register/types/StepForm';
+import { useState } from 'react';
 
 interface StepFormProps {
     accountType: 'user' | 'specialist' | 'organization' | null;
@@ -15,13 +11,10 @@ interface StepFormProps {
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     handleSubmit: (e: React.FormEvent) => void;
     onBack: () => void;
-    formStep: 1 | 2 | 3;
-    setFormStep: (step: 1 | 2 | 3) => void;
     error?: string;
     loading?: boolean;
-    avatarPreview: string | null; //
-    handleAvatarChange: (e: React.ChangeEvent<HTMLInputElement>) => void; //
-    setAvatarPreview: (value: string | null) => void; //
+    errors: Record<string, string>;
+    validateStep1: () => Promise<boolean>;
 }
 
 export const RegisterStepsForm: React.FC<StepFormProps> = ({
@@ -30,40 +23,19 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                                                                handleChange,
                                                                handleSubmit,
                                                                onBack,
-                                                               formStep,
-                                                               setFormStep,
                                                                error,
                                                                loading,
-                                                               avatarPreview,
-                                                               handleAvatarChange,
+                                                               errors,
+                                                               validateStep1,
                                                            }) => {
-    const toast = useWarnToast();
+    const [formStep, setFormStep] = useState<1 | 2>(1);
+    const progressValue = formStep === 1 ? 50 : 100;
 
-    const handleNext = () => {
-        if (!validateStep(formStep, formData, accountType)) {
-            toast('Пожалуйста, заполните все поля на этом шаге.');
-            return;
-        }
-        setFormStep((formStep + 1) as 1 | 2 | 3);
-    };
-
-    const handleBack = () => {
-        setFormStep((formStep - 1) as 1 | 2 | 3);
-    };
-
-    const internalSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateStep(1, formData, accountType)) {
-            setFormStep(1);
-            toast('Пожалуйста, заполните все поля на шаге 1.');
-            return;
-        }
-        if (!validateStep(2, formData, accountType)) {
+    const handleNext = async () => {
+        const isValid = await validateStep1();
+        if (isValid) {
             setFormStep(2);
-            toast('Пожалуйста, заполните все поля на шаге 2.');
-            return;
         }
-        handleSubmit(e);
     };
 
     return (
@@ -72,9 +44,10 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                 <div className="flex items-center mb-4">
                     <button
                         type="button"
-                        onClick={onBack}
+                        onClick={formStep === 1 ? onBack : () => setFormStep(1)}
                         className="btn btn-ghost btn-sm p-2"
-                        aria-label="Назад к выбору"
+                        aria-label="Назад"
+                        disabled={loading}
                     >
                         <svg
                             viewBox="0 0 24 24"
@@ -93,7 +66,7 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                     </button>
                 </div>
 
-                <form className="space-y-4" onSubmit={internalSubmit}>
+                <form className="space-y-4" onSubmit={handleSubmit}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={formStep}
@@ -103,33 +76,43 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                             transition={{ duration: 0.15, ease: 'easeInOut' }}
                             className="space-y-4"
                         >
-                            {formStep === 1 && (
-                                <AccountTypeSelectStep
+                            {formStep === 1 ? (
+                                <BaseInfoStep
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                    errors={errors}
+                                    onNext={handleNext}
+                                />
+                            ) : (
+                                <AdditionalInfoStep
                                     formData={formData}
                                     accountType={accountType}
                                     handleChange={handleChange}
-                                    onNext={handleNext}
-                                />
-                            )}
-                            {formStep === 2 && (
-                                <TypeBasedFormFieldsStep
-                                    formData={formData}
-                                    accountType={accountType}
-                                    handleChange={handleChange}
-                                    onNext={handleNext}
-                                    onBack={handleBack}
-                                />
-                            )}
-                            {formStep === 3 && (
-                                <ImageUploadStep
-                                    avatarPreview={avatarPreview}
-                                    handleAvatarChange={handleAvatarChange}
-                                    onBack={handleBack}
+                                    errors={errors}
+                                    onBack={() => setFormStep(1)}
+                                    onSubmit={(e) => {
+                                        if (e) e.preventDefault();
+                                        handleSubmit(e || { preventDefault: () => {} } as React.FormEvent);
+                                    }}
                                     loading={loading}
                                 />
                             )}
                         </motion.div>
                     </AnimatePresence>
+
+                    <motion.div
+                        className="w-full h-1 bg-base-200 rounded-full overflow-hidden mt-6"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <motion.div
+                            className="h-full bg-primary rounded-full"
+                            initial={{ width: `${(formStep-1)*50}%` }}
+                            animate={{ width: `${progressValue}%` }}
+                            transition={{ duration: 0.5, ease: 'easeInOut' }}
+                        />
+                    </motion.div>
 
                     {error && (
                         <div className="alert alert-error shadow-md mt-2 mb-3 max-w-md mx-auto py-1.5 px-3 rounded-md flex items-center gap-2 text-xs">
@@ -149,14 +132,6 @@ export const RegisterStepsForm: React.FC<StepFormProps> = ({
                             <span>{error}</span>
                         </div>
                     )}
-                    <div className="w-full flex flex-col items-center mb-6">
-                        <div className="w-full max-w-md h-1 bg-base-300 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-primary transition-all duration-500"
-                                style={{ width: `${formStep === 1 ? 33 : formStep === 2 ? 66 : 100}%` }}
-                            />
-                        </div>
-                    </div>
                 </form>
             </div>
 

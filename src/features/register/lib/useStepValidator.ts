@@ -1,7 +1,7 @@
 import type { StepFormData, AccountType } from '@features/register/types/StepForm';
 
 export const validateStep = (
-    step: 1 | 2 | 3,
+    step: 1 | 2,
     formData: StepFormData,
     accountType: AccountType | null
 ): boolean => {

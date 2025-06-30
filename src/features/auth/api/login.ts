@@ -17,7 +17,7 @@ export const login = async (credentials: { username: string; password: string })
 
     if (!response.ok) {
         const error = await response.json();
-        throw new LoginError(error.error || 'Ошибка авторизации', error.error_code);
+        throw new LoginError(error.message || 'Ошибка авторизации', error.error_code);
     }
 
     return response.json();

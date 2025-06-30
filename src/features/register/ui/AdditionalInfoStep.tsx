@@ -1,10 +1,16 @@
-import { useState } from 'react';
-import { Input, Textarea } from './FormFields.tsx';
+import {Input, NumberInput, Textarea} from './FormFields.tsx';
 import type { StepComponentProps } from '../types/StepForm.ts';
 import { usePasswordStrength } from '../lib/usePasswordStrength';
 
-export const TypeBasedFormFieldsStep = ({ formData, accountType, handleChange, onNext, onBack }: StepComponentProps) => {
-    const [confirmPassword, setConfirmPassword] = useState('');
+export const AdditionalInfoStep = ({
+                                       formData,
+                                       accountType,
+                                       handleChange,
+                                       errors,
+                                       onBack,
+                                       onSubmit,
+                                       loading = false,
+                                   }: StepComponentProps) => {
     const { strength, evaluateStrength } = usePasswordStrength();
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +46,7 @@ export const TypeBasedFormFieldsStep = ({ formData, accountType, handleChange, o
                 label="Логин"
                 value={formData.username}
                 onChange={handleChange}
+                error={errors.username}
             />
 
             <div className="space-y-1">
@@ -49,6 +56,7 @@ export const TypeBasedFormFieldsStep = ({ formData, accountType, handleChange, o
                     label="Пароль"
                     value={formData.password}
                     onChange={handlePasswordChange}
+                    error={errors.password}
                 />
                 {strength && (
                     <div className="space-y-1">
@@ -70,27 +78,26 @@ export const TypeBasedFormFieldsStep = ({ formData, accountType, handleChange, o
                 name="confirmPassword"
                 type="password"
                 label="Повторите пароль"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                error={errors.confirmPassword}
             />
-            {confirmPassword && formData.password !== confirmPassword && (
-                <p className="text-error text-sm">Пароли не совпадают</p>
-            )}
 
             {accountType === 'specialist' && (
                 <>
-                    <Input
+                    <NumberInput
                         name="experienceYears"
-                        type="number"
                         label="Опыт (в годах)"
-                        value={formData.experienceYears || ''}
+                        value={formData.experienceYears}
                         onChange={handleChange}
+                        error={errors.experienceYears}
                     />
                     <Textarea
                         name="about"
                         label="О себе"
                         value={formData.about || ''}
                         onChange={handleChange}
+                        error={errors.about}
                     />
                 </>
             )}
@@ -102,35 +109,48 @@ export const TypeBasedFormFieldsStep = ({ formData, accountType, handleChange, o
                         label="Сайт"
                         value={formData.website || ''}
                         onChange={handleChange}
+                        error={errors.website}
                     />
                     <Input
                         name="address"
                         label="Адрес"
                         value={formData.address || ''}
                         onChange={handleChange}
+                        error={errors.address}
                     />
                     <Textarea
                         name="about"
                         label="О нас"
                         value={formData.about || ''}
                         onChange={handleChange}
+                        error={errors.about}
                     />
                 </>
             )}
 
             <div className="flex justify-end gap-4 mt-4">
-                <button type="button" className="btn" onClick={onBack}>Назад</button>
                 <button
                     type="button"
-                    className="btn btn-primary"
-                    onClick={onNext}
-                    disabled={
-                        formData.password !== confirmPassword ||
-                        !formData.password ||
-                        !confirmPassword
-                    }
+                    className={`btn ${loading ? 'btn-disabled' : ''}`}
+                    onClick={onBack}
+                    disabled={loading}
                 >
-                    Далее
+                    Назад
+                </button>
+                <button
+                    type="button"
+                    className={`btn btn-primary ${loading ? 'btn-disabled' : ''}`}
+                    onClick={onSubmit}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <span className="flex items-center gap-2">
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Отправка...
+                        </span>
+                    ) : (
+                        'Зарегистрироваться'
+                    )}
                 </button>
             </div>
         </>

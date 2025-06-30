@@ -7,9 +7,9 @@ import Toast from '@shared/ui/Toast';
 export const RegisterForm = () => {
     const {
         step,
-        formStep,
         accountType,
         formData,
+        errors,
         error,
         loading,
         showToast,
@@ -19,10 +19,7 @@ export const RegisterForm = () => {
         handleBackToType,
         handleChange,
         handleSubmit,
-        setFormStep,
-        avatarPreview,                // добавлено
-        handleAvatarChange,          // добавлено
-        setAvatarPreview,            // добавлено
+        validateStep1,
     } = useRegister();
 
     return (
@@ -70,16 +67,13 @@ export const RegisterForm = () => {
                         <RegisterStepsForm
                             accountType={accountType}
                             formData={formData}
-                            formStep={formStep}
+                            errors={errors}
                             handleChange={handleChange}
                             handleSubmit={handleSubmit}
                             onBack={handleBackToType}
-                            setFormStep={setFormStep}
                             error={error}
                             loading={loading}
-                            avatarPreview={avatarPreview}
-                            handleAvatarChange={handleAvatarChange}
-                            setAvatarPreview={setAvatarPreview}
+                            validateStep1={validateStep1}
                         />
                     </motion.div>
                 )}

@@ -1,33 +1,63 @@
-// useRegister.ts
-import { useState, type ChangeEvent } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register as apiRegister } from '../api/register';
 import { useWarnToast } from '../lib/useWarnToast';
+import * as yup from 'yup';
+
+const step1Schema = yup.object().shape({
+    name: yup.string().required('Обязательное поле'),
+    email: yup.string().email('Некорректный email').required('Обязательное поле'),
+    phone: yup.string().required('Обязательное поле'),
+});
+
+const step2Schema = yup.object().shape({
+    username: yup.string().required('Обязательное поле'),
+    password: yup.string().min(8, 'Минимум 8 символов').required('Обязательное поле'),
+    confirmPassword: yup.string()
+        .oneOf([yup.ref('password')], 'Пароли не совпадают')
+        .required('Обязательное поле'),
+});
+
+const specialistSchema = yup.object().shape({
+    experienceYears: yup
+        .number()
+        .typeError('Обязательное поле')
+        .required('Обязательное поле')
+        .min(0, 'Не может быть отрицательным'),
+    about: yup.string().required('Обязательное поле'),
+});
+
+
+const organizationSchema = yup.object().shape({
+    website: yup.string().url('Некорректный URL').required('Обязательное поле'),
+    address: yup.string().required('Обязательное поле'),
+    about: yup.string().required('Обязательное поле'),
+});
 
 export const useRegister = () => {
     const navigate = useNavigate();
     const toast = useWarnToast();
     const [step, setStep] = useState<1 | 2>(1);
-    const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
     const [accountType, setAccountType] = useState<'user' | 'specialist' | 'organization' | null>(null);
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
-    const [avatarFile, setAvatarFile] = useState<File | null>(null);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         username: '',
         password: '',
+        confirmPassword: '',
         name: '',
         email: '',
         phone: '',
-        experienceYears: '',
+        experienceYears: 0,
         about: '',
         website: '',
         address: '',
     });
+
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleAccountTypeSelect = (type: 'user' | 'specialist' | 'organization') => {
         setAccountType(type);
@@ -38,35 +68,64 @@ export const useRegister = () => {
         setStep(1);
         setAccountType(null);
     };
+ // нужно найти решение получше
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'experienceYears'
+                ? (value === '' ? '' : Number(value))
+                : value,
+        }));
+
+        if (errors[name]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
     };
 
-    const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
+    const validateStep1 = async () => {
+        try {
+            await step1Schema.validate(formData, { abortEarly: false });
+            return true;
+        } catch (err) {
+            if (err instanceof yup.ValidationError) {
+                const newErrors = err.inner.reduce((acc, curr) => {
+                    if (curr.path) acc[curr.path] = curr.message;
+                    return acc;
+                }, {} as Record<string, string>);
+                setErrors(newErrors);
+            }
+            return false;
+        }
+    };
 
-            if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
-                setError('Только JPG/PNG изображения');
-                return;
+    const validateStep2 = async () => {
+        try {
+            await step2Schema.validate(formData, { abortEarly: false });
+
+            if (accountType === 'specialist') {
+                await specialistSchema.validate(formData, { abortEarly: false });
             }
 
-            if (file.size > 5 * 1024 * 1024) {
-                setError('Максимальный размер 5MB');
-                return;
+            if (accountType === 'organization') {
+                await organizationSchema.validate(formData, { abortEarly: false });
             }
 
-            setAvatarFile(file);
-            setError('');
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target?.result) {
-                    setAvatarPreview(event.target.result as string);
-                }
-            };
-            reader.readAsDataURL(file);
+            return true;
+        } catch (err) {
+            if (err instanceof yup.ValidationError) {
+                const newErrors = err.inner.reduce((acc, curr) => {
+                    if (curr.path) acc[curr.path] = curr.message;
+                    return acc;
+                }, {} as Record<string, string>);
+                setErrors(newErrors);
+            }
+            return false;
         }
     };
 
@@ -78,35 +137,32 @@ export const useRegister = () => {
         try {
             if (!accountType) throw new Error('Выберите тип аккаунта');
 
-            const formDataToSend = new FormData();
-            formDataToSend.append('username', formData.username);
-            formDataToSend.append('password', formData.password);
-            formDataToSend.append('name', formData.name);
-            formDataToSend.append('email', formData.email);
-            formDataToSend.append('phone', formData.phone);
-            formDataToSend.append('account_type', accountType);
+            const isStep1Valid = await validateStep1();
+            const isStep2Valid = await validateStep2();
 
-            if (avatarFile) {
-                formDataToSend.append('avatar', avatarFile);
+            if (!isStep1Valid || !isStep2Valid) {
+                throw new Error('Пожалуйста, исправьте ошибки в форме');
             }
 
-            if (accountType === 'specialist') {
-                if (formData.experienceYears)
-                    formDataToSend.append('experience_years', formData.experienceYears);
-                if (formData.about)
-                    formDataToSend.append('about', formData.about);
-            }
+            const dataToSend = {
+                username: formData.username,
+                password: formData.password,
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                account_type: accountType,
+                ...(accountType === 'specialist' && {
+                    experience_years: formData.experienceYears,
+                    about: formData.about,
+                }),
+                ...(accountType === 'organization' && {
+                    website: formData.website,
+                    address: formData.address,
+                    about: formData.about,
+                }),
+            };
 
-            if (accountType === 'organization') {
-                if (formData.website)
-                    formDataToSend.append('website', formData.website);
-                if (formData.address)
-                    formDataToSend.append('address', formData.address);
-                if (formData.about)
-                    formDataToSend.append('about', formData.about);
-            }
-
-            const response = await apiRegister(formDataToSend);
+            const response = await apiRegister(dataToSend);
 
             setToastMessage(response.message || 'Регистрация успешна');
             setShowToast(true);
@@ -121,22 +177,19 @@ export const useRegister = () => {
 
     return {
         step,
-        formStep,
         accountType,
         formData,
+        errors,
         error,
         loading,
         showToast,
         toastMessage,
-        avatarPreview,
-        setAvatarPreview,
         setShowToast,
         handleAccountTypeSelect,
         handleBackToType,
         handleChange,
-        handleAvatarChange,
         handleSubmit,
-        setFormStep,
-
+        validateStep1,
+        validateStep2,
     };
 };

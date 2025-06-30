@@ -1,4 +1,4 @@
-import type {ChangeEvent} from 'react';
+import type { ChangeEvent } from 'react';
 
 export type AccountType = 'user' | 'specialist' | 'organization';
 
@@ -8,17 +8,20 @@ export interface StepFormData {
     phone: string;
     username: string;
     password: string;
-    experienceYears?: string;
+    confirmPassword: string;
+    experienceYears: number;
     about?: string;
     website?: string;
     address?: string;
-    avatar?: File | null;
 }
 
 export interface StepComponentProps {
     formData: StepFormData;
     accountType: AccountType | null;
     handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    errors: Record<string, string>;
     onNext?: () => void;
     onBack?: () => void;
+    onSubmit?: (e?: React.FormEvent) => void;
+    loading?: boolean;
 }

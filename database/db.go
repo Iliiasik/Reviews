@@ -60,7 +60,7 @@ func InitDB() {
 		&models.Review{},
 		&models.ReviewCollection{},
 		&models.ReviewCollectionAccess{},
-		&models.QRCode{},
+		&models.RefreshToken{},
 	)
 	if err != nil {
 		log.Fatalf("Error running migrations: %v", err)
@@ -94,7 +94,7 @@ func SeedCasbinPolicies() {
 		log.Fatalf("Failed to create casbin adapter: %v", err)
 	}
 
-	enforcer, err := casbin.NewEnforcer("casbin/model.conf", adapter)
+	enforcer, err := casbin.NewEnforcer("rbac/casbin/model.conf", adapter)
 	if err != nil {
 		log.Fatalf("Failed to create casbin enforcer: %v", err)
 	}

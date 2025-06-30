@@ -6,8 +6,9 @@ import (
 	"log"
 	"os"
 	"reviews-back/controllers/auth"
-	"reviews-back/controllers/rbac"
 	"reviews-back/database"
+	"reviews-back/middlewares"
+	"reviews-back/rbac"
 	"reviews-back/routes"
 )
 
@@ -21,10 +22,11 @@ func main() {
 	if len(auth.JwtKey) == 0 {
 		log.Fatal("JWT_SECRET is not set in .env")
 	}
+
 	database.InitDB()
 	//storage.InitMinio()
 	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(gin.Logger(), gin.Recovery(), middlewares.ErrorHandler())
 
 	r.RedirectTrailingSlash = false
 	enforcer, err := rbac.NewEnforcer(database.DB)

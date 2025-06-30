@@ -11,20 +11,20 @@ import (
 
 func GetProfileHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := c.Cookie("token")
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Нет доступа: отсутствует токен"})
+		userIDVal, exists := c.Get("user_id")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Нет доступа: отсутствует user_id в контексте"})
 			return
 		}
 
-		claims, err := auth.ValidateJWT(token)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Невалидный токен"})
+		userID, ok := userIDVal.(uint)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Неверный тип user_id"})
 			return
 		}
 
 		var user models.User
-		if err := db.Preload("Role").First(&user, claims.UserID).Error; err != nil {
+		if err := db.Preload("Role").First(&user, userID).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
 			return
 		}

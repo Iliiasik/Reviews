@@ -1,10 +1,9 @@
 package middlewares
 
 import (
-	"net/http"
-
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"reviews-back/errors"
 )
 
 func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
@@ -16,10 +15,8 @@ func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 
 		role, exists := c.Get("user_role")
 		if !exists {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error":   "unauthorized",
-				"message": "Authentication required",
-			})
+			c.Error(errors.UnauthorizedError(errors.CodeUnauthorized, "Требуется авторизация"))
+			c.Abort()
 			return
 		}
 
@@ -28,18 +25,14 @@ func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 
 		allowed, err := enforcer.Enforce(role, path, method)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error":   "internal_error",
-				"message": "Failed to check permissions",
-			})
+			c.Error(errors.InternalServerError(err).WithCode(errors.CodeInternalServerError))
+			c.Abort()
 			return
 		}
 
 		if !allowed {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
-				"error":   "forbidden",
-				"message": "You don't have permission to access this resource",
-			})
+			c.Error(errors.ForbiddenError("У вас нет прав доступа к этому ресурсу"))
+			c.Abort()
 			return
 		}
 

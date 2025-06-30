@@ -43,6 +43,7 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 	public.Use(middlewares.AuthMiddleware(database.DB))
 	{
 		public.POST("/login", auth.Login)
+		public.POST("/auth/refresh", auth.Refresh)
 		public.GET("/auth/google", auth.GoogleLogin)
 		public.GET("/auth/google/callback", auth.GoogleCallback)
 		public.GET("/confirm-email", auth.ConfirmEmailHandler(database.DB))

@@ -37,7 +37,6 @@ func Initialize() http.Handler {
 	b.Model(&models.Review{}).Label("Отзывы").MenuIcon("mdi-comment-text-multiple")
 	b.Model(&models.ReviewCollection{}).Label("Коллекции отзывов").MenuIcon("mdi-folder-multiple")
 	b.Model(&models.ReviewCollectionAccess{}).Label("Доступы к коллекциям").MenuIcon("mdi-lock-open")
-	b.Model(&models.QRCode{}).Label("QR-коды").MenuIcon("mdi-qrcode")
 
 	b.MenuOrder(
 		b.MenuGroup("Пользователи и доступы").SubItems(
@@ -63,8 +62,6 @@ func Initialize() http.Handler {
 			"report_categories",
 			"review_reports",
 		).Icon("mdi-shield-account"),
-
-		"qr_codes",
 	)
 
 	return b

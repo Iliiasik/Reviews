@@ -52,6 +52,19 @@ type Confirmation struct {
 	Token          string `json:"token" gorm:"uniqueIndex;not null"`
 }
 
+type RefreshToken struct {
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	UserID    uint      `json:"user_id" gorm:"not null;index"`
+	Token     string    `json:"token" gorm:"type:varchar(36);uniqueIndex;not null"`
+	ExpiresAt time.Time `json:"expires_at" gorm:"not null"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"-"`
+}
+
+func (RefreshToken) TableName() string {
+	return "refresh_tokens"
+}
+
 func (Role) TableName() string {
 	return "roles"
 }

@@ -25,17 +25,6 @@ type ReviewAspect struct {
 	Positive    bool   `json:"positive" gorm:"not null"` // true — сильная сторона, false — слабая
 }
 
-type QRCode struct {
-	ID     uint   `json:"id" gorm:"primaryKey"`
-	QRUrl  string `json:"qr_url" gorm:"type:varchar(255);not null"`
-	UserID uint   `json:"user_id" gorm:"not null;index"`
-	User   User   `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-}
-
-func (QRCode) TableName() string {
-	return "qr_codes"
-}
-
 func (Review) TableName() string {
 	return "reviews"
 }

@@ -12,7 +12,7 @@ func NewEnforcer(db *gorm.DB) (*casbin.Enforcer, error) {
 		return nil, err
 	}
 
-	enforcer, err := casbin.NewEnforcer("casbin/model.conf", adapter)
+	enforcer, err := casbin.NewEnforcer("rbac/casbin/model.conf", adapter)
 	if err != nil {
 		return nil, err
 	}

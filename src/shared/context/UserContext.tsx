@@ -9,7 +9,7 @@ interface User {
 
 interface UserContextType {
     user: User | null;
-    setUser: (user: User | null) => void; // 👈 добавлено
+    setUser: (user: User | null) => void;
     loading: boolean;
 }
 

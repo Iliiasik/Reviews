@@ -1,7 +1,7 @@
-import { useUser } from "@shared/context/UserContext";
+import { useUser } from "@shared/context/UserContext.tsx";
 import axios from "axios";
 
-export const logout = () => {
+export const useLogout = () => {
     const { setUser } = useUser();
 
     const logout = async (): Promise<void> => {

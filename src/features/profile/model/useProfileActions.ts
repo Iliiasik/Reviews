@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useToast } from '@features/profile/model/useToast';
-import { useLogout } from '@features/profile/api/useLogout';
+import { logout } from '@features/profile/api/logout.ts';
 
 export const useProfileActions = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-    const logout = useLogout();
 
     const handleLogout = async () => {
         try {

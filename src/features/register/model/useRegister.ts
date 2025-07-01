@@ -29,7 +29,7 @@ const specialistSchema = yup.object().shape({
 
 
 const organizationSchema = yup.object().shape({
-    website: yup.string().url('Некорректный URL').required('Обязательное поле'),
+    website: yup.string().url('Некорректный URL').nullable(),
     address: yup.string().required('Обязательное поле'),
     about: yup.string().required('Обязательное поле'),
 });

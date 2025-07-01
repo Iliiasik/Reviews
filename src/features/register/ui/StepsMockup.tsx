@@ -47,7 +47,7 @@ export const StepsMockup = ({ formStep, accountType }: StepsMockupProps) => (
                                 <span className="badge badge-info badge-xs mt-1"></span>
                                 <div>
                                     <p className="font-medium">Телефон</p>
-                                    <p className="text-xs opacity-70">Международный формат: +7 (XXX) XXX-XX-XX</p>
+                                    <p className="text-xs opacity-70">Только кыргызский формат: +996 (XXX) XX-XX-XX</p>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@ export const StepsMockup = ({ formStep, accountType }: StepsMockupProps) => (
                                         <span className="badge badge-info badge-xs mt-1"></span>
                                         <div>
                                             <p className="font-medium">О себе</p>
-                                            <p className="text-xs opacity-70">Краткое профессиональное описание (макс. 200 символов)</p>
+                                            <p className="text-xs opacity-70">Краткое профессиональное описание</p>
                                         </div>
                                     </div>
                                 </>
@@ -100,7 +100,7 @@ export const StepsMockup = ({ formStep, accountType }: StepsMockupProps) => (
                                         <span className="badge badge-info badge-xs mt-1"></span>
                                         <div>
                                             <p className="font-medium">Веб-сайт</p>
-                                            <p className="text-xs opacity-70">Полный URL (например, https://вашакомпания.ру)</p>
+                                            <p className="text-xs opacity-70">Полный URL (например, https://вашакомпания.kg), необязателен</p>
                                         </div>
                                     </div>
 
@@ -116,7 +116,7 @@ export const StepsMockup = ({ formStep, accountType }: StepsMockupProps) => (
                                         <span className="badge badge-info badge-xs mt-1"></span>
                                         <div>
                                             <p className="font-medium">Описание деятельности</p>
-                                            <p className="text-xs opacity-70">Кратко опишите сферу деятельности (макс. 300 символов)</p>
+                                            <p className="text-xs opacity-70">Кратко опишите сферу деятельности</p>
                                         </div>
                                     </div>
                                 </>

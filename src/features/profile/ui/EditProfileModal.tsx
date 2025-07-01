@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import {updateProfile} from "@features/profile/api/profile.ts";
+import { useEditProfile } from '@features/profile/model/useEditProfile';
+import { IMaskInput } from 'react-imask';
 
 interface EditProfileModalProps {
     profile: any;
@@ -8,58 +8,80 @@ interface EditProfileModalProps {
 }
 
 export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileModalProps) => {
-    const [form, setForm] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        about: '',
-        website: '',
-        address: '',
-        experience_years: '',
-    });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const {
+        form,
+        errors,
+        error,
+        loading,
+        handleChange,
+        handleNumberChange,
+        handleSubmit,
+    } = useEditProfile(profile, onSuccess);
 
-    useEffect(() => {
-        setForm({
-            name: profile?.name ?? '',
-            email: profile?.email ?? '',
-            phone: profile?.phone ?? '',
-            about: profile?.about ?? '',
-            website: profile?.website ?? '',
-            address: profile?.address ?? '',
-            experience_years: profile?.experience_years?.toString() ?? '',
-        });
-    }, [profile]);
+    const renderField = (
+        name: string,
+        label: string,
+        type = 'text',
+        placeholder = '',
+        isTextarea = false,
+        isNumber = false,
+        isPhone = false
+    ) => {
+        const value = form[name as keyof typeof form];
+        const error = errors[name];
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        const payload = {
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
-            about: form.about,
-            website: profile.role === 'organization' ? form.website : undefined,
-            address: profile.role === 'organization' ? form.address : undefined,
-            experience_years: profile.role === 'specialist' ? parseInt(form.experience_years || '0') : undefined,
-        };
-
-        try {
-            await updateProfile(payload);
-            onSuccess();
-        } catch (error) {
-            setError(error instanceof Error ? error.message : 'Ошибка при сохранении');
-        } finally {
-            setLoading(false);
+        if (isPhone) {
+            return (
+                <div className="form-control">
+                    <label className="label">
+                        <span className="label-text font-semibold">{label}</span>
+                    </label>
+                    <IMaskInput
+                        mask={'+996 (000)-00-00-00'}
+                        value={value as string}
+                        unmask={false}
+                        onAccept={(value: string) => {
+                            handleChange({
+                                target: { name, value },
+                            } as React.ChangeEvent<HTMLInputElement>);
+                        }}
+                        placeholder="+996 (XXX)-XX-XX-XX"
+                        type="tel"
+                        name={name}
+                        className={`input input-bordered w-full ${error ? 'input-error' : ''}`}
+                    />
+                    {error && <span className="text-error text-sm mt-1">{error}</span>}
+                </div>
+            );
         }
+
+        return (
+            <div className="form-control">
+                <label className="label">
+                    <span className="label-text font-semibold">{label}</span>
+                </label>
+                {isTextarea ? (
+                    <textarea
+                        name={name}
+                        value={value as string}
+                        onChange={handleChange}
+                        className={`textarea textarea-bordered w-full ${error ? 'textarea-error' : ''}`}
+                        placeholder={placeholder}
+                        rows={4}
+                    />
+                ) : (
+                    <input
+                        name={name}
+                        type={type}
+                        value={value as string}
+                        onChange={isNumber ? handleNumberChange : handleChange}
+                        className={`input input-bordered w-full ${error ? 'input-error' : ''}`}
+                        placeholder={placeholder}
+                    />
+                )}
+                {error && <span className="text-error text-sm mt-1">{error}</span>}
+            </div>
+        );
     };
 
     return (
@@ -67,111 +89,30 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
             <div className="bg-base-100/70 backdrop-blur-md p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40">
                 <h3 className="text-xl font-bold mb-4">Редактирование профиля</h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    {renderField('name', 'Имя / Название', 'text', 'Имя / Название')}
+                    {renderField('email', 'Email', 'email', 'Email')}
+                    {renderField('phone', 'Телефон', 'tel', 'Телефон', false, false, true)}
 
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text font-semibold">Имя / Название</span>
-                        </label>
-                        <input
-                            name="name"
-                            value={form.name}
-                            onChange={handleChange}
-                            className="input input-bordered w-full opacity-75"
-                            placeholder="Имя / Название"
-                            required
-                        />
-                    </div>
+                    {(form.role === 'specialist' || form.role === 'organization') &&
+                        renderField(
+                            'about',
+                            form.role === 'specialist' ? 'О себе' : 'О нас',
+                            'text',
+                            form.role === 'specialist' ? 'О себе' : 'О нас',
+                            true
+                        )
+                    }
 
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text font-semibold">Email</span>
-                        </label>
-                        <input
-                            name="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            type="email"
-                            className="input input-bordered w-full opacity-75 "
-                            placeholder="Email"
-                            required
-                        />
-                    </div>
-
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text font-semibold">Телефон</span>
-                        </label>
-                        <input
-                            name="phone"
-                            value={form.phone}
-                            onChange={handleChange}
-                            className="input input-bordered w-full opacity-75 "
-                            placeholder="Телефон"
-                        />
-                    </div>
-
-                    {(profile.role === 'specialist' || profile.role === 'organization') && (
-                        <div className="form-control">
-                            <label className="label">
-            <span className="label-text font-semibold">
-              {profile.role === 'specialist' ? 'О себе' : 'О нас'}
-            </span>
-                            </label>
-                            <textarea
-                                name="about"
-                                value={form.about}
-                                onChange={handleChange}
-                                className="textarea textarea-bordered w-full opacity-75"
-                                placeholder={profile.role === 'specialist' ? 'О себе' : 'О нас'}
-                            />
-                        </div>
-                    )}
-
-                    {profile.role === 'organization' && (
+                    {form.role === 'organization' && (
                         <>
-                            <div className="form-control">
-                                <label className="label">
-                                    <span className="label-text font-semibold">Сайт</span>
-                                </label>
-                                <input
-                                    name="website"
-                                    value={form.website}
-                                    onChange={handleChange}
-                                    className="input input-bordered w-full opacity-75 "
-                                    placeholder="Сайт"
-                                />
-                            </div>
-
-                            <div className="form-control">
-                                <label className="label">
-                                    <span className="label-text font-semibold">Адрес</span>
-                                </label>
-                                <input
-                                    name="address"
-                                    value={form.address}
-                                    onChange={handleChange}
-                                    className="input input-bordered w-full opacity-75 "
-                                    placeholder="Адрес"
-                                />
-                            </div>
+                            {renderField('website', 'Сайт', 'url', 'Сайт')}
+                            {renderField('address', 'Адрес', 'text', 'Адрес')}
                         </>
                     )}
 
-                    {profile.role === 'specialist' && (
-                        <div className="form-control">
-                            <label className="label">
-                                <span className="label-text font-semibold">Опыт (лет)</span>
-                            </label>
-                            <input
-                                name="experience_years"
-                                value={form.experience_years}
-                                onChange={handleChange}
-                                type="number"
-                                className="input input-bordered w-full opacity-75 "
-                                placeholder="Опыт (лет)"
-                            />
-                        </div>
-                    )}
+                    {form.role === 'specialist' &&
+                        renderField('experience_years', 'Опыт (лет)', 'number', 'Опыт (лет)', false, true)
+                    }
 
                     {error && <div className="text-error text-sm">{error}</div>}
 
@@ -190,15 +131,14 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
-              <span className="loading loading-spinner loading-sm"></span>
-              Сохраняем...
-            </span>
+                                    <span className="loading loading-spinner loading-sm"></span>
+                                    Сохраняем...
+                                </span>
                             ) : 'Сохранить'}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-
     );
 };

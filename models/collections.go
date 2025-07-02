@@ -2,47 +2,77 @@ package models
 
 import "time"
 
-type ReviewCollectionAccess struct {
-	ID           uint             `gorm:"primaryKey"`
-	CollectionID uint             `gorm:"not null"`
-	Collection   ReviewCollection `gorm:"foreignKey:CollectionID;constraint:OnDelete:CASCADE"`
-	UserID       uint             `gorm:"not null"`
-	User         User             `gorm:"foreignKey:UserID"`
-	CanEdit      bool             `gorm:"default:false"` // Доступ только к просмотру или с возможностью редактировать
+// Переработанные подборки, теперь я правильно их настроил с отзывов на спецов и организации.
+// Более гибкая структура с явным отделением спецов и организаций, лучше для сортировки и тд
+
+type CollectionAccess struct {
+	ID           uint       `gorm:"primaryKey"`
+	CollectionID uint       `gorm:"not null"`
+	Collection   Collection `gorm:"foreignKey:CollectionID;constraint:OnDelete:CASCADE"`
+	UserID       uint       `gorm:"not null"`
+	User         User       `gorm:"foreignKey:UserID"`
+	CanEdit      bool       `gorm:"default:false"`
 	CreatedAt    time.Time
 }
 
-type ReviewCollection struct {
-	ID          uint            `gorm:"primaryKey"`
-	OwnerID     uint            `gorm:"not null"`
-	Owner       User            `gorm:"foreignKey:OwnerID"`
-	Title       string          `gorm:"not null"`
-	Description string          `gorm:"type:text"`
-	IsPublic    bool            `gorm:"default:false"`
-	SharedToken *string         `gorm:"uniqueIndex;type:uuid"`
-	CategoryID  *uint           `gorm:"index"`
-	Category    *ReviewCategory `gorm:"foreignKey:CategoryID"`
+type Collection struct {
+	ID          uint                `gorm:"primaryKey"`
+	OwnerID     uint                `gorm:"not null"`
+	Owner       User                `gorm:"foreignKey:OwnerID"`
+	Title       string              `gorm:"not null"`
+	Description string              `gorm:"type:text"`
+	IsPublic    bool                `gorm:"default:false"`
+	SharedToken *string             `gorm:"uniqueIndex;type:uuid"`
+	CategoryID  *uint               `gorm:"index"`
+	Category    *CollectionCategory `gorm:"foreignKey:CategoryID"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 
-	Reviews       []Review                 `gorm:"many2many:review_collection_reviews"`
-	AccessEntries []ReviewCollectionAccess `gorm:"foreignKey:CollectionID"`
+	Specialists   []SpecialistProfile   `gorm:"many2many:collection_specialists"`
+	Organizations []OrganizationProfile `gorm:"many2many:collection_organizations"`
+	AccessEntries []CollectionAccess    `gorm:"foreignKey:CollectionID"`
 }
 
-type ReviewCategory struct {
+type CollectionCategory struct {
 	ID          uint   `gorm:"primaryKey"`
 	Name        string `gorm:"unique;not null"`
 	Description string `gorm:"type:text"`
 }
 
-func (ReviewCollectionAccess) TableName() string {
-	return "review_collection_access"
+type CollectionSpecialist struct {
+	CollectionID uint              `gorm:"primaryKey"`
+	SpecialistID uint              `gorm:"primaryKey"`
+	Collection   Collection        `gorm:"foreignKey:CollectionID;constraint:OnDelete:CASCADE"`
+	Specialist   SpecialistProfile `gorm:"foreignKey:SpecialistID;constraint:OnDelete:CASCADE"`
+	AddedAt      time.Time         `gorm:"autoCreateTime"`
+	Notes        string            `gorm:"type:text"`
 }
 
-func (ReviewCollection) TableName() string {
-	return "review_collections"
+type CollectionOrganization struct {
+	CollectionID   uint                `gorm:"primaryKey"`
+	OrganizationID uint                `gorm:"primaryKey"`
+	Collection     Collection          `gorm:"foreignKey:CollectionID;constraint:OnDelete:CASCADE"`
+	Organization   OrganizationProfile `gorm:"foreignKey:OrganizationID;constraint:OnDelete:CASCADE"`
+	AddedAt        time.Time           `gorm:"autoCreateTime"`
+	Notes          string              `gorm:"type:text"`
 }
 
-func (ReviewCategory) TableName() string {
-	return "review_categories"
+func (CollectionAccess) TableName() string {
+	return "collection_access"
+}
+
+func (Collection) TableName() string {
+	return "collections"
+}
+
+func (CollectionCategory) TableName() string {
+	return "collection_categories"
+}
+
+func (CollectionSpecialist) TableName() string {
+	return "collection_specialists"
+}
+
+func (CollectionOrganization) TableName() string {
+	return "collection_organizations"
 }

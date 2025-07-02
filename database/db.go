@@ -56,10 +56,12 @@ func InitDB() {
 		&models.ReportCategory{},
 		&models.ReviewReport{},
 		&models.ReviewAspect{},
-		&models.ReviewCategory{},
+		&models.CollectionCategory{},
 		&models.Review{},
-		&models.ReviewCollection{},
-		&models.ReviewCollectionAccess{},
+		&models.Collection{},
+		&models.CollectionAccess{},
+		&models.CollectionSpecialist{},
+		&models.CollectionOrganization{},
 		&models.RefreshToken{},
 	)
 	if err != nil {
@@ -146,6 +148,7 @@ func SeedCasbinPolicies() {
 		{"user", "/api/profile", "GET"},
 		{"user", "/api/logout", "POST"},
 		{"user", "/api/change-password", "POST"},
+		{"user", "/api/profile/update", "POST"},
 	}
 
 	for _, policy := range policies {

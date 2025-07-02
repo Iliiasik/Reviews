@@ -33,10 +33,7 @@ func Initialize() http.Handler {
 	b.Model(&models.ReportCategory{}).Label("Категории жалоб").MenuIcon("mdi-alert-box")
 	b.Model(&models.ReviewReport{}).Label("Жалобы на отзывы").MenuIcon("mdi-flag")
 	b.Model(&models.ReviewAspect{}).Label("Аспекты отзывов").MenuIcon("mdi-star-half-full")
-	b.Model(&models.ReviewCategory{}).Label("Категории отзывов").MenuIcon("mdi-shape")
 	b.Model(&models.Review{}).Label("Отзывы").MenuIcon("mdi-comment-text-multiple")
-	b.Model(&models.ReviewCollection{}).Label("Коллекции отзывов").MenuIcon("mdi-folder-multiple")
-	b.Model(&models.ReviewCollectionAccess{}).Label("Доступы к коллекциям").MenuIcon("mdi-lock-open")
 
 	b.MenuOrder(
 		b.MenuGroup("Пользователи и доступы").SubItems(

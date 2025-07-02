@@ -2,6 +2,7 @@ package profile
 
 import (
 	"net/http"
+	"reviews-back/controllers/auth"
 	"reviews-back/errors"
 	"reviews-back/models"
 	"reviews-back/validation"
@@ -96,7 +97,9 @@ func UpdateProfileHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		if req.Email != user.Email {
+		emailChanged := req.Email != user.Email
+
+		if emailChanged {
 			var existingUser models.User
 			if err := db.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
 				c.JSON(http.StatusBadRequest, errors.ValidationError(map[string]string{
@@ -107,8 +110,25 @@ func UpdateProfileHandler(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		user.Name = req.Name
-		user.Email = req.Email
 		user.Phone = req.Phone
+
+		if emailChanged {
+			user.Email = req.Email
+
+			if err := db.Where("user_id = ?", user.ID).Delete(&models.Confirmation{}).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
+				return
+			}
+
+			confirmation, err := auth.CreateConfirmation(db, user.ID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, err)
+				return
+			}
+
+			go auth.SendConfirmationEmail(user, confirmation.Token)
+		}
+
 		if err := db.Save(&user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
 			return
@@ -138,6 +158,15 @@ func UpdateProfileHandler(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Профиль успешно обновлён"})
+		response := gin.H{
+			"message": "Профиль успешно обновлён",
+		}
+
+		if emailChanged {
+			response["email_changed"] = true
+			response["requires_logout"] = true
+		}
+
+		c.JSON(http.StatusOK, response)
 	}
 }

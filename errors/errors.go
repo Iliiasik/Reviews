@@ -28,6 +28,7 @@ const (
 	CodeRefreshTokenRequired        = "REFRESH_TOKEN_REQUIRED"
 	CodeRefreshTokenGenerationError = "REFRESH_TOKEN_GENERATION_ERROR"
 	CodeRefreshTokenRevokeError     = "REFRESH_TOKEN_REVOKE_ERROR"
+	CodeDatabaseError               = "DATABASE_ERROR"
 )
 
 type AppError struct {

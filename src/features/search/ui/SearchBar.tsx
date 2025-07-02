@@ -1,20 +1,29 @@
-// SearchBar.tsx
 import { useSearchShortcut } from '../model/useSearchShortcut';
 import { useSearch } from '@features/search/lib/useSearch';
 import { SearchResultsDropdown } from '@features/search/ui/SearchResultDropdown';
 import { SearchInput } from '@features/search/ui/SearchInput';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-export const SearchBar = () => {
-    const searchInputRef = useSearchShortcut();
+// SearchBar.tsx
+interface SearchBarProps {
+    externalRef?: React.RefObject<HTMLInputElement | null>;
+}
+
+export const SearchBar = ({ externalRef }: SearchBarProps) => {
+    const hotkeyRef = useSearchShortcut();
     const navigate = useNavigate();
+
     const {
         query,
         results,
         isFocused,
         setQuery,
         setIsFocused,
+        hasMore,
+        loadMore,
     } = useSearch();
+
+    const mergedRef = externalRef || hotkeyRef;
 
     return (
         <div className="w-full mb-10 px-4">
@@ -23,23 +32,21 @@ export const SearchBar = () => {
                     value={query}
                     onChange={setQuery}
                     onFocus={() => setIsFocused(true)}
-                    onBlur={() => {
-                        setTimeout(() => {
-                            setIsFocused(false);
-                        }, 150); // 100–150мс хватает
-                    }}                    inputRef={searchInputRef}
+                    onBlur={() => setTimeout(() => setIsFocused(false), 150)}
+                    inputRef={mergedRef}
                 />
-
                 {isFocused && query.length > 0 && (
                     <SearchResultsDropdown
                         results={results}
+                        hasMore={hasMore}
+                        onLoadMore={loadMore}
                         onSelect={(id, type) => {
                             navigate(`/${type}/${id}`);
                         }}
                     />
                 )}
-
             </div>
         </div>
     );
 };
+

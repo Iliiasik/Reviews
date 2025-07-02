@@ -1,18 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDebounce } from './useDebounce';
 import { fetchSearchResults } from '../api/search';
 import type { SearchResult } from '../types/SearchResult';
+
+const LIMIT = 10;
 
 export const useSearch = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [isFocused, setIsFocused] = useState(false);
+    const [offset, setOffset] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
+
     const debounced = useDebounce(query, 400);
 
-    useEffect(() => {
-        if (!debounced.trim()) return setResults([]);
-        fetchSearchResults(debounced).then(setResults).catch(() => setResults([]));
+    const fetchInitial = useCallback(async () => {
+        setLoading(true);
+        try {
+            const newResults = await fetchSearchResults(debounced, LIMIT, 0);
+            setResults(newResults);
+            setOffset(newResults.length);
+            setHasMore(newResults.length === LIMIT);
+        } catch {
+            setResults([]);
+            setHasMore(false);
+        } finally {
+            setLoading(false);
+        }
     }, [debounced]);
 
-    return { query, setQuery, results, isFocused, setIsFocused };
+    const loadMore = useCallback(async () => {
+        if (loading || !hasMore) return;
+        setLoading(true);
+        try {
+            const moreResults = await fetchSearchResults(debounced, LIMIT, offset);
+            setResults(prev => [...prev, ...moreResults]);
+            setOffset(prev => prev + moreResults.length);
+            if (moreResults.length < LIMIT) setHasMore(false);
+        } catch {
+            // handle error silently
+        } finally {
+            setLoading(false);
+        }
+    }, [debounced, offset, hasMore, loading]);
+
+    useEffect(() => {
+        if (!debounced.trim()) {
+            setResults([]);
+            setHasMore(false);
+            setOffset(0);
+            return;
+        }
+
+        fetchInitial();
+    }, [debounced, fetchInitial]);
+
+    return {
+        query,
+        setQuery,
+        results,
+        isFocused,
+        setIsFocused,
+        hasMore,
+        loadMore,
+        loading,
+    };
 };

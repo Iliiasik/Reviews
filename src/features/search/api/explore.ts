@@ -1,5 +1,5 @@
 // src/api/explore.ts
-import axios from 'axios';
+import api from "@shared/axios/axios.ts";
 
 export interface ExploreResult {
     id: number;
@@ -21,7 +21,7 @@ export async function fetchExploreData(
     page: number,
     limit: number
 ): Promise<ExploreResponse> {
-    const res = await axios.get('/api/explore', {
+    const res = await api.get('/explore', {
         params: {
             type,
             rating: rating ?? undefined,

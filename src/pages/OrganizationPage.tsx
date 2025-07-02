@@ -1,37 +1,35 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import { getSpecialistById } from "@features/specialist/api/getSpecialistById.ts";
-import type { SpecialistProfile } from "@features/specialist/types/SpecialistProfile.ts";
-import { SpecialistProfileView } from "@features/specialist/ui/SpecialistProfileView.tsx";
-import { Reviews } from "@shared/Reviews.tsx";
-import { useToast } from "@shared/context/ToastContext.tsx";
+import { getOrganizationById } from "@features/organisation/api/getOrganizationById";
+import type { OrganizationProfile } from "@features/organisation/types/OrganizationProfile";
+import { OrganizationProfileView } from "@features/organisation/ui/OrganizationProfileView";
+import { Reviews } from "@shared/Reviews.tsx"; // можно переименовать
+import { useToast } from "@shared/context/ToastContext";
 
-export const Specialist = () => {
+export const OrganizationPage = () => {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
     const { showToast } = useToast();
 
-    const [data, setData] = useState<SpecialistProfile | null>(null);
+    const [data, setData] = useState<OrganizationProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // ✅ Показ тоста один раз и сброс состояния безопасным способом
     useEffect(() => {
         const toast = location.state?.toast;
         if (toast) {
             showToast(toast.message, toast.type || "info");
-
             setTimeout(() => {
                 navigate(location.pathname, { replace: true });
-            }, 100); // достаточно короткой задержки
+            }, 100);
         }
     }, []);
 
     useEffect(() => {
         if (!id) return;
-        getSpecialistById(id)
+        getOrganizationById(id)
             .then(setData)
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
@@ -43,8 +41,8 @@ export const Specialist = () => {
 
     return (
         <main className="flex-grow p-6 flex flex-col items-center">
-            <SpecialistProfileView data={data} />
-            <Reviews type="specialist" />
+            <OrganizationProfileView data={data} />
+            <Reviews type="organization" />
         </main>
     );
 };

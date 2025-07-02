@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import type { ReviewAspect } from "@features/review/types/ReviewAspect.ts";
 import { getReviewAspects } from "@features/review/api/getReviewAspects.ts";
 import { createReview } from "@features/review/api/createReview.ts";
@@ -9,15 +8,18 @@ import { RatingInput } from "@features/review/ui/RatingInput.tsx";
 import { AspectCheckboxList } from "@features/review/ui/AspectCheckBoxList.tsx";
 import { CommentTextarea } from "@features/review/ui/CommentTextArea.tsx";
 import { AnonymousCheckbox } from "@features/review/ui/AnonymousChechBox.tsx";
-import { useUser } from "@shared/context/UserContext"; // ← подключаем контекст
+import { useUser } from "@shared/context/UserContext";
 
 interface ReviewFormProps {
+    profileUserId: number;
     onSubmitSuccess: () => void;
 }
 
-export const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
-    const { id } = useParams();
-    const { user, loading: userLoading } = useUser(); // ← получаем текущего пользователя
+export const ReviewForm = ({
+                               profileUserId,
+                               onSubmitSuccess,
+                           }: ReviewFormProps) => {
+    const { user, loading: userLoading } = useUser();
 
     const [rating, setRating] = useState(5);
     const [text, setText] = useState("");
@@ -29,9 +31,7 @@ export const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getReviewAspects()
-            .then(setAspects)
-            .catch(() => setAspects([]));
+        getReviewAspects().then(setAspects).catch(() => setAspects([]));
     }, []);
 
     const toggleAspect = (id: number, target: "pros" | "cons") => {
@@ -47,10 +47,10 @@ export const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
 
         try {
             await createReview({
-                profile_user_id: Number(id),
+                profile_user_id: profileUserId,
                 rating,
                 text,
-                is_anonymous: user ? isAnonymous : true, // ⬅ гость всегда анонимно
+                is_anonymous: user ? isAnonymous : true,
                 pros,
                 cons,
             });
@@ -74,38 +74,38 @@ export const ReviewForm = ({ onSubmitSuccess }: ReviewFormProps) => {
         }
     };
 
-    if (userLoading) {
-        return <p>Загрузка...</p>;
-    }
+    if (userLoading) return <p>Загрузка...</p>;
 
     return (
         <div className="w-full px-4">
-        <form onSubmit={handleSubmit} className="mb-6 space-y-4">
-
+            <form onSubmit={handleSubmit} className="mb-6 space-y-4">
                 {error && <div className="alert alert-error">{error}</div>}
 
                 <RatingInput value={rating} onChange={setRating} />
 
-
-                {user && (
-                    <AnonymousCheckbox value={isAnonymous} onChange={setIsAnonymous} />
-                )}
+                {user && <AnonymousCheckbox value={isAnonymous} onChange={setIsAnonymous} />}
 
                 <AspectCheckboxList
-                    label="Что вам больше всего понравилось в специалисте?"
+                    label="Что вам больше всего понравилось?"
                     aspects={aspects.filter((a) => a.positive)}
                     selectedIds={pros}
                     onToggle={(id) => toggleAspect(id, "pros")}
                 />
 
                 <AspectCheckboxList
-                    label="Что вам не понравилось, и над чем нам стоит поработать?"
+                    label="Что стоит улучшить?"
                     aspects={aspects.filter((a) => !a.positive)}
                     selectedIds={cons}
                     onToggle={(id) => toggleAspect(id, "cons")}
                 />
-                <CommentTextarea value={text} onChange={setText} />
-                <button type="submit" className="btn btn-primary w-full sm:w-auto self-center" disabled={loading}>
+
+                <CommentTextarea value={text} onChange={setText} required />
+
+                <button
+                    type="submit"
+                    className="btn btn-primary w-full sm:w-auto self-center"
+                    disabled={loading}
+                >
                     {loading ? "Отправка..." : "Оставить отзыв"}
                 </button>
             </form>

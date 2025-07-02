@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "@shared/axios/axios.ts";
 
 interface CreateReviewPayload {
     profile_user_id: number;
@@ -10,9 +10,7 @@ interface CreateReviewPayload {
 }
 
 export const createReview = async (data: CreateReviewPayload) => {
-    const response = await axios.post("/api/reviews", data, {
-        withCredentials: true,
-    });
+    const response = await api.post('/reviews', data);
     return response.data;
 };
 

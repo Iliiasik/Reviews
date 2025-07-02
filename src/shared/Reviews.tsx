@@ -7,7 +7,9 @@ interface ReviewAspect {
     id: number;
     description: string;
 }
-
+interface ReviewsProps {
+    type: 'specialist' | 'organization';
+}
 interface Author {
     id: number;
     name: string;
@@ -25,7 +27,7 @@ interface Review {
 }
 
 
-export const SpecialistReviews = () => {
+export const Reviews = ({type}:ReviewsProps) => {
     const { id } = useParams();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
@@ -46,7 +48,7 @@ export const SpecialistReviews = () => {
                     Отзывы
                 </h2>
                 <div className="mb-4">
-                    <a href={`/specialist/${id}/add-review`} className="btn btn-primary">
+                    <a href={`/${type}/${id}/add-review`} className="btn btn-primary">
                         Оставить отзыв
                     </a>
                 </div>

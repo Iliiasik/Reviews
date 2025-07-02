@@ -5,11 +5,11 @@ import { Profile } from '@pages/Profile';
 import NotFound from '@pages/NotFound';
 import { Register } from "@pages/Register.tsx";
 import ConfirmEmail from "@pages/ConfirmEmail.tsx";
-import {OrganizationPage} from "@pages/OrganisationPage.tsx";
+import {OrganizationPage} from "@pages/OrganizationPage.tsx";
 import {AddReview} from "@pages/AddReview.tsx";
 import {MainLayout} from "@widgets/layout/MainLayout.tsx";
 import {Specialist} from "@pages/Specialist.tsx";
-import {UnverifiedProfileCreation} from "@pages/UnverifiedProfileCreation.tsx";
+import {UnverifiedProfileCreation} from "@features/unverified/ui/UnverifiedProfileCreation.tsx";
 
 function App() {
     return (
@@ -19,6 +19,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/specialist/:id" element={<Specialist />} />
                     <Route path="/specialist/:id/add-review" element={<AddReview />} />
+                    <Route path="/organization/:id/add-review" element={<AddReview />} />
                     <Route path="/new-unverified" element={<UnverifiedProfileCreation />} />
                     <Route path="/organization/:id" element={<OrganizationPage />} />
                 </Route>

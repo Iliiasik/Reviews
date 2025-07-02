@@ -141,6 +141,13 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
+		if err := dc.LoadFontFace("assets/Montserrat-SemiBold.ttf", 48); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось загрузить шрифт для имени"})
+			return
+		}
+		dc.SetColor(color.Black)
+		dc.DrawStringWrapped(user.Name, float64(canvasSize)/2, float64(canvasSize)-80, 0.5, 0.5, float64(canvasSize)-100, 1.5, gg.AlignCenter)
+
 		buf := new(bytes.Buffer)
 		if err := png.Encode(buf, dc.Image()); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка кодирования изображения"})

@@ -1,4 +1,4 @@
-import { useUser } from "@shared/context/UserContext";
+import { useUser } from "@shared/context/UserContext.tsx";
 import axios from "axios";
 
 export const useLogout = () => {
@@ -10,7 +10,7 @@ export const useLogout = () => {
             setUser(null);
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                throw new Error(error.response?.data?.error || "Ошибка выхода");
+                throw new Error(error.response?.data?.message || "Ошибка выхода");
             }
             throw new Error("Неизвестная ошибка при выходе");
         }

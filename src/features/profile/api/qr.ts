@@ -8,6 +8,6 @@ export const generateQrCode = async (): Promise<Blob> => {
         });
         return response.data;
     } catch (error: any) {
-        throw new Error(error.response?.data?.error || 'Ошибка генерации QR-кода');
+        throw new Error(error.response?.data?.message || 'Ошибка генерации QR-кода');
     }
 };

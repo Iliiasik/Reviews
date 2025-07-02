@@ -10,7 +10,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
     const [currentPassword, setCurrentPassword] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
-    const { isLoading, error, handleChangePassword } = useChangePassword();
+    const { isLoading, error, errors, handleChangePassword } = useChangePassword();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,12 +37,15 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                         </label>
                         <input
                             type="password"
-                            className="input input-bordered w-full opacity-75"
+                            className={`input input-bordered w-full opacity-75 ${errors.currentPassword ? 'input-error' : ''}`}
                             placeholder="Текущий пароль"
                             value={currentPassword}
-                            onChange={e => setCurrentPassword(e.target.value)}
-                            required
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+
                         />
+                        {errors.currentPassword && (
+                            <span className="text-error text-sm mt-1">{errors.currentPassword}</span>
+                        )}
                     </div>
 
                     <div className="form-control">
@@ -51,12 +54,15 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                         </label>
                         <input
                             type="password"
-                            className="input input-bordered w-full opacity-75"
+                            className={`input input-bordered w-full opacity-75 ${errors.newPassword ? 'input-error' : ''}`}
                             placeholder="Новый пароль"
                             value={newPassword}
-                            onChange={e => setNewPassword(e.target.value)}
-                            required
+                            onChange={(e) => setNewPassword(e.target.value)}
+
                         />
+                        {errors.newPassword && (
+                            <span className="text-error text-sm mt-1">{errors.newPassword}</span>
+                        )}
                     </div>
 
                     <div className="form-control">
@@ -65,12 +71,14 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                         </label>
                         <input
                             type="password"
-                            className="input input-bordered w-full opacity-75"
+                            className={`input input-bordered w-full opacity-75 ${errors.confirmPassword ? 'input-error' : ''}`}
                             placeholder="Подтверждение пароля"
                             value={confirmPassword}
-                            onChange={e => setConfirmPassword(e.target.value)}
-                            required
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                         />
+                        {errors.confirmPassword && (
+                            <span className="text-error text-sm mt-1">{errors.confirmPassword}</span>
+                        )}
                     </div>
 
                     {error && <div className="text-error text-sm">{error}</div>}
@@ -90,9 +98,9 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
-                            <span className="loading loading-spinner loading-sm"></span>
-                            Сохраняем...
-                        </span>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Сохраняем...
+                </span>
                             ) : 'Сменить'}
                         </button>
                     </div>

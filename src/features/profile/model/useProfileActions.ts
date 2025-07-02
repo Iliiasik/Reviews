@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useToast } from '@features/profile/model/useToast';
-import { useLogout } from '@features/profile/api/useLogout';
+import { useLogout } from '@features/profile/model/useLogout.ts';
 
 export const useProfileActions = () => {
     const navigate = useNavigate();

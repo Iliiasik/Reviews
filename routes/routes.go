@@ -56,6 +56,7 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		public.GET("/aspects", reviews.GetReviewAspects(database.DB))
 		public.GET("/specialist/:id", profile.GetSpecialistProfile(database.DB))
 		public.POST("/unverified-profile", profile.CreateUnverifiedProfile(database.DB))
+		public.GET("/organization/:id", profile.GetOrganizationProfile(database.DB))
 	}
 
 	// Защищенные роуты

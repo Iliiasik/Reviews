@@ -84,7 +84,7 @@ func GoogleCallback(c *gin.Context) {
 			Name:         info.Name,
 			Email:        info.Email,
 			Username:     username,
-			PasswordHash: "Oauth",
+			PasswordHash: "Oauth", // фиктивный пароль
 			RoleID:       role.ID,
 			Role:         role,
 		}
@@ -97,17 +97,29 @@ func GoogleCallback(c *gin.Context) {
 	} else {
 		fmt.Println("Пользователь уже существует:", user.Username)
 	}
-
-	jwtToken, err := GenerateJWT(user.ID, user.Username, user.Role.Name)
-	if err != nil {
-		fmt.Println("Ошибка генерации JWT:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка JWT"})
+	if err := RevokeAllRefreshTokens(user.ID); err != nil {
+		fmt.Println("Ошибка при удалении старых refresh токенов:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка очистки токенов"})
 		return
 	}
-	fmt.Println("JWT сгенерирован:", jwtToken)
 
-	c.SetCookie("token", jwtToken, 3600*24, "/", "localhost", false, true)
-	fmt.Println("Кука token установлена")
+	accessToken, appErr := GenerateJWT(user.ID, user.Username, user.Role.Name)
+	if appErr != nil {
+		fmt.Println("Ошибка генерации access токена:", appErr, "Токен:", accessToken)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка access токена"})
+		return
+	}
+
+	refreshToken, appErr := GenerateRefreshToken(user.ID)
+	if appErr != nil {
+		fmt.Println("Ошибка генерации refresh токена:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка refresh токена"})
+		return
+	}
+
+	c.SetCookie("access_token", accessToken, int(AccessTokenExp.Seconds()), "/", "localhost", false, true)
+	c.SetCookie("refresh_token", refreshToken, int(RefreshTokenExp.Seconds()), "/", "localhost", false, true)
+	fmt.Println("Куки установлены: access + refresh")
 
 	c.Redirect(http.StatusTemporaryRedirect, "http://localhost:5173/profile")
 	fmt.Println("Редирект на профиль завершён")

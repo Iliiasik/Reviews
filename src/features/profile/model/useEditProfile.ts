@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import * as yup from 'yup';
 import { updateProfile } from "@features/profile/api/profile.ts";
+import { useLogout } from '@features/profile/model/useLogout';
+import { useNavigate } from 'react-router-dom';
 
 const baseSchema = yup.object().shape({
     name: yup.string().required('Обязательное поле'),
@@ -61,6 +63,9 @@ export const useEditProfile = (profile: any, onSuccess: () => void) => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [emailChanged, setEmailChanged] = useState(false);
+    const logout = useLogout();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (profile) {
@@ -77,6 +82,14 @@ export const useEditProfile = (profile: any, onSuccess: () => void) => {
         }
     }, [profile]);
 
+    useEffect(() => {
+        if (profile && form.email !== profile.email) {
+            setEmailChanged(true);
+        } else {
+            setEmailChanged(false);
+        }
+    }, [form.email, profile]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
@@ -92,7 +105,6 @@ export const useEditProfile = (profile: any, onSuccess: () => void) => {
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        // Разрешаем только цифры и пустую строку
         if (value === '' || /^\d+$/.test(value)) {
             setForm(prev => ({ ...prev, [name]: value }));
 
@@ -155,7 +167,18 @@ export const useEditProfile = (profile: any, onSuccess: () => void) => {
                 }),
             };
 
-            await updateProfile(payload);
+            const response = await updateProfile(payload);
+
+            if (response.requires_logout) {
+                await logout();
+                navigate('/login', {
+                    state: {
+                        message: 'Email изменен. На ваш новый email отправлено письмо с подтверждением. Пожалуйста, подтвердите email и войдите снова.'
+                    }
+                });
+                return;
+            }
+
             onSuccess();
         } catch (error) {
             setError(error instanceof Error ? error.message : 'Ошибка при сохранении');
@@ -169,6 +192,7 @@ export const useEditProfile = (profile: any, onSuccess: () => void) => {
         errors,
         error,
         loading,
+        emailChanged,
         handleChange,
         handleNumberChange,
         handleSubmit,

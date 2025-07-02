@@ -1,5 +1,6 @@
 import { useEditProfile } from '@features/profile/model/useEditProfile';
 import { IMaskInput } from 'react-imask';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface EditProfileModalProps {
     profile: any;
@@ -13,6 +14,7 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
         errors,
         error,
         loading,
+        emailChanged,
         handleChange,
         handleNumberChange,
         handleSubmit,
@@ -85,12 +87,33 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-base-100/70 backdrop-blur-md p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div className="bg-base-100/70 backdrop-blur-md p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40 flex flex-col">
                 <h3 className="text-xl font-bold mb-4">Редактирование профиля</h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
+
+                <form
+                    id="edit-profile-form"
+                    onSubmit={handleSubmit}
+                    className="space-y-4 overflow-y-auto max-h-[60vh] px-2"
+                >
                     {renderField('name', 'Имя / Название', 'text', 'Имя / Название')}
-                    {renderField('email', 'Email', 'email', 'Email')}
+
+                    <div className="space-y-2">
+                        {renderField('email', 'Email', 'email', 'Email')}
+                        {emailChanged && (
+                            <div className="flex items-start gap-2 p-3 bg-warning/10 text-warning rounded-lg">
+                                <ExclamationTriangleIcon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                                <div>
+                                    <p className="font-medium">Вы изменили email</p>
+                                    <p className="text-sm">
+                                        После сохранения вам будет необходимо подтвердить новый email.
+                                        Вы будете автоматически разлогинены и получите письмо с подтверждением.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     {renderField('phone', 'Телефон', 'tel', 'Телефон', false, false, true)}
 
                     {(form.role === 'specialist' || form.role === 'organization') &&
@@ -115,29 +138,30 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
                     }
 
                     {error && <div className="text-error text-sm">{error}</div>}
-
-                    <div className="flex justify-end gap-3 pt-2">
-                        <button
-                            type="button"
-                            className="btn btn-ghost bg-opacity-5 hover:bg-opacity-10"
-                            onClick={onClose}
-                        >
-                            Отмена
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn bg-opacity-10 hover:bg-opacity-20"
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <span className="loading loading-spinner loading-sm"></span>
-                                    Сохраняем...
-                                </span>
-                            ) : 'Сохранить'}
-                        </button>
-                    </div>
                 </form>
+
+                <div className="flex justify-end gap-3 pt-4">
+                    <button
+                        type="button"
+                        className="btn btn-ghost bg-opacity-5 hover:bg-opacity-10"
+                        onClick={onClose}
+                    >
+                        Отмена
+                    </button>
+                    <button
+                        type="submit"
+                        form="edit-profile-form"
+                        className="btn bg-opacity-10 hover:bg-opacity-20"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <span className="loading loading-spinner loading-sm"></span>
+                                Сохраняем...
+                            </span>
+                        ) : 'Сохранить'}
+                    </button>
+                </div>
             </div>
         </div>
     );

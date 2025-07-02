@@ -7,12 +7,17 @@ import { useNavigate } from 'react-router-dom';
 const baseSchema = yup.object().shape({
     name: yup.string().required('Обязательное поле'),
     email: yup.string().email('Некорректный email').required('Обязательное поле'),
-    phone: yup.string().required('Обязательное поле'),
     about: yup.string().when('role', {
         is: (role: string) => ['specialist', 'organization'].includes(role),
         then: (schema) => schema.required('Обязательное поле'),
         otherwise: (schema) => schema.notRequired(),
     }),
+    phone: yup.string()
+        .required('Обязательное поле')
+        .test('phone-format', 'Неверный формат телефона', (value) => {
+            const phoneRegex = /^\+996 \(\d{3}\)-\d{2}-\d{2}-\d{2}$/;
+            return phoneRegex.test(value || '');
+        }),
 });
 
 const specialistSchema = yup.object().shape({

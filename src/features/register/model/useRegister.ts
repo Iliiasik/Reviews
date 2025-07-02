@@ -7,8 +7,12 @@ import * as yup from 'yup';
 const step1Schema = yup.object().shape({
     name: yup.string().required('Обязательное поле'),
     email: yup.string().email('Некорректный email').required('Обязательное поле'),
-    phone: yup.string().required('Обязательное поле'),
-});
+    phone: yup.string()
+        .required('Обязательное поле')
+        .test('phone-format', 'Неверный формат телефона', (value) => {
+            const phoneRegex = /^\+996 \(\d{3}\)-\d{2}-\d{2}-\d{2}$/;
+            return phoneRegex.test(value || '');
+        }),});
 
 const step2Schema = yup.object().shape({
     username: yup.string().required('Обязательное поле'),

@@ -276,9 +276,9 @@ func ChangePassword(c *gin.Context) {
 		}
 	}
 
-	claims, err := ValidateJWT(accessToken)
-	if err != nil {
-		c.Error(err)
+	claims, appErr := ValidateJWT(accessToken)
+	if appErr != nil {
+		c.Error(appErr)
 		return
 	}
 
@@ -293,20 +293,20 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := HashPassword(req.NewPassword)
-	if err != nil {
-		c.Error(err)
+	hashedPassword, appErr := HashPassword(req.NewPassword)
+	if appErr != nil {
+		c.Error(appErr)
 		return
 	}
 
 	user.PasswordHash = hashedPassword
 	if err := database.DB.Save(&user).Error; err != nil {
-		c.Error(errors.InternalServerError(err))
+		c.Error(errors.InternalServerError(err).WithCode(errors.CodeDatabaseError))
 		return
 	}
 
 	if err := RevokeAllRefreshTokens(user.ID); err != nil {
-		c.Error(err)
+		c.Error(errors.InternalServerError(err).WithCode(errors.CodeRefreshTokenRevokeError))
 		return
 	}
 

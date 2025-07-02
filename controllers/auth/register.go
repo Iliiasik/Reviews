@@ -64,13 +64,13 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		confirmation, err := createConfirmation(db, user.ID)
+		confirmation, err := CreateConfirmation(db, user.ID)
 		if err != nil {
 			c.Error(err)
 			return
 		}
 
-		go sendConfirmationEmail(user, confirmation.Token)
+		go SendConfirmationEmail(user, confirmation.Token)
 
 		c.JSON(http.StatusCreated, gin.H{
 			"message": "Пользователь создан. Письмо с подтверждением отправлено",
@@ -240,7 +240,7 @@ func createProfile(db *gorm.DB, req validation.RegisterRequest, roleName string,
 	return nil
 }
 
-func createConfirmation(db *gorm.DB, userID uint) (*models.Confirmation, *errors.AppError) {
+func CreateConfirmation(db *gorm.DB, userID uint) (*models.Confirmation, *errors.AppError) {
 	token := uuid.NewString()
 	confirmation := &models.Confirmation{
 		UserID:         userID,
@@ -255,7 +255,7 @@ func createConfirmation(db *gorm.DB, userID uint) (*models.Confirmation, *errors
 	return confirmation, nil
 }
 
-func sendConfirmationEmail(user models.User, token string) {
+func SendConfirmationEmail(user models.User, token string) {
 	link := fmt.Sprintf("http://localhost:5173/confirm-email?token=%s", token)
 	err := email.SendEmail(email.EmailData{
 		To:       user.Email,
@@ -339,13 +339,13 @@ func ResendConfirmationHandler(db *gorm.DB) gin.HandlerFunc {
 
 		db.Where("user_id = ?", user.ID).Delete(&models.Confirmation{})
 
-		confirmation, err := createConfirmation(db, user.ID)
+		confirmation, err := CreateConfirmation(db, user.ID)
 		if err != nil {
 			c.Error(err)
 			return
 		}
 
-		go sendConfirmationEmail(user, confirmation.Token)
+		go SendConfirmationEmail(user, confirmation.Token)
 
 		c.JSON(http.StatusOK, gin.H{"message": "Письмо с подтверждением отправлено"})
 	}

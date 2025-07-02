@@ -45,8 +45,19 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 		)
 
 		dc := gg.NewContext(canvasSize, canvasSize)
-		dc.SetColor(color.White)
-		dc.Clear()
+
+		cornerRadius := 100.0
+		bgMargin := 30.0
+		bgWidth := float64(canvasSize) - 2*bgMargin
+		bgHeight := float64(canvasSize) - 2*bgMargin
+
+		grad := gg.NewLinearGradient(bgMargin, bgMargin, bgMargin+bgWidth, bgMargin+bgHeight)
+		grad.AddColorStop(0, color.RGBA{150, 230, 255, 255})
+		grad.AddColorStop(1, color.RGBA{150, 255, 230, 255})
+
+		dc.SetFillStyle(grad)
+		dc.DrawRoundedRectangle(bgMargin, bgMargin, bgWidth, bgHeight, cornerRadius)
+		dc.Fill()
 
 		bitmap := qr.Bitmap()
 		rows := len(bitmap)
@@ -60,7 +71,6 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 		dc.SetColor(color.Black)
 		radius := float64(moduleSize) * 0.3
 
-		// Горизонтальные объединения
 		for y := 0; y < rows; y++ {
 			x := 0
 			for x < cols {
@@ -84,7 +94,6 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
-		// Вертикальные объединения
 		for x := 0; x < cols; x++ {
 			y := 0
 			for y < rows {
@@ -124,13 +133,6 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 						logoImg, logoImg.Bounds(),
 						draw.Over, nil,
 					)
-
-					clearSize := logoSize + 10
-					clearX := canvasSize/2 - clearSize/2
-					clearY := canvasSize/2 - clearSize/2
-					dc.SetColor(color.White)
-					dc.DrawRectangle(float64(clearX), float64(clearY), float64(clearSize), float64(clearSize))
-					dc.Fill()
 
 					logoX := canvasSize/2 - logoSize/2
 					logoY := canvasSize/2 - logoSize/2

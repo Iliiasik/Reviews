@@ -3,7 +3,9 @@ package profile
 import (
 	"net/http"
 	"reviews-back/controllers/auth"
+	"reviews-back/errors"
 	"reviews-back/models"
+	"reviews-back/validation"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -13,19 +15,25 @@ func GetProfileHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userIDVal, exists := c.Get("user_id")
 		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Нет доступа: отсутствует user_id в контексте"})
+			c.JSON(http.StatusUnauthorized, errors.UnauthorizedError(errors.CodeUnauthorized, "Нет доступа: отсутствует user_id в контексте"))
 			return
 		}
 
 		userID, ok := userIDVal.(uint)
 		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Неверный тип user_id"})
+			c.JSON(http.StatusInternalServerError, errors.InternalServerError(nil).
+				WithCode(errors.CodeInternalServerError).
+				WithDetails("Неверный тип user_id"))
 			return
 		}
 
 		var user models.User
 		if err := db.Preload("Role").First(&user, userID).Error; err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, errors.NotFoundError(errors.CodeUserNotFound, "Пользователь"))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
 			return
 		}
 
@@ -57,48 +65,76 @@ func GetProfileHandler(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, profile)
 	}
 }
+
 func UpdateProfileHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, err := c.Cookie("token")
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Нет доступа: отсутствует токен"})
+		userIDVal, exists := c.Get("user_id")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, errors.UnauthorizedError(errors.CodeUnauthorized, "Нет доступа: отсутствует user_id в контексте"))
 			return
 		}
 
-		claims, err := auth.ValidateJWT(token)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Невалидный токен"})
+		userID, ok := userIDVal.(uint)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, errors.InternalServerError(nil).
+				WithCode(errors.CodeInternalServerError).
+				WithDetails("Неверный тип user_id"))
 			return
 		}
 
 		var user models.User
-		if err := db.First(&user, claims.UserID).Error; err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
+		if err := db.Preload("Role").First(&user, userID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, errors.NotFoundError(errors.CodeUserNotFound, "Пользователь"))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
 			return
 		}
 
-		// Общие поля
-		var req struct {
-			Name            string `json:"name"`
-			Email           string `json:"email"`
-			Phone           string `json:"phone"`
-			About           string `json:"about"`
-			Website         string `json:"website"`
-			Address         string `json:"address"`
-			ExperienceYears *int   `json:"experience_years"`
-		}
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
+		var req validation.UpdateProfileRequest
+		if !validation.BindAndValidate(c, &req) {
 			return
+		}
+
+		emailChanged := req.Email != user.Email
+
+		if emailChanged {
+			var existingUser models.User
+			if err := db.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
+				c.JSON(http.StatusBadRequest, errors.ValidationError(map[string]string{
+					"email": "Этот email уже используется другим пользователем",
+				}))
+				return
+			}
 		}
 
 		user.Name = req.Name
-		user.Email = req.Email
 		user.Phone = req.Phone
-		db.Save(&user)
 
-		role := user.Role.Name
-		switch role {
+		if emailChanged {
+			user.Email = req.Email
+
+			if err := db.Where("user_id = ?", user.ID).Delete(&models.Confirmation{}).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
+				return
+			}
+
+			confirmation, err := auth.CreateConfirmation(db, user.ID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, err)
+				return
+			}
+
+			go auth.SendConfirmationEmail(user, confirmation.Token)
+		}
+
+		if err := db.Save(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
+			return
+		}
+
+		switch user.Role.Name {
 		case "specialist":
 			var sp models.SpecialistProfile
 			db.FirstOrCreate(&sp, models.SpecialistProfile{UserID: user.ID})
@@ -106,16 +142,31 @@ func UpdateProfileHandler(db *gorm.DB) gin.HandlerFunc {
 			if req.ExperienceYears != nil {
 				sp.ExperienceYears = *req.ExperienceYears
 			}
-			db.Save(&sp)
+			if err := db.Save(&sp).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
+				return
+			}
 		case "organization":
 			var org models.OrganizationProfile
 			db.FirstOrCreate(&org, models.OrganizationProfile{UserID: user.ID})
 			org.About = req.About
 			org.Website = req.Website
 			org.Address = req.Address
-			db.Save(&org)
+			if err := db.Save(&org).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, errors.InternalServerError(err))
+				return
+			}
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Профиль успешно обновлён"})
+		response := gin.H{
+			"message": "Профиль успешно обновлён",
+		}
+
+		if emailChanged {
+			response["email_changed"] = true
+			response["requires_logout"] = true
+		}
+
+		c.JSON(http.StatusOK, response)
 	}
 }

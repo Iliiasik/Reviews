@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"reviews-back/controllers/auth"
-	"reviews-back/errors"
+	"reviews-back/error_types"
 	"reviews-back/models"
 )
 
@@ -25,7 +25,7 @@ func AuthMiddleware(db *gorm.DB) gin.HandlerFunc {
 
 		var user models.User
 		if err := db.Preload("Role").First(&user, claims.UserID).Error; err != nil {
-			c.Error(errors.NotFoundError(errors.CodeUserNotFound, "Пользователь"))
+			c.Error(error_types.NotFoundError(error_types.CodeUserNotFound, "Пользователь"))
 			c.Abort()
 			return
 		}

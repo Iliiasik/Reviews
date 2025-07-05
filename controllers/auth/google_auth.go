@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 	"reviews-back/database"
-	"reviews-back/errors"
+	"reviews-back/error_types"
 	"reviews-back/models"
 
 	"github.com/gin-gonic/gin"
@@ -38,26 +38,26 @@ func GoogleCallback(c *gin.Context) {
 
 	code := c.Query("code")
 	if code == "" {
-		c.Error(errors.UnauthorizedError(errors.CodeTokenInvalid, "Не получен код от Google"))
+		c.Error(error_types.UnauthorizedError(error_types.CodeTokenInvalid, "Не получен код от Google"))
 		return
 	}
 
 	token, err := conf.Exchange(context.Background(), code)
 	if err != nil {
-		c.Error(errors.UnauthorizedError(errors.CodeTokenInvalid, "Ошибка обмена кода на токен").WithInternal(err))
+		c.Error(error_types.UnauthorizedError(error_types.CodeTokenInvalid, "Ошибка обмена кода на токен").WithInternal(err))
 		return
 	}
 
 	client := conf.Client(context.Background(), token)
 	service, err := googleapi.New(client)
 	if err != nil {
-		c.Error(errors.InternalServerError(err).WithCode(errors.CodeInternalServerError))
+		c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeInternalServerError))
 		return
 	}
 
 	info, err := service.Userinfo.Get().Do()
 	if err != nil {
-		c.Error(errors.InternalServerError(err).WithCode(errors.CodeInternalServerError))
+		c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeInternalServerError))
 		return
 	}
 
@@ -67,7 +67,7 @@ func GoogleCallback(c *gin.Context) {
 	if result.Error != nil {
 		var role models.Role
 		if err := database.DB.Where("name = ?", "user").First(&role).Error; err != nil {
-			c.Error(errors.NotFoundError(errors.CodeRoleNotFound, "Роль").WithInternal(err))
+			c.Error(error_types.NotFoundError(error_types.CodeRoleNotFound, "Роль").WithInternal(err))
 			return
 		}
 
@@ -86,7 +86,7 @@ func GoogleCallback(c *gin.Context) {
 		}
 
 		if err := database.DB.Create(&user).Error; err != nil {
-			c.Error(errors.InternalServerError(err).WithCode(errors.CodeDatabaseError))
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 	}

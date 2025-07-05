@@ -1,4 +1,4 @@
-package errors
+package error_types
 
 import (
 	"fmt"
@@ -24,10 +24,12 @@ const (
 	CodeEmailSendError              = "EMAIL_SEND_ERROR"
 	CodeUniqueConstraint            = "UNIQUE_CONSTRAINT"
 	CodeTokenExpired                = "TOKEN_EXPIRED"
+	CodeRefreshTokenExpired         = "REFRESH_TOKEN_EXPIRED"
 	CodeRefreshTokenInvalid         = "REFRESH_TOKEN_INVALID"
 	CodeRefreshTokenRequired        = "REFRESH_TOKEN_REQUIRED"
 	CodeRefreshTokenGenerationError = "REFRESH_TOKEN_GENERATION_ERROR"
 	CodeRefreshTokenRevokeError     = "REFRESH_TOKEN_REVOKE_ERROR"
+	CodeTokenNotFound               = "TOKEN_NOT_FOUND"
 	CodeDatabaseError               = "DATABASE_ERROR"
 )
 
@@ -109,5 +111,9 @@ func (e *AppError) WithDetails(details interface{}) *AppError {
 
 func (e *AppError) WithInternal(err error) *AppError {
 	e.InternalError = err
+	return e
+}
+func (e *AppError) WithMessage(message string) *AppError {
+	e.Message = message
 	return e
 }

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator/v10"
-	"reviews-back/errors"
+	"reviews-back/error_types"
 )
 
 var validate *validator.Validate
@@ -31,7 +31,7 @@ func isValidPassword(fl validator.FieldLevel) bool {
 		regexp.MustCompile(`[a-zA-Z]`).MatchString(password)
 }
 
-func ValidateStruct(s interface{}) *errors.AppError {
+func ValidateStruct(s interface{}) *error_types.AppError {
 	err := validate.Struct(s)
 	if err == nil {
 		return nil
@@ -43,10 +43,10 @@ func ValidateStruct(s interface{}) *errors.AppError {
 			field := getJSONFieldName(e.StructField(), s)
 			details[field] = getValidationMessage(e)
 		}
-		return errors.ValidationError(details)
+		return error_types.ValidationError(details)
 	}
 
-	return errors.InternalServerError(err)
+	return error_types.InternalServerError(err)
 }
 
 func getJSONFieldName(structField string, s interface{}) string {
@@ -89,7 +89,7 @@ func getValidationMessage(e validator.FieldError) string {
 
 func BindAndValidate(c *gin.Context, req interface{}) bool {
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.Error(errors.ValidationError(map[string]string{
+		c.Error(error_types.ValidationError(map[string]string{
 			"request": "Неверный формат запроса",
 		}))
 		return false

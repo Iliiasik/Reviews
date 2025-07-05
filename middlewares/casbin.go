@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"reviews-back/errors"
+	"reviews-back/error_types"
 )
 
 func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
@@ -15,7 +15,7 @@ func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 
 		role, exists := c.Get("user_role")
 		if !exists {
-			c.Error(errors.UnauthorizedError(errors.CodeUnauthorized, "Требуется авторизация"))
+			c.Error(error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация"))
 			c.Abort()
 			return
 		}
@@ -25,13 +25,13 @@ func CasbinMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 
 		allowed, err := enforcer.Enforce(role, path, method)
 		if err != nil {
-			c.Error(errors.InternalServerError(err).WithCode(errors.CodeInternalServerError))
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeInternalServerError))
 			c.Abort()
 			return
 		}
 
 		if !allowed {
-			c.Error(errors.ForbiddenError("У вас нет прав доступа к этому ресурсу"))
+			c.Error(error_types.ForbiddenError("У вас нет прав доступа к этому ресурсу"))
 			c.Abort()
 			return
 		}

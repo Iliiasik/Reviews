@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"reviews-back/errors"
+	"reviews-back/error_types"
 	"reviews-back/models"
 	"reviews-back/storage"
 	"reviews-back/utils/email"
@@ -55,7 +55,7 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		if err := db.Create(&user).Error; err != nil {
-			c.Error(errors.InternalServerError(err))
+			c.Error(error_types.InternalServerError(err))
 			return
 		}
 
@@ -83,9 +83,9 @@ func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID, err := strconv.Atoi(c.Param("user_id"))
 		if err != nil {
-			c.Error(errors.CustomError(
+			c.Error(error_types.CustomError(
 				http.StatusBadRequest,
-				errors.CodeValidationError,
+				error_types.CodeValidationError,
 				"Некорректный ID пользователя",
 				nil,
 			))
@@ -94,9 +94,9 @@ func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
 
 		accountType := c.Query("account_type")
 		if accountType == "" {
-			c.Error(errors.CustomError(
+			c.Error(error_types.CustomError(
 				http.StatusBadRequest,
-				errors.CodeValidationError,
+				error_types.CodeValidationError,
 				"Не указан тип аккаунта",
 				nil,
 			))
@@ -113,9 +113,9 @@ func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
 
 		file, header, err := c.Request.FormFile("avatar")
 		if err != nil {
-			c.Error(errors.CustomError(
+			c.Error(error_types.CustomError(
 				http.StatusBadRequest,
-				errors.CodeFileUploadError,
+				error_types.CodeFileUploadError,
 				"Ошибка получения файла аватара",
 				nil,
 			))
@@ -125,9 +125,9 @@ func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
 
 		ext := strings.ToLower(filepath.Ext(header.Filename))
 		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
-			c.Error(errors.CustomError(
+			c.Error(error_types.CustomError(
 				http.StatusBadRequest,
-				errors.CodeUnsupportedImageFormat,
+				error_types.CodeUnsupportedImageFormat,
 				"Неподдерживаемый формат изображения",
 				nil,
 			))
@@ -144,9 +144,9 @@ func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
 			minio.PutObjectOptions{ContentType: header.Header.Get("Content-Type")},
 		)
 		if err != nil {
-			c.Error(errors.CustomError(
+			c.Error(error_types.CustomError(
 				http.StatusInternalServerError,
-				errors.CodeFileUploadError,
+				error_types.CodeFileUploadError,
 				"Ошибка загрузки аватара в хранилище",
 				nil,
 			))
@@ -155,7 +155,7 @@ func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
 
 		avatarURL := storage.GetAvatarURL(userType, uint(userID), ext)
 		if err := db.Model(&models.User{}).Where("id = ?", userID).Update("avatar_url", avatarURL).Error; err != nil {
-			c.Error(errors.InternalServerError(err))
+			c.Error(error_types.InternalServerError(err))
 			return
 		}
 
@@ -166,14 +166,14 @@ func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func checkUniqueFields(db *gorm.DB, req validation.RegisterRequest) *errors.AppError {
+func checkUniqueFields(db *gorm.DB, req validation.RegisterRequest) *error_types.AppError {
 	var count int64
 
 	db.Model(&models.User{}).Where("email = ?", req.Email).Count(&count)
 	if count > 0 {
-		return errors.CustomError(
+		return error_types.CustomError(
 			http.StatusBadRequest,
-			errors.CodeUniqueConstraint,
+			error_types.CodeUniqueConstraint,
 			"Email уже используется",
 			nil,
 		)
@@ -181,9 +181,9 @@ func checkUniqueFields(db *gorm.DB, req validation.RegisterRequest) *errors.AppE
 
 	db.Model(&models.User{}).Where("username = ?", req.Username).Count(&count)
 	if count > 0 {
-		return errors.CustomError(
+		return error_types.CustomError(
 			http.StatusBadRequest,
-			errors.CodeUniqueConstraint,
+			error_types.CodeUniqueConstraint,
 			"Имя пользователя уже занято",
 			nil,
 		)
@@ -192,9 +192,9 @@ func checkUniqueFields(db *gorm.DB, req validation.RegisterRequest) *errors.AppE
 	if req.Phone != "" {
 		db.Model(&models.User{}).Where("phone = ?", req.Phone).Count(&count)
 		if count > 0 {
-			return errors.CustomError(
+			return error_types.CustomError(
 				http.StatusBadRequest,
-				errors.CodeUniqueConstraint,
+				error_types.CodeUniqueConstraint,
 				"Телефон уже используется",
 				nil,
 			)
@@ -204,16 +204,16 @@ func checkUniqueFields(db *gorm.DB, req validation.RegisterRequest) *errors.AppE
 	return nil
 }
 
-func findRole(db *gorm.DB, roleName string) (*models.Role, *errors.AppError) {
+func findRole(db *gorm.DB, roleName string) (*models.Role, *error_types.AppError) {
 	roleName = strings.ToLower(roleName)
 	var role models.Role
 	if err := db.Where("name = ?", roleName).First(&role).Error; err != nil {
-		return nil, errors.NotFoundError(errors.CodeRoleNotFound, "Роль")
+		return nil, error_types.NotFoundError(error_types.CodeRoleNotFound, "Роль")
 	}
 	return &role, nil
 }
 
-func createProfile(db *gorm.DB, req validation.RegisterRequest, roleName string, userID uint) *errors.AppError {
+func createProfile(db *gorm.DB, req validation.RegisterRequest, roleName string, userID uint) *error_types.AppError {
 	switch strings.ToLower(roleName) {
 	case "specialist":
 		if err := db.Create(&models.SpecialistProfile{
@@ -222,7 +222,7 @@ func createProfile(db *gorm.DB, req validation.RegisterRequest, roleName string,
 			About:           req.About,
 			CreatedAt:       time.Now(),
 		}).Error; err != nil {
-			return errors.InternalServerError(err)
+			return error_types.InternalServerError(err)
 		}
 
 	case "organization":
@@ -233,14 +233,14 @@ func createProfile(db *gorm.DB, req validation.RegisterRequest, roleName string,
 			About:     req.About,
 			CreatedAt: time.Now(),
 		}).Error; err != nil {
-			return errors.InternalServerError(err)
+			return error_types.InternalServerError(err)
 		}
 	}
 
 	return nil
 }
 
-func CreateConfirmation(db *gorm.DB, userID uint) (*models.Confirmation, *errors.AppError) {
+func CreateConfirmation(db *gorm.DB, userID uint) (*models.Confirmation, *error_types.AppError) {
 	token := uuid.NewString()
 	confirmation := &models.Confirmation{
 		UserID:         userID,
@@ -250,7 +250,7 @@ func CreateConfirmation(db *gorm.DB, userID uint) (*models.Confirmation, *errors
 	}
 	err := db.Create(confirmation).Error
 	if err != nil {
-		return nil, errors.InternalServerError(err)
+		return nil, error_types.InternalServerError(err)
 	}
 	return confirmation, nil
 }
@@ -276,7 +276,7 @@ func ConfirmEmailHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Query("token")
 		if token == "" {
-			c.Error(errors.ValidationError(map[string]string{
+			c.Error(error_types.ValidationError(map[string]string{
 				"token": "Токен обязателен",
 			}))
 			return
@@ -284,7 +284,7 @@ func ConfirmEmailHandler(db *gorm.DB) gin.HandlerFunc {
 
 		err := confirmEmailByToken(db, token)
 		if err != nil {
-			if err.ErrorCode == errors.CodeEmailNotConfirmed {
+			if err.ErrorCode == error_types.CodeEmailNotConfirmed {
 				c.JSON(http.StatusOK, gin.H{"message": err.Message})
 			} else {
 				c.Error(err)
@@ -296,16 +296,16 @@ func ConfirmEmailHandler(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func confirmEmailByToken(db *gorm.DB, token string) *errors.AppError {
+func confirmEmailByToken(db *gorm.DB, token string) *error_types.AppError {
 	var confirmation models.Confirmation
 	if err := db.Where("token = ?", token).First(&confirmation).Error; err != nil {
-		return errors.UnauthorizedError(errors.CodeTokenInvalid, "Неверный токен")
+		return error_types.UnauthorizedError(error_types.CodeTokenInvalid, "Неверный токен")
 	}
 
 	if confirmation.EmailConfirmed {
-		return errors.CustomError(
+		return error_types.CustomError(
 			http.StatusOK,
-			errors.CodeEmailNotConfirmed,
+			error_types.CodeEmailNotConfirmed,
 			"Email уже подтверждён",
 			nil,
 		)
@@ -313,7 +313,7 @@ func confirmEmailByToken(db *gorm.DB, token string) *errors.AppError {
 
 	confirmation.EmailConfirmed = true
 	if err := db.Save(&confirmation).Error; err != nil {
-		return errors.InternalServerError(err)
+		return error_types.InternalServerError(err)
 	}
 	return nil
 }
@@ -325,7 +325,7 @@ func ResendConfirmationHandler(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.Error(errors.ValidationError(map[string]string{
+			c.Error(error_types.ValidationError(map[string]string{
 				"username": "Обязательное поле",
 			}))
 			return
@@ -333,7 +333,7 @@ func ResendConfirmationHandler(db *gorm.DB) gin.HandlerFunc {
 
 		var user models.User
 		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
-			c.Error(errors.NotFoundError(errors.CodeUserNotFound, "Пользователь"))
+			c.Error(error_types.NotFoundError(error_types.CodeUserNotFound, "Пользователь"))
 			return
 		}
 

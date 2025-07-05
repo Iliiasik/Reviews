@@ -1,10 +1,9 @@
-import axios from 'axios';
+import api from '@shared/axios/axios';
 
 export const generateQrCode = async (): Promise<Blob> => {
     try {
-        const response = await axios.get('/api/generate-qr', {
+        const response = await api.get('/generate-qr', {
             responseType: 'blob',
-            withCredentials: true,
         });
         return response.data;
     } catch (error: any) {

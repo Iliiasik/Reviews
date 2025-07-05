@@ -1,5 +1,5 @@
 import React from 'react';
-import ReviewsSvg from "@assets/undraw_reviews_ukai.svg";
+import ReviewsSvg from "@assets/home_bg.svg";
 
 interface HeroProps {
     onSearchClick: () => void;

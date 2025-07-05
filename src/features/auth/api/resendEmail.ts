@@ -1,11 +1,9 @@
-export const resendConfirmationEmail = async (username: string) => {
-    const response = await fetch('/api/resend-confirmation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username }),
-    });
+import api from '@shared/axios/axios.ts';
 
-    if (!response.ok) {
+export const resendConfirmationEmail = async (username: string) => {
+    try {
+        await api.post('/resend-confirmation', { username });
+    } catch {
         throw new Error('Не удалось отправить письмо');
     }
 };

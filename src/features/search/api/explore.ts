@@ -1,4 +1,3 @@
-// src/api/explore.ts
 import api from "@shared/axios/axios.ts";
 
 export interface ExploreResult {

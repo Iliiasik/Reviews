@@ -1,4 +1,5 @@
-import { useUser } from "@shared/context/UserContext.tsx";
+import { useUser } from "@shared/context/UserContext";
+import api from "@shared/axios/axios";
 import axios from "axios";
 
 export const useLogout = () => {
@@ -6,7 +7,7 @@ export const useLogout = () => {
 
     const logout = async (): Promise<void> => {
         try {
-            await axios.post("/api/logout", {}, { withCredentials: true });
+            await api.post("/logout");
             setUser(null);
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {

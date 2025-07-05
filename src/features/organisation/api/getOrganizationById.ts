@@ -1,4 +1,3 @@
-// features/organization/api/getOrganizationById.ts
 import api from '@shared/axios/axios';
 import type { OrganizationProfile } from '../types/OrganizationProfile';
 

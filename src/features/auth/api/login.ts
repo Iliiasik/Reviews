@@ -1,3 +1,5 @@
+import api from '@shared/axios/axios.ts';
+
 export class LoginError extends Error {
     code?: string;
 
@@ -9,16 +11,14 @@ export class LoginError extends Error {
 }
 
 export const login = async (credentials: { username: string; password: string }) => {
-    const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new LoginError(error.message || 'Ошибка авторизации', error.error_code);
+    try {
+        const response = await api.post('/login', credentials);
+        return response.data;
+    } catch (error: any) {
+        if (error.response?.data) {
+            const data = error.response.data;
+            throw new LoginError(data.message || 'Ошибка авторизации', data.error_code);
+        }
+        throw error;
     }
-
-    return response.json();
 };

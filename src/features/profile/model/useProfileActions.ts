@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useToast } from '@features/profile/model/useToast';
+import { useToast } from '@shared/context/ToastContext';
 import { useLogout } from '@features/profile/model/useLogout.ts';
 
 export const useProfileActions = () => {
@@ -14,9 +14,11 @@ export const useProfileActions = () => {
     const handleLogout = async () => {
         try {
             await logout();
+            showToast('Вы успешно вышли из системы', 'success');
             navigate('/login');
         } catch (error) {
             console.error('Ошибка при выходе:', error);
+            showToast('Ошибка при выходе', 'error');
         }
     };
 
@@ -43,7 +45,10 @@ export const useProfileActions = () => {
             return true;
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                showToast(error.response?.data?.error || 'Ошибка смены пароля', 'error');
+                showToast(
+                    error.response?.data?.error || 'Ошибка смены пароля',
+                    'error'
+                );
             } else if (error instanceof Error) {
                 showToast(error.message, 'error');
             } else {

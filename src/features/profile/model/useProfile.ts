@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchProfile } from '../api/profile';
-import { useToast } from '@features/profile/model/useToast';
+import { useToast } from '@shared/context/ToastContext';
 
 export const useProfile = () => {
     const [profile, setProfile] = useState<any>(null);
@@ -29,6 +29,7 @@ export const useProfile = () => {
                 navigate(location.pathname, { replace: true, state: {} });
             } catch (error) {
                 console.error("Ошибка загрузки профиля:", error);
+                showToast('Ошибка загрузки профиля', 'error');
                 navigate("/login");
             } finally {
                 setIsLoading(false);
@@ -45,6 +46,7 @@ export const useProfile = () => {
             showToast('Профиль успешно обновлён', 'success');
         } catch (error) {
             console.error('Ошибка при обновлении профиля:', error);
+            showToast('Ошибка при обновлении профиля', 'error');
         }
     };
 

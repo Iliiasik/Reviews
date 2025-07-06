@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import * as yup from 'yup';
 import { changePassword } from '../api/auth';
+import { useToast } from '@shared/context/ToastContext';
 
 const passwordSchema = yup.object().shape({
     currentPassword: yup.string().required('Текущий пароль обязателен'),
@@ -22,6 +23,7 @@ export const useChangePassword = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const { showToast } = useToast();
 
     const handleChangePassword = async (data: {
         currentPassword: string;
@@ -39,7 +41,10 @@ export const useChangePassword = () => {
                 current_password: data.currentPassword,
                 new_password: data.newPassword,
             });
+
+            showToast('Пароль успешно изменён', 'success');
             return true;
+
         } catch (err) {
             if (err instanceof yup.ValidationError) {
                 const validationErrors = err.inner.reduce((acc, curr) => {

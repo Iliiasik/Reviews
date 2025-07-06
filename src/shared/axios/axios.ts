@@ -5,20 +5,6 @@ const api = axios.create({
     withCredentials: true,
 });
 
-// let isRefreshing = false;
-// let failedQueue: { resolve: (value?: any) => void; reject: (reason?: any) => void }[] = [];
-//
-// const processQueue = (error: any, token: string | null = null) => {
-//     failedQueue.forEach(({ resolve, reject }) => {
-//         if (error) {
-//             reject(error);
-//         } else {
-//             resolve(token);
-//         }
-//     });
-//     failedQueue = [];
-// };
-
 api.interceptors.response.use(
     response => response,
     async error => {

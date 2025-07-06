@@ -63,6 +63,7 @@ func InitDB() {
 		&models.CollectionSpecialist{},
 		&models.CollectionOrganization{},
 		&models.RefreshToken{},
+		&models.VerificationRequest{},
 	)
 	if err != nil {
 		log.Fatalf("Error running migrations: %v", err)
@@ -118,6 +119,10 @@ func SeedCasbinPolicies() {
 		{"admin", "/api/aspects", "GET"},
 		{"admin", "/api/logout", "POST"},
 		{"admin", "/api/change-password", "POST"},
+		{"admin", "/api/verification-requests", "POST"},
+		{"admin", "/api/verification-requests/pending", "GET"},
+		{"admin", "/api/verification-requests/:id/approve", "POST"},
+		{"admin", "/api/verification-requests/:id/reject", "POST"},
 
 		// Модераторские права
 		{"moderator", "/api/profile", "GET"},
@@ -134,6 +139,7 @@ func SeedCasbinPolicies() {
 		{"specialist", "/api/generate-qr", "GET"},
 		{"specialist", "/api/logout", "POST"},
 		{"specialist", "/api/change-password", "POST"},
+		{"specialist", "/api/verification-requests", "POST"},
 
 		// Права организации
 		{"organization", "/api/profile", "GET"},
@@ -143,6 +149,7 @@ func SeedCasbinPolicies() {
 		{"organization", "/api/generate-qr", "GET"},
 		{"organization", "/api/logout", "POST"},
 		{"organization", "/api/change-password", "POST"},
+		{"organization", "/api/verification-requests", "POST"},
 
 		// Базовые права пользователя
 		{"user", "/api/profile", "GET"},

@@ -61,6 +61,20 @@ type RefreshToken struct {
 	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"-"`
 }
 
+type VerificationRequest struct {
+	ID          uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	UserID      uint      `json:"user_id" gorm:"not null;uniqueIndex"`
+	User        User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"user"`
+	Description string    `json:"description" gorm:"type:text"`
+	IsApproved  bool      `json:"is_approved" gorm:"default:false"`
+	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+}
+
+func (VerificationRequest) TableName() string {
+	return "verification_requests"
+}
+
 func (RefreshToken) TableName() string {
 	return "refresh_tokens"
 }

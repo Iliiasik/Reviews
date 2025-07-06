@@ -11,6 +11,7 @@ import (
 	"reviews-back/controllers/qr"
 	"reviews-back/controllers/reviews"
 	"reviews-back/controllers/search"
+	"reviews-back/controllers/verifications"
 	"reviews-back/database"
 	"reviews-back/middlewares"
 )
@@ -69,5 +70,9 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		protected.GET("/profile", profile.GetProfileHandler(database.DB))
 		protected.POST("/profile/update", profile.UpdateProfileHandler(database.DB))
 		protected.GET("/generate-qr", qr.GenerateQR(database.DB))
+		protected.POST("/verification-requests", verifications.CreateVerificationRequest)
+		protected.GET("/verification-requests/pending", verifications.GetPendingVerificationRequests)
+		protected.POST("/verification-requests/:id/approve", verifications.ApproveVerificationRequest)
+		protected.POST("/verification-requests/:id/reject", verifications.RejectVerificationRequest)
 	}
 }

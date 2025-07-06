@@ -31,6 +31,9 @@ const (
 	CodeRefreshTokenRevokeError     = "REFRESH_TOKEN_REVOKE_ERROR"
 	CodeTokenNotFound               = "TOKEN_NOT_FOUND"
 	CodeDatabaseError               = "DATABASE_ERROR"
+	CodeVerificationRequestNotFound = "VERIFICATION_REQUEST_NOT_FOUND"
+	CodeVerificationRequestExists   = "VERIFICATION_REQUEST_EXISTS"
+	CodeProfileAlreadyConfirmed     = "PROFILE_ALREADY_CONFIRMED"
 )
 
 type AppError struct {

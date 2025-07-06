@@ -1,9 +1,11 @@
 import { FiAward, FiInfo } from 'react-icons/fi';
 import type { IconType } from 'react-icons';
+import { RequestVerificationButton } from './RequestVerificationButton';
 
 interface SpecialistInfoProps {
     experience_years?: number;
     about?: string;
+    is_confirmed?: boolean;
 }
 
 const InfoItem = ({ icon: Icon, label, value }: { icon: IconType, label: string, value: React.ReactNode }) => (
@@ -16,7 +18,7 @@ const InfoItem = ({ icon: Icon, label, value }: { icon: IconType, label: string,
     </div>
 );
 
-const SpecialistInfo = ({ experience_years, about }: SpecialistInfoProps) => (
+export const SpecialistInfo = ({ experience_years, about, is_confirmed }: SpecialistInfoProps) => (
     <div className="space-y-3">
         <InfoItem
             icon={FiAward}
@@ -32,7 +34,11 @@ const SpecialistInfo = ({ experience_years, about }: SpecialistInfoProps) => (
             }
         />
         <InfoItem icon={FiInfo} label="О себе" value={about} />
+
+        <RequestVerificationButton
+            userType="specialist"
+            isConfirmed={is_confirmed || false}
+        />
     </div>
 );
-
 export default SpecialistInfo;

@@ -1,19 +1,18 @@
-import {useState, useRef, useEffect} from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { useProfile } from '../model/useProfile';
 import { useProfileActions } from '../model/useProfileActions';
 import { useQrCode } from '../model/useQrCode';
+import { useVerificationRequests } from '../model/useVerificationRequests';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileTab } from './ProfileTab';
 import { ReviewsTab } from './ReviewsTab';
 import { QrTab } from './QrTab';
+import { VerificationsTab } from './VerificationsTab';
 import { ChangePasswordModal } from '@features/profile/ui/ChangePasswordModal';
 import { EditProfileModal } from './EditProfileModal';
 
 export const ProfileContent = () => {
-    const { profile, isLoading, handleProfileUpdate } = useProfile();
-    const { handleLogout } = useProfileActions();
-    const { qrUrl, generate, download } = useQrCode();
     const [activeTab, setActiveTab] = useState('profile');
     const [showEditModal, setShowEditModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
@@ -21,22 +20,48 @@ export const ProfileContent = () => {
     const profileRef = useRef<HTMLDivElement>(null);
     const reviewsRef = useRef<HTMLDivElement>(null);
     const qrRef = useRef<HTMLDivElement>(null);
+    const verificationsRef = useRef<HTMLDivElement>(null);
+
+    const { profile, isLoading, handleProfileUpdate } = useProfile();
+    const { handleLogout } = useProfileActions();
+    const { qrUrl, generate, download } = useQrCode();
+    const { requests, loading, approveRequest, rejectRequest } = useVerificationRequests();
 
     useEffect(() => {
-        if (activeTab === 'reviews' && reviewsRef.current) {
-            gsap.from(reviewsRef.current, {
-                opacity: 0, x: -20, duration: 0.3, ease: "power2.out"
-            });
-        } else if (activeTab === 'qr' && qrRef.current) {
-            gsap.from(qrRef.current, {
-                opacity: 0, x: 20, duration: 0.3, ease: "power2.out"
-            });
-        } else if (profileRef.current) {
-            gsap.from(profileRef.current, {
-                opacity: 0, y: 20, duration: 0.3, ease: "power2.out"
-            });
-        }
+        const refs = {
+            profile: profileRef,
+            reviews: reviewsRef,
+            qr: qrRef,
+            verifications: verificationsRef,
+        };
+
+        const currentRef = refs[activeTab as keyof typeof refs]?.current;
+        if (!currentRef) return;
+
+        const animationProps = {
+            profile: { opacity: 0, y: 20 },
+            reviews: { opacity: 0, x: -20 },
+            qr: { opacity: 0, x: 20 },
+            verifications: { opacity: 0, y: 20 },
+        };
+
+        gsap.from(currentRef, {
+            ...animationProps[activeTab as keyof typeof animationProps],
+            duration: 0.3,
+            ease: "power2.out"
+        });
     }, [activeTab]);
+
+    const tabs = [
+        { id: 'profile', label: 'Профиль' },
+        { id: 'reviews', label: 'Отзывы' },
+        ...(profile?.role === 'specialist' || profile?.role === 'organization'
+            ? [{ id: 'qr', label: 'QR-код' }]
+            : []),
+        ...(profile?.role === 'admin'
+            ? [{ id: 'verifications', label: 'Заявки' }]
+            : []),
+    ];
 
     return (
         <div className="max-w-6xl mx-auto">
@@ -44,6 +69,7 @@ export const ProfileContent = () => {
                 profile={profile}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
+                tabs={tabs}
             />
 
             <div className="bg-base-200 rounded-lg shadow overflow-hidden">
@@ -62,12 +88,22 @@ export const ProfileContent = () => {
                     <ReviewsTab ref={reviewsRef} profile={profile} />
                 )}
 
-                {(activeTab === 'qr' && (profile?.role === 'specialist' || profile?.role === 'organization')) && (
+                {activeTab === 'qr' && (
                     <QrTab
                         ref={qrRef}
                         qrCode={qrUrl}
                         onGenerate={generate}
                         onDownload={download}
+                    />
+                )}
+
+                {activeTab === 'verifications' && (
+                    <VerificationsTab
+                        ref={verificationsRef}
+                        requests={requests}
+                        loading={loading}
+                        onApprove={approveRequest}
+                        onReject={rejectRequest}
                     />
                 )}
             </div>

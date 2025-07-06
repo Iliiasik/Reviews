@@ -1,10 +1,12 @@
 import { FiGlobe, FiMapPin, FiInfo } from 'react-icons/fi';
 import type { IconType } from 'react-icons';
+import { RequestVerificationButton } from './RequestVerificationButton';
 
 interface OrganizationInfoProps {
     website?: string;
     address?: string;
     about?: string;
+    is_confirmed?: boolean;
 }
 
 const InfoItem = ({ icon: Icon, label, value }: { icon: IconType; label: string; value: React.ReactNode }) => (
@@ -17,7 +19,7 @@ const InfoItem = ({ icon: Icon, label, value }: { icon: IconType; label: string;
     </div>
 );
 
-const OrganizationInfo = ({ website, address, about }: OrganizationInfoProps) => (
+export const OrganizationInfo = ({ website, address, about, is_confirmed }: OrganizationInfoProps) => (
     <div className="space-y-3">
         {website && (
             <InfoItem
@@ -37,7 +39,11 @@ const OrganizationInfo = ({ website, address, about }: OrganizationInfoProps) =>
         )}
         <InfoItem icon={FiMapPin} label="Адрес" value={address} />
         <InfoItem icon={FiInfo} label="О нас" value={about} />
+
+        <RequestVerificationButton
+            userType="organization"
+            isConfirmed={is_confirmed || false}
+        />
     </div>
 );
-
 export default OrganizationInfo;

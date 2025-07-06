@@ -67,6 +67,7 @@ export const ProfileTab = forwardRef<HTMLDivElement, ProfileTabProps>(({
                                 <SpecialistInfo
                                     experience_years={profile.experience_years}
                                     about={profile.about}
+                                    is_confirmed={profile.is_confirmed}
                                 />
                             </div>
                         </div>
@@ -80,6 +81,7 @@ export const ProfileTab = forwardRef<HTMLDivElement, ProfileTabProps>(({
                                     website={profile.website}
                                     address={profile.address}
                                     about={profile.about}
+                                    is_confirmed={profile.is_confirmed}
                                 />
                             </div>
                         </div>

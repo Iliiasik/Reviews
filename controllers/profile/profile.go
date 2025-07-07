@@ -52,6 +52,7 @@ func GetProfileHandler(db *gorm.DB) gin.HandlerFunc {
 			if err := db.First(&sp, "user_id = ?", user.ID).Error; err == nil {
 				profile["experience_years"] = sp.ExperienceYears
 				profile["about"] = sp.About
+				profile["is_confirmed"] = sp.IsConfirmed
 			}
 		case "organization":
 			var org models.OrganizationProfile
@@ -59,6 +60,7 @@ func GetProfileHandler(db *gorm.DB) gin.HandlerFunc {
 				profile["website"] = org.Website
 				profile["address"] = org.Address
 				profile["about"] = org.About
+				profile["is_confirmed"] = org.IsConfirmed
 			}
 		}
 

@@ -74,5 +74,6 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		protected.GET("/verification-requests/pending", verifications.GetPendingVerificationRequests)
 		protected.POST("/verification-requests/:id/approve", verifications.ApproveVerificationRequest)
 		protected.POST("/verification-requests/:id/reject", verifications.RejectVerificationRequest)
+		protected.GET("/verification-requests/status", verifications.CheckVerificationRequestStatus)
 	}
 }

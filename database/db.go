@@ -140,6 +140,7 @@ func SeedCasbinPolicies() {
 		{"specialist", "/api/logout", "POST"},
 		{"specialist", "/api/change-password", "POST"},
 		{"specialist", "/api/verification-requests", "POST"},
+		{"specialist", "/api/verification-requests/status", "GET"},
 
 		// Права организации
 		{"organization", "/api/profile", "GET"},
@@ -150,6 +151,7 @@ func SeedCasbinPolicies() {
 		{"organization", "/api/logout", "POST"},
 		{"organization", "/api/change-password", "POST"},
 		{"organization", "/api/verification-requests", "POST"},
+		{"organization", "/api/verification-requests/status", "GET"},
 
 		// Базовые права пользователя
 		{"user", "/api/profile", "GET"},

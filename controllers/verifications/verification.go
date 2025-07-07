@@ -227,3 +227,34 @@ func RejectVerificationRequest(c *gin.Context) {
 		"message": "Заявка отклонена и удалена",
 	})
 }
+
+func CheckVerificationRequestStatus(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.Error(error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация"))
+		return
+	}
+
+	userIDUint, ok := userID.(uint)
+	if !ok {
+		c.Error(error_types.InternalServerError(nil).WithMessage("Некорректный формат user_id"))
+		return
+	}
+
+	var request models.VerificationRequest
+	err := database.DB.Where("user_id = ? AND is_approved = ?", userIDUint, false).First(&request).Error
+
+	if err == gorm.ErrRecordNotFound {
+		c.JSON(http.StatusOK, gin.H{
+			"hasPendingRequest": false,
+		})
+		return
+	} else if err != nil {
+		c.Error(error_types.InternalServerError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"hasPendingRequest": true,
+	})
+}

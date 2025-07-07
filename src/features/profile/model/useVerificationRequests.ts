@@ -2,19 +2,15 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@shared/context/ToastContext';
 import { VerificationRequestsApi } from '../api/verification_requests';
 import { useProfile } from './useProfile';
+import type {VerificationRequest} from '../types/verifications';
 
 export const useVerificationRequests = () => {
-    const [requests, setRequests] = useState<any[]>([]);
+    const [requests, setRequests] = useState<VerificationRequest[]>([]);
     const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
     const { profile } = useProfile();
 
-    const fetchRequests = async () => {
-        if (profile?.role !== 'admin') {
-            setRequests([]);
-            return;
-        }
-
+    const refreshRequests = async () => {
         try {
             setLoading(true);
             const data = await VerificationRequestsApi.getPending();
@@ -27,11 +23,15 @@ export const useVerificationRequests = () => {
         }
     };
 
+    const handleRequestResult = (id: number, successMsg: string) => {
+        setRequests(prev => prev.filter(req => req.id !== id));
+        showToast(successMsg, 'success');
+    };
+
     const approveRequest = async (id: number) => {
         try {
             await VerificationRequestsApi.approve(id);
-            showToast('Заявка подтверждена', 'success');
-            setRequests(prev => prev.filter(req => req.id !== id));
+            handleRequestResult(id, 'Заявка подтверждена');
         } catch (error) {
             console.error('Ошибка подтверждения:', error);
             showToast('Ошибка подтверждения', 'error');
@@ -41,8 +41,7 @@ export const useVerificationRequests = () => {
     const rejectRequest = async (id: number) => {
         try {
             await VerificationRequestsApi.reject(id);
-            showToast('Заявка отклонена', 'success');
-            setRequests(prev => prev.filter(req => req.id !== id));
+            handleRequestResult(id, 'Заявка отклонена');
         } catch (error) {
             console.error('Ошибка отклонения:', error);
             showToast('Ошибка отклонения', 'error');
@@ -50,7 +49,11 @@ export const useVerificationRequests = () => {
     };
 
     useEffect(() => {
-        fetchRequests();
+        if (profile?.role === 'admin') {
+            refreshRequests();
+        } else {
+            setRequests([]);
+        }
     }, [profile?.role]);
 
     return {
@@ -58,6 +61,6 @@ export const useVerificationRequests = () => {
         loading,
         approveRequest,
         rejectRequest,
-        refreshRequests: fetchRequests
+        refreshRequests,
     };
 };

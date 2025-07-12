@@ -1,6 +1,6 @@
-import {forwardRef, type JSX} from 'react';
+import { forwardRef, type JSX } from 'react';
 import { Link } from 'react-router-dom';
-import { FiExternalLink, FiStar, FiThumbsUp, FiThumbsDown } from 'react-icons/fi';
+import { FiExternalLink, FiStar, FiThumbsUp, FiThumbsDown, FiChevronDown } from 'react-icons/fi';
 
 interface ReviewsTabProps {
     profile: {
@@ -19,40 +19,52 @@ interface ReviewsTabProps {
 }
 
 const aspectIcons: Record<number, JSX.Element> = {
-    1: <span className="text-lg">😊</span>, // Вежливость
-    2: <span className="text-lg">⏰</span>, // Пунктуальность
-    3: <span className="text-lg">🎓</span>, // Компетентность
-    4: <span className="text-lg">🧼</span>, // Чистота помещения
-    5: <span className="text-lg">🗣️</span>, // Умение слушать
-    6: <span className="text-lg">😠</span>, // Грубость
-    7: <span className="text-lg">⌛</span>, // Слишком долго ждать
-    8: <span className="text-lg">🤷</span>, // Некомпетентность
-    9: <span className="text-lg">🧹</span>, // Неопрятность
-    10: <span className="text-lg">🙉</span>, // Игнорирование жалоб
+    1: <span className="text-lg">😊</span>,
+    2: <span className="text-lg">⏰</span>,
+    3: <span className="text-lg">🎓</span>,
+    4: <span className="text-lg">🧼</span>,
+    5: <span className="text-lg">🗣️</span>,
+    6: <span className="text-lg">😠</span>,
+    7: <span className="text-lg">⌛</span>,
+    8: <span className="text-lg">🤷</span>,
+    9: <span className="text-lg">🧹</span>,
+    10: <span className="text-lg">🙉</span>,
 };
 
 const ReviewAspectCard = ({ aspect }: { aspect: any }) => {
     return (
-        <div className="flex-shrink-0 w-28 p-2 rounded-xl shadow-sm flex flex-col items-center text-sm text-base-content/80 bg-base-200">
-            {aspectIcons[aspect.id] || <span className="text-lg">⭐</span>}
-            <span className="text-xs mt-1 text-center line-clamp-2">{aspect.description}</span>
+        <div className="flex-shrink-0 w-16 p-0.5 rounded-md shadow-sm flex flex-col items-center text-[10px] text-base-content/70 bg-base-200">
+            <span className="text-base">
+                {aspectIcons[aspect.id] || '⭐'}
+            </span>
+            <span className="text-[8px] mt-0.5 text-center leading-tight line-clamp-2">
+                {aspect.description}
+            </span>
         </div>
     );
 };
 
+
 export const ReviewCard = ({ review }: { review: any }) => {
-    const formattedRating = Number.isInteger(review.rating)
-        ? review.rating.toString()
-        : review.rating.toFixed(1)
+    const formattedDate = new Date(review.created_at).toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    const rating = Math.round(review.rating);
 
     return (
-        <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-            <div className="card-body p-3 sm:p-4 md:p-6">
-                <div className="flex flex-col gap-3">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 min-w-0">
+        <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col min-h-[16rem] min-w-[18rem] p-2">
+            <div className="card-body p-3 flex-1">
+                <div className="flex flex-col gap-2 h-full">
+                    <div className="flex justify-between items-start gap-2">
+                        <Link
+                            to={`/${review.profile_user.role.name}/${review.profile_user.id}`}
+                            className="flex items-start gap-2 min-w-0 flex-1"
+                        >
                             <div className="avatar flex-shrink-0">
-                                <div className="w-9 sm:w-10 rounded-full">
+                                <div className="w-8 rounded-full">
                                     <img
                                         src={
                                             review.profile_user.avatar_url ||
@@ -64,73 +76,74 @@ export const ReviewCard = ({ review }: { review: any }) => {
                                 </div>
                             </div>
                             <div className="min-w-0">
-                                <div className="flex items-baseline gap-1 flex-wrap">
-                                    <h4 className="font-semibold text-sm sm:text-base truncate max-w-[120px] sm:max-w-[180px]">
-                                        {review.profile_user.name}
-                                    </h4>
-                                    <Link
-                                        to={`/${review.profile_user.role.name}/${review.profile_user.id}`}
-                                        className="text-xs flex items-center gap-1 text-primary hover:text-primary-focus transition-colors whitespace-nowrap"
-                                    >
-                                        <span>Перейти</span>
-                                        <FiExternalLink size={12} />
-                                    </Link>
-                                </div>
-                                <div className="badge badge-ghost text-xs mt-0.5 px-1.5 py-0.5 border-base-300">
+                                <h4 className="font-semibold text-sm truncate">
+                                    {review.profile_user.name}
+                                </h4>
+                                <div className="badge badge-ghost text-xs mt-0.5 px-1 py-0">
                                     {review.profile_user.role.name === 'specialist' && 'Специалист'}
                                     {review.profile_user.role.name === 'organization' && 'Организация'}
                                 </div>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-1 sm:ml-auto">
-                            <span className="text-base sm:text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                                {formattedRating}
-                            </span>
-                            <FiStar size={16} className="fill-current text-yellow-500 flex-shrink-0" />
-                        </div>
-                    </div>
-                    <p className="text-sm text-base-content mt-1 break-words whitespace-pre-line">
-                        {review.text}
-                    </p>
-                    {(review.pros.length > 0 || review.cons.length > 0) && (
-                        <div className="mt-2 space-y-3">
+                        </Link>
+
+                        <div className="flex gap-2">
                             {review.pros.length > 0 && (
-                                <div>
-                                    <div className="flex items-center gap-2 text-xs sm:text-sm text-success mb-1">
-                                        <FiThumbsUp size={12} className="flex-shrink-0" />
-                                        <span>Плюсы</span>
+                                <div className="dropdown dropdown-end">
+                                    <div tabIndex={0} role="button" className="btn btn-xs btn-ghost flex items-center gap-1 px-1">
+                                        <FiThumbsUp size={12} className="text-success" />
+                                        <span className="text-xs">{review.pros.length}</span>
+                                        <FiChevronDown size={10} />
                                     </div>
-                                    <div className="overflow-x-hidden pb-2">
-                                        <div className="flex gap-2 w-max min-w-full px-1">
-                                            {review.pros.map((pro: any) => (
-                                                <ReviewAspectCard key={pro.id} aspect={pro} type="pro" />
-                                            ))}
+                                    <div tabIndex={0} className="dropdown-content z-[1] card card-sm bg-base-100 shadow-lg w-auto max-h-60 overflow-y-auto">
+                                        <div className="card-body p-2">
+                                            <div className={`grid ${review.pros.length > 1 ? 'grid-cols-3' : ''} gap-1 w-max`}>
+                                                {review.pros.map((pro: any) => (
+                                                    <ReviewAspectCard key={pro.id} aspect={pro} />
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             )}
                             {review.cons.length > 0 && (
-                                <div>
-                                    <div className="flex items-center gap-2 text-xs sm:text-sm text-error mb-1">
-                                        <FiThumbsDown size={12} className="flex-shrink-0" />
-                                        <span>Минусы</span>
+                                <div className="dropdown dropdown-end">
+                                    <div tabIndex={0} role="button" className="btn btn-xs btn-ghost flex items-center gap-1 px-1">
+                                        <FiThumbsDown size={12} className="text-error" />
+                                        <span className="text-xs">{review.cons.length}</span>
+                                        <FiChevronDown size={10} />
                                     </div>
-                                    <div className="overflow-x-hidden pb-2">
-                                        <div className="flex gap-2 w-max min-w-full px-1">
-                                            {review.cons.map((con: any) => (
-                                                <ReviewAspectCard key={con.id} aspect={con} type="con" />
-                                            ))}
+                                    <div tabIndex={0} className="dropdown-content z-[1] card card-sm bg-base-100 shadow-lg w-auto max-h-60 overflow-y-auto">
+                                        <div className="card-body p-2">
+                                            <div className={`grid ${review.cons.length > 1 ? 'grid-cols-3' : ''} gap-1 w-max`}>
+                                                {review.cons.map((con: any) => (
+                                                    <ReviewAspectCard key={con.id} aspect={con} />
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             )}
                         </div>
-                    )}
+                    </div>
+
+                    <p className="text-sm text-base-content mt-1 break-words whitespace-pre-line line-clamp-3 flex-1">
+                        {review.text}
+                    </p>
                 </div>
             </div>
+
+            <div className="divider my-0 mx-3"></div>
+
+            <div className="px-3 pb-2 pt-1 flex justify-between items-center text-xs">
+                <div className="flex items-center gap-1 text-yellow-500">
+                    <span className="font-medium">{rating}</span>
+                    <FiStar size={12} className="fill-current" />
+                </div>
+                <span className="text-base-content/60">{formattedDate}</span>
+            </div>
         </div>
-    )
-}
+    );
+};
 
 export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
     ({ profile, userReviews, summary, loading }, ref) => {
@@ -174,10 +187,8 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                                             <h3 className="font-medium text-lg">Ваш рейтинг</h3>
                                             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-2">
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-2xl sm:text-3xl font-bold">
-                                                        {summary.rating % 1 === 0
-                                                            ? summary.rating.toString()
-                                                            : summary.rating?.toFixed(1)}
+                                                    <span className="text-2xl sm:text-3xl font-bold ">
+                                                        {summary.rating.toFixed(1)}
                                                     </span>
                                                     {renderRatingStars(summary.rating || 0)}
                                                 </div>
@@ -211,7 +222,7 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                             </span>
 
                             {userReviews.length > 0 ? (
-                                <div className="grid gap-4">
+                                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                     {userReviews.map(review => (
                                         <ReviewCard key={review.id} review={review} />
                                     ))}

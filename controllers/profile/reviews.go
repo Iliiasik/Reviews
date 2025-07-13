@@ -55,13 +55,19 @@ type ReviewSummaryResponse struct {
 	Rating       float64 `json:"rating"`
 }
 
+type AspectCount struct {
+	ID          uint   `json:"id"`
+	Description string `json:"description"`
+	Count       int64  `json:"count"`
+}
+
 func GetUserReviewsSummary(c *gin.Context) {
 	userID := c.Param("id")
 
 	var user models.User
 	if err := database.DB.Preload("Role").First(&user, userID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.Error(error_types.NotFoundError(error_types.CodeUserNotFound, "Пользователь"))
+			c.Error(error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация"))
 			return
 		}
 		c.Error(error_types.InternalServerError(err))
@@ -95,10 +101,46 @@ func GetUserReviewsSummary(c *gin.Context) {
 		rating = profile.Rating
 	}
 
+	var prosCount []AspectCount
+	if err := database.DB.Table("review_aspects").
+		Select("review_aspects.id, review_aspects.description, COUNT(review_pros.aspect_id) as count").
+		Joins("JOIN review_pros ON review_aspects.id = review_pros.aspect_id").
+		Joins("JOIN reviews ON review_pros.review_id = reviews.id").
+		Where("reviews.profile_user_id = ? AND review_aspects.positive = true", userID).
+		Group("review_aspects.id, review_aspects.description").
+		Scan(&prosCount).Error; err != nil {
+		c.Error(error_types.InternalServerError(err))
+		return
+	}
+
+	var consCount []AspectCount
+	if err := database.DB.Table("review_aspects").
+		Select("review_aspects.id, review_aspects.description, COUNT(review_cons.aspect_id) as count").
+		Joins("JOIN review_cons ON review_aspects.id = review_cons.aspect_id").
+		Joins("JOIN reviews ON review_cons.review_id = reviews.id").
+		Where("reviews.profile_user_id = ? AND review_aspects.positive = false", userID).
+		Group("review_aspects.id, review_aspects.description").
+		Scan(&consCount).Error; err != nil {
+		c.Error(error_types.InternalServerError(err))
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"data": ReviewSummaryResponse{
-			TotalReviews: count,
-			Rating:       rating,
+		"data": gin.H{
+			"total_reviews": count,
+			"rating":        rating,
+			"pros_count":    prosCount,
+			"cons_count":    consCount,
+			"total_pros":    sumCounts(prosCount),
+			"total_cons":    sumCounts(consCount),
 		},
 	})
+}
+
+func sumCounts(aspects []AspectCount) int64 {
+	var total int64
+	for _, a := range aspects {
+		total += a.Count
+	}
+	return total
 }

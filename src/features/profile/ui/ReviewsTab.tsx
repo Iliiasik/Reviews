@@ -14,6 +14,18 @@ interface ReviewsTabProps {
         total_reviews: number;
         user_reviews_count: number;
         rating: number;
+        total_pros: number;
+        total_cons: number;
+        pros_count: Array<{
+            id: number;
+            description: string;
+            count: number;
+        }>;
+        cons_count: Array<{
+            id: number;
+            description: string;
+            count: number;
+        }>;
     };
     loading: boolean;
 }
@@ -44,6 +56,50 @@ const ReviewAspectCard = ({ aspect }: { aspect: any }) => {
     );
 };
 
+const RatingStatCard = ({ title, value, icon, color }: { title: string; value: number; icon: JSX.Element; color: string }) => {
+    return (
+        <div className={`card bg-${color}/10 border border-${color}/20`}>
+            <div className="card-body p-3 flex flex-row items-center gap-3">
+                <div className={`text-${color}`}>{icon}</div>
+                <div>
+                    <h3 className="text-sm font-medium">{title}</h3>
+                    <p className="text-lg font-bold">{value}</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const AspectCard = ({ aspect, color }: { aspect: any; color: string }) => {
+    return (
+        <div className={`card bg-${color}/10 border border-${color}/20`}>
+            <div className="card-body p-3">
+                <div className="flex justify-between items-center">
+                    <span className="text-sm">{aspect.description}</span>
+                    <span className={`font-bold text-${color}`}>{aspect.count}</span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const AspectSection = ({ title, aspects, icon, color }: { title: string; aspects: any[]; icon: JSX.Element; color: string }) => {
+    if (!aspects || aspects.length === 0) return null;
+
+    return (
+        <div className="mt-4">
+            <h4 className="font-medium flex items-center gap-2 mb-3">
+                {icon}
+                <span>{title} ({aspects.reduce((acc, a) => acc + a.count, 0)})</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {aspects.map(aspect => (
+                    <AspectCard key={aspect.id} aspect={aspect} color={color} />
+                ))}
+            </div>
+        </div>
+    );
+};
 
 export const ReviewCard = ({ review }: { review: any }) => {
     const formattedDate = new Date(review.created_at).toLocaleDateString('ru-RU', {
@@ -183,11 +239,21 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                             <div className="card bg-base-100 border border-base-300 shadow-sm">
                                 <div className="card-body p-4 sm:p-6">
                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                        <div>
-                                            <h3 className="font-medium text-lg">Ваш рейтинг</h3>
-                                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-2">
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <h3 className="font-medium text-lg">Ваш рейтинг</h3>
+                                                <Link
+                                                    to={`/${profile.role}/${profile.id}`}
+                                                    className="btn btn-sm btn-outline flex items-center gap-1"
+                                                >
+                                                    <span>Мой профиль</span>
+                                                    <FiExternalLink size={16} />
+                                                </Link>
+                                            </div>
+
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-4">
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-2xl sm:text-3xl font-bold ">
+                                                    <span className="text-2xl sm:text-3xl font-bold">
                                                         {summary.rating.toFixed(1)}
                                                     </span>
                                                     {renderRatingStars(summary.rating || 0)}
@@ -197,14 +263,36 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                                                     summary.total_reviews > 1 && summary.total_reviews < 5 ? 'отзыва' : 'отзывов'}
                                                 </span>
                                             </div>
+
+                                            <div className="grid grid-cols-2 gap-3 mt-4">
+                                                <RatingStatCard
+                                                    title="Плюсы"
+                                                    value={summary.total_pros || 0}
+                                                    icon={<FiThumbsUp size={20} />}
+                                                    color="success"
+                                                />
+                                                <RatingStatCard
+                                                    title="Минусы"
+                                                    value={summary.total_cons || 0}
+                                                    icon={<FiThumbsDown size={20} />}
+                                                    color="error"
+                                                />
+                                            </div>
+
+                                            <AspectSection
+                                                title="Сильные стороны"
+                                                aspects={summary.pros_count}
+                                                icon={<FiThumbsUp size={16} className="text-success" />}
+                                                color="success"
+                                            />
+
+                                            <AspectSection
+                                                title="Слабые стороны"
+                                                aspects={summary.cons_count}
+                                                icon={<FiThumbsDown size={16} className="text-error" />}
+                                                color="error"
+                                            />
                                         </div>
-                                        <Link
-                                            to={`/${profile.role}/${profile.id}`}
-                                            className="btn btn-ghost btn-sm mt-2 sm:mt-0 flex items-center gap-1 text-primary hover:text-primary-focus"
-                                        >
-                                            <span>Мой профиль</span>
-                                            <FiExternalLink size={16} />
-                                        </Link>
                                     </div>
                                 </div>
                             </div>

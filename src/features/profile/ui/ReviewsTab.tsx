@@ -1,6 +1,8 @@
-import { forwardRef, type JSX } from 'react';
+import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FiExternalLink, FiStar, FiThumbsUp, FiThumbsDown, FiChevronDown } from 'react-icons/fi';
+import {FiExternalLink, FiStar, FiCornerRightDown} from 'react-icons/fi';
+import {ReviewCard} from './reviews/ReviewCard';
+import {AspectSection} from './reviews/AspectSection';
 
 interface ReviewsTabProps {
     profile: {
@@ -14,8 +16,6 @@ interface ReviewsTabProps {
         total_reviews: number;
         user_reviews_count: number;
         rating: number;
-        total_pros: number;
-        total_cons: number;
         pros_count: Array<{
             id: number;
             description: string;
@@ -27,182 +27,23 @@ interface ReviewsTabProps {
             count: number;
         }>;
     };
+
     loading: boolean;
+    pagination: {
+        page: number;
+        limit: number;
+        totalPages: number;
+        totalItems: number;
+    };
+    filters: {
+        role: string;
+    };
+    handlePageChange: (page: number) => void;
+    handleFilterChange: (role: string) => void;
 }
 
-const aspectIcons: Record<number, JSX.Element> = {
-    1: <span className="text-lg">😊</span>,
-    2: <span className="text-lg">⏰</span>,
-    3: <span className="text-lg">🎓</span>,
-    4: <span className="text-lg">🧼</span>,
-    5: <span className="text-lg">🗣️</span>,
-    6: <span className="text-lg">😠</span>,
-    7: <span className="text-lg">⌛</span>,
-    8: <span className="text-lg">🤷</span>,
-    9: <span className="text-lg">🧹</span>,
-    10: <span className="text-lg">🙉</span>,
-};
-
-const ReviewAspectCard = ({ aspect }: { aspect: any }) => {
-    return (
-        <div className="flex-shrink-0 w-16 p-0.5 rounded-md shadow-sm flex flex-col items-center text-[10px] text-base-content/70 bg-base-200">
-            <span className="text-base">
-                {aspectIcons[aspect.id] || '⭐'}
-            </span>
-            <span className="text-[8px] mt-0.5 text-center leading-tight line-clamp-2">
-                {aspect.description}
-            </span>
-        </div>
-    );
-};
-
-const RatingStatCard = ({ title, value, icon, color }: { title: string; value: number; icon: JSX.Element; color: string }) => {
-    return (
-        <div className={`card bg-${color}/10 border border-${color}/20`}>
-            <div className="card-body p-3 flex flex-row items-center gap-3">
-                <div className={`text-${color}`}>{icon}</div>
-                <div>
-                    <h3 className="text-sm font-medium">{title}</h3>
-                    <p className="text-lg font-bold">{value}</p>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const AspectCard = ({ aspect, color }: { aspect: any; color: string }) => {
-    return (
-        <div className={`card bg-${color}/10 border border-${color}/20`}>
-            <div className="card-body p-3">
-                <div className="flex justify-between items-center">
-                    <span className="text-sm">{aspect.description}</span>
-                    <span className={`font-bold text-${color}`}>{aspect.count}</span>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const AspectSection = ({ title, aspects, icon, color }: { title: string; aspects: any[]; icon: JSX.Element; color: string }) => {
-    if (!aspects || aspects.length === 0) return null;
-
-    return (
-        <div className="mt-4">
-            <h4 className="font-medium flex items-center gap-2 mb-3">
-                {icon}
-                <span>{title} ({aspects.reduce((acc, a) => acc + a.count, 0)})</span>
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {aspects.map(aspect => (
-                    <AspectCard key={aspect.id} aspect={aspect} color={color} />
-                ))}
-            </div>
-        </div>
-    );
-};
-
-export const ReviewCard = ({ review }: { review: any }) => {
-    const formattedDate = new Date(review.created_at).toLocaleDateString('ru-RU', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-
-    const rating = Math.round(review.rating);
-
-    return (
-        <div className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col min-h-[16rem] min-w-[18rem] p-2">
-            <div className="card-body p-3 flex-1">
-                <div className="flex flex-col gap-2 h-full">
-                    <div className="flex justify-between items-start gap-2">
-                        <Link
-                            to={`/${review.profile_user.role.name}/${review.profile_user.id}`}
-                            className="flex items-start gap-2 min-w-0 flex-1"
-                        >
-                            <div className="avatar flex-shrink-0">
-                                <div className="w-8 rounded-full">
-                                    <img
-                                        src={
-                                            review.profile_user.avatar_url ||
-                                            `https://api.dicebear.com/7.x/initials/svg?seed=${review.profile_user.name}`
-                                        }
-                                        alt="Аватар профиля"
-                                        className="object-cover"
-                                    />
-                                </div>
-                            </div>
-                            <div className="min-w-0">
-                                <h4 className="font-semibold text-sm truncate">
-                                    {review.profile_user.name}
-                                </h4>
-                                <div className="badge badge-ghost text-xs mt-0.5 px-1 py-0">
-                                    {review.profile_user.role.name === 'specialist' && 'Специалист'}
-                                    {review.profile_user.role.name === 'organization' && 'Организация'}
-                                </div>
-                            </div>
-                        </Link>
-
-                        <div className="flex gap-2">
-                            {review.pros.length > 0 && (
-                                <div className="dropdown dropdown-end">
-                                    <div tabIndex={0} role="button" className="btn btn-xs btn-ghost flex items-center gap-1 px-1">
-                                        <FiThumbsUp size={12} className="text-success" />
-                                        <span className="text-xs">{review.pros.length}</span>
-                                        <FiChevronDown size={10} />
-                                    </div>
-                                    <div tabIndex={0} className="dropdown-content z-[1] card card-sm bg-base-100 shadow-lg w-auto max-h-60 overflow-y-auto">
-                                        <div className="card-body p-2">
-                                            <div className={`grid ${review.pros.length > 1 ? 'grid-cols-3' : ''} gap-1 w-max`}>
-                                                {review.pros.map((pro: any) => (
-                                                    <ReviewAspectCard key={pro.id} aspect={pro} />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            {review.cons.length > 0 && (
-                                <div className="dropdown dropdown-end">
-                                    <div tabIndex={0} role="button" className="btn btn-xs btn-ghost flex items-center gap-1 px-1">
-                                        <FiThumbsDown size={12} className="text-error" />
-                                        <span className="text-xs">{review.cons.length}</span>
-                                        <FiChevronDown size={10} />
-                                    </div>
-                                    <div tabIndex={0} className="dropdown-content z-[1] card card-sm bg-base-100 shadow-lg w-auto max-h-60 overflow-y-auto">
-                                        <div className="card-body p-2">
-                                            <div className={`grid ${review.cons.length > 1 ? 'grid-cols-3' : ''} gap-1 w-max`}>
-                                                {review.cons.map((con: any) => (
-                                                    <ReviewAspectCard key={con.id} aspect={con} />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <p className="text-sm text-base-content mt-1 break-words whitespace-pre-line line-clamp-3 flex-1">
-                        {review.text}
-                    </p>
-                </div>
-            </div>
-
-            <div className="divider my-0 mx-3"></div>
-
-            <div className="px-3 pb-2 pt-1 flex justify-between items-center text-xs">
-                <div className="flex items-center gap-1 text-yellow-500">
-                    <span className="font-medium">{rating}</span>
-                    <FiStar size={12} className="fill-current" />
-                </div>
-                <span className="text-base-content/60">{formattedDate}</span>
-            </div>
-        </div>
-    );
-};
-
 export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
-    ({ profile, userReviews, summary, loading }, ref) => {
+    ({ profile, userReviews, summary, loading, pagination, filters, handlePageChange, handleFilterChange }, ref) => {
         const renderRatingStars = (rating: number) => {
             const stars = [];
             const fullStars = Math.floor(rating);
@@ -264,32 +105,19 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                                                 </span>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-3 mt-4">
-                                                <RatingStatCard
-                                                    title="Плюсы"
-                                                    value={summary.total_pros || 0}
-                                                    icon={<FiThumbsUp size={20} />}
-                                                    color="success"
-                                                />
-                                                <RatingStatCard
-                                                    title="Минусы"
-                                                    value={summary.total_cons || 0}
-                                                    icon={<FiThumbsDown size={20} />}
-                                                    color="error"
-                                                />
-                                            </div>
+
 
                                             <AspectSection
                                                 title="Сильные стороны"
                                                 aspects={summary.pros_count}
-                                                icon={<FiThumbsUp size={16} className="text-success" />}
+                                                icon={<FiCornerRightDown size={16} className="text-success" />}
                                                 color="success"
                                             />
 
                                             <AspectSection
                                                 title="Слабые стороны"
                                                 aspects={summary.cons_count}
-                                                icon={<FiThumbsDown size={16} className="text-error" />}
+                                                icon={<FiCornerRightDown size={16} className="text-error" />}
                                                 color="error"
                                             />
                                         </div>
@@ -299,25 +127,105 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                         )}
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium">Оставленные вами отзывы</h3>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <h3 className="text-lg font-medium">Оставленные вами отзывы</h3>
+
+                                <div className="flex items-center gap-3">
+                                    <div className="form-control">
+                                        <label className="label cursor-pointer gap-2">
+                                            <span className="label-text">Специалисты</span>
+                                            <input
+                                                type="radio"
+                                                name="role"
+                                                className="radio radio-sm"
+                                                checked={filters.role === 'specialist'}
+                                                onChange={() => handleFilterChange('specialist')}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div className="form-control">
+                                        <label className="label cursor-pointer gap-2">
+                                            <span className="label-text">Организации</span>
+                                            <input
+                                                type="radio"
+                                                name="role"
+                                                className="radio radio-sm"
+                                                checked={filters.role === 'organization'}
+                                                onChange={() => handleFilterChange('organization')}
+                                            />
+                                        </label>
+                                    </div>
+                                    <button
+                                        className="btn btn-sm btn-ghost"
+                                        onClick={() => handleFilterChange('')}
+                                    >
+                                        Сбросить
+                                    </button>
+                                </div>
+                            </div>
 
                             <span className="text-sm text-base-content/60 block">
-                                {summary.user_reviews_count} {summary.user_reviews_count === 1
+                                {pagination.totalItems} {pagination.totalItems === 1
                                 ? 'отзыв'
-                                : summary.user_reviews_count > 1 && summary.user_reviews_count < 5
+                                : pagination.totalItems > 1 && pagination.totalItems < 5
                                     ? 'отзыва'
                                     : 'отзывов'}
                             </span>
 
                             {userReviews.length > 0 ? (
-                                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                                    {userReviews.map(review => (
-                                        <ReviewCard key={review.id} review={review} />
-                                    ))}
-                                </div>
+                                <>
+                                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                        {userReviews.map(review => (
+                                            <ReviewCard key={review.id} review={review} />
+                                        ))}
+                                    </div>
+
+                                    <div className="flex justify-center mt-6">
+                                        <div className="join">
+                                            <button
+                                                className="join-item btn btn-sm"
+                                                disabled={pagination.page === 1}
+                                                onClick={() => handlePageChange(pagination.page - 1)}
+                                            >
+                                                «
+                                            </button>
+                                            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                                                let pageNum;
+                                                if (pagination.totalPages <= 5) {
+                                                    pageNum = i + 1;
+                                                } else if (pagination.page <= 3) {
+                                                    pageNum = i + 1;
+                                                } else if (pagination.page >= pagination.totalPages - 2) {
+                                                    pageNum = pagination.totalPages - 4 + i;
+                                                } else {
+                                                    pageNum = pagination.page - 2 + i;
+                                                }
+
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        className={`join-item btn btn-sm ${pagination.page === pageNum ? 'btn-active' : ''}`}
+                                                        onClick={() => handlePageChange(pageNum)}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            })}
+                                            <button
+                                                className="join-item btn btn-sm"
+                                                disabled={pagination.page === pagination.totalPages}
+                                                onClick={() => handlePageChange(pagination.page + 1)}
+                                            >
+                                                »
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
                             ) : (
                                 <div className="bg-base-200 text-base-content/60 p-6 rounded-box text-center">
-                                    Вы ещё не оставляли отзывов
+                                    {filters.role
+                                        ? `Вы ещё не оставляли отзывов для ${filters.role === 'specialist' ? 'специалистов' : 'организаций'}`
+                                        : 'Вы ещё не оставляли отзывов'}
                                 </div>
                             )}
                         </div>

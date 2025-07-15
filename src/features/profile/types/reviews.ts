@@ -30,8 +30,6 @@ export interface ReviewsSummary {
     total_reviews: number;
     user_reviews_count: number;
     rating: number;
-    total_pros: number;
-    total_cons: number;
     pros_count: Array<{
         id: number;
         description: string;

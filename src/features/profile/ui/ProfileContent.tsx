@@ -27,7 +27,15 @@ export const ProfileContent = () => {
     const { handleLogout } = useProfileActions();
     const { qrUrl, generate, download } = useQrCode();
     const { requests, loading: verificationsLoading, approveRequest, rejectRequest } = useVerificationRequests();
-    const { userReviews,  summary, loading: reviewsLoading } = useReviews();
+    const {
+        userReviews,
+        summary,
+        loading: reviewsLoading,
+        pagination,
+        filters,
+        handlePageChange,
+        handleFilterChange,
+    } = useReviews();
 
     useEffect(() => {
         const refs = {
@@ -93,6 +101,10 @@ export const ProfileContent = () => {
                         userReviews={userReviews}
                         summary={summary}
                         loading={reviewsLoading}
+                        pagination={pagination}
+                        filters={filters}
+                        handlePageChange={handlePageChange}
+                        handleFilterChange={handleFilterChange}
                     />
                 )}
 

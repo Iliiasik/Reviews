@@ -10,19 +10,37 @@ export const useReviews = () => {
         total_reviews: 0,
         user_reviews_count: 0,
         rating: 0,
+        pros_count: [],
+        cons_count: [],
     });
     const [loading, setLoading] = useState(false);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 6,
+        totalPages: 1,
+        totalItems: 0,
+    });
+    const [filters, setFilters] = useState({
+        role: '',
+    });
     const { showToast } = useToast();
     const { profile } = useProfile();
 
-    const loadUserReviews = async () => {
+    const loadUserReviews = async (page: number = 1, limit: number = 6, role: string = '') => {
         try {
             setLoading(true);
-            const response = await ReviewsApi.getUserReviews();
+            const response = await ReviewsApi.getUserReviews(page, limit, role);
             setUserReviews(response.data);
+            setPagination(prev => ({
+                ...prev,
+                page,
+                limit,
+                totalPages: Math.ceil(response.total / limit),
+                totalItems: response.total,
+            }));
             setSummary(prev => ({
                 ...prev,
-                user_reviews_count: response.user_reviews_count || 0
+                user_reviews_count: response.total || 0
             }));
         } catch (error) {
             console.error('Ошибка загрузки отзывов:', error);
@@ -47,11 +65,22 @@ export const useReviews = () => {
             setSummary({
                 total_reviews: 0,
                 user_reviews_count: 0,
-                rating: 0
+                rating: 0,
+                pros_count: [],
+                cons_count: [],
             });
         } finally {
             setLoading(false);
         }
+    };
+
+    const handlePageChange = (page: number) => {
+        loadUserReviews(page, pagination.limit, filters.role);
+    };
+
+    const handleFilterChange = (role: string) => {
+        setFilters({ role });
+        loadUserReviews(1, pagination.limit, role);
     };
 
     useEffect(() => {
@@ -68,6 +97,10 @@ export const useReviews = () => {
         userReviews,
         summary,
         loading,
+        pagination,
+        filters,
         refreshUserReviews: loadUserReviews,
+        handlePageChange,
+        handleFilterChange,
     };
 };

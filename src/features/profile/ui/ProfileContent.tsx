@@ -4,6 +4,7 @@ import { useProfile } from '../model/useProfile';
 import { useProfileActions } from '../model/useProfileActions';
 import { useQrCode } from '../model/useQrCode';
 import { useVerificationRequests } from '../model/useVerificationRequests';
+import { useReviews } from '../model/useReviews';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileTab } from './ProfileTab';
 import { ReviewsTab } from './ReviewsTab';
@@ -25,7 +26,8 @@ export const ProfileContent = () => {
     const { profile, isLoading, handleProfileUpdate } = useProfile();
     const { handleLogout } = useProfileActions();
     const { qrUrl, generate, download } = useQrCode();
-    const { requests, loading, approveRequest, rejectRequest } = useVerificationRequests();
+    const { requests, loading: verificationsLoading, approveRequest, rejectRequest } = useVerificationRequests();
+    const { userReviews,  summary, loading: reviewsLoading } = useReviews();
 
     useEffect(() => {
         const refs = {
@@ -85,7 +87,13 @@ export const ProfileContent = () => {
                 )}
 
                 {activeTab === 'reviews' && (
-                    <ReviewsTab ref={reviewsRef} profile={profile} />
+                    <ReviewsTab
+                        ref={reviewsRef}
+                        profile={profile}
+                        userReviews={userReviews}
+                        summary={summary}
+                        loading={reviewsLoading}
+                    />
                 )}
 
                 {activeTab === 'qr' && (
@@ -101,7 +109,7 @@ export const ProfileContent = () => {
                     <VerificationsTab
                         ref={verificationsRef}
                         requests={requests}
-                        loading={loading}
+                        loading={verificationsLoading}
                         onApprove={approveRequest}
                         onReject={rejectRequest}
                     />

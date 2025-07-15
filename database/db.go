@@ -64,6 +64,7 @@ func InitDB() {
 		&models.CollectionOrganization{},
 		&models.RefreshToken{},
 		&models.VerificationRequest{},
+		&models.ReviewLike{},
 	)
 	if err != nil {
 		log.Fatalf("Error running migrations: %v", err)

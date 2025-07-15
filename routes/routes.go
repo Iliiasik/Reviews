@@ -58,6 +58,8 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		public.GET("/specialist/:id", profile.GetSpecialistProfile(database.DB))
 		public.POST("/unverified-profile", profile.CreateUnverifiedProfile(database.DB))
 		public.GET("/organization/:id", profile.GetOrganizationProfile(database.DB))
+		public.GET("/reviews/summary/:id", profile.GetUserReviewsSummary)
+
 	}
 
 	// Защищенные роуты
@@ -75,5 +77,6 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		protected.POST("/verification-requests/:id/approve", verifications.ApproveVerificationRequest)
 		protected.POST("/verification-requests/:id/reject", verifications.RejectVerificationRequest)
 		protected.GET("/verification-requests/status", verifications.CheckVerificationRequestStatus)
+		protected.GET("/reviews/user", profile.GetUserReviews)
 	}
 }

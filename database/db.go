@@ -123,6 +123,7 @@ func SeedCasbinPolicies() {
 		{"admin", "/api/verification-requests/pending", "GET"},
 		{"admin", "/api/verification-requests/:id/approve", "POST"},
 		{"admin", "/api/verification-requests/:id/reject", "POST"},
+		{"admin", "/api/reviews/user", "GET"},
 
 		// Модераторские права
 		{"moderator", "/api/profile", "GET"},
@@ -130,6 +131,7 @@ func SeedCasbinPolicies() {
 		{"moderator", "/api/reviews", "GET"},
 		{"moderator", "/api/logout", "POST"},
 		{"moderator", "/api/change-password", "POST"},
+		{"moderator", "/api/reviews/user", "GET"},
 
 		// Права специалиста
 		{"specialist", "/api/profile", "GET"},
@@ -141,6 +143,7 @@ func SeedCasbinPolicies() {
 		{"specialist", "/api/change-password", "POST"},
 		{"specialist", "/api/verification-requests", "POST"},
 		{"specialist", "/api/verification-requests/status", "GET"},
+		{"specialist", "/api/reviews/user", "GET"},
 
 		// Права организации
 		{"organization", "/api/profile", "GET"},
@@ -152,12 +155,14 @@ func SeedCasbinPolicies() {
 		{"organization", "/api/change-password", "POST"},
 		{"organization", "/api/verification-requests", "POST"},
 		{"organization", "/api/verification-requests/status", "GET"},
+		{"organization", "/api/reviews/user", "GET"},
 
 		// Базовые права пользователя
 		{"user", "/api/profile", "GET"},
 		{"user", "/api/logout", "POST"},
 		{"user", "/api/change-password", "POST"},
 		{"user", "/api/profile/update", "POST"},
+		{"user", "/api/reviews/user", "GET"},
 	}
 
 	for _, policy := range policies {

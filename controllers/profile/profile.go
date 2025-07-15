@@ -38,6 +38,7 @@ func GetProfileHandler(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		profile := gin.H{
+			"id":         user.ID,
 			"name":       user.Name,
 			"email":      user.Email,
 			"username":   user.Username,

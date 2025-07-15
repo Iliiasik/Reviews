@@ -12,7 +12,7 @@ import (
 )
 
 type CreateRequest struct {
-	Description string `json:"description" binding:"required,min=20,max=1000"`
+	Description string `json:"description" binding:"required,min=10,max=1000"`
 }
 
 func CreateVerificationRequest(c *gin.Context) {

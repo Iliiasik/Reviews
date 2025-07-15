@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from "axios";
+import {StarIcon} from "lucide-react";
 
 
 interface ReviewAspect {
@@ -89,7 +90,10 @@ export const Reviews = ({type}:ReviewsProps) => {
                                             <span className="text-base-content/60 italic">Аноним</span>
                                         )}
                                     </div>
-                                    <span className="text-warning font-semibold">{review.rating}⭐</span>
+                                    <span className="text-warning font-semibold flex items-center gap-1">
+                                        {review.rating}
+                                        <StarIcon size={18} className="text-warning" />
+                                    </span>
                                 </div>
 
                                 <p className="text-base-content whitespace-pre-line">{review.text}</p>

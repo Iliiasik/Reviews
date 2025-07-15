@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { Laugh, Frown, Angry, Meh, Smile } from "lucide-react";
+import type {JSX} from "react";
+
 
 interface RatingInputProps {
     value: number;
@@ -13,13 +16,14 @@ const ratingLabels: Record<number, string> = {
     5: 'Отлично',
 };
 
-const ratingEmojis: Record<number, string> = {
-    1: '😡',
-    2: '😕',
-    3: '😐',
-    4: '😊',
-    5: '🤩',
+const ratingIcons: Record<number, JSX.Element> = {
+    1: <Angry size={48} color="#f44336" />,
+    2: <Frown size={48} color="#ff9800" />,
+    3: <Meh size={48} color="#9e9e9e" />,
+    4: <Smile size={48} color="#2196f3" />,
+    5: <Laugh size={48} color="#4caf50" />,
 };
+
 
 export const RatingInput = ({ value, onChange }: RatingInputProps) => (
     <div className="form-control items-center w-full">
@@ -32,7 +36,7 @@ export const RatingInput = ({ value, onChange }: RatingInputProps) => (
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="mb-3 flex justify-center w-full text-5xl sm:text-6xl"
             >
-                {ratingEmojis[value]}
+                {ratingIcons[value]}
             </motion.div>
         )}
 

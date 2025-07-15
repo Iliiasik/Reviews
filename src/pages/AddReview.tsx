@@ -34,7 +34,7 @@ export const AddReview = () => {
                 <p className="mb-4 text-red-500">{error}</p>
             ) : (
                 <h1 className="text-2xl font-bold mb-4">
-                    Оставить отзыв для: <span className="text-primary">{name}</span>
+                    Отзыв для: <span className="text-primary">{name}</span>
                 </h1>
             )}
 

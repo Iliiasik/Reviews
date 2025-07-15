@@ -26,7 +26,7 @@ export const MainHomeCards = () => {
                     type={type}
                     onChange={(newType) => {
                         setType(newType);
-                        setPage(1); // ⬅ сбрасываем
+                        setPage(1);
                     }}
                 />
             </div>
@@ -41,7 +41,7 @@ export const MainHomeCards = () => {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                     {results.map((item) => (
-                        <ExploreCard key={item.id} {...item} />
+                        <ExploreCard review_count={0} key={item.id} {...item} />
                     ))}
                 </motion.div>
             </AnimatePresence>
@@ -52,7 +52,7 @@ export const MainHomeCards = () => {
                     rating={rating}
                     onChange={(newRating) => {
                         setRating(newRating);
-                        setPage(1); // ⬅ сбрасываем
+                        setPage(1);
                     }}
                 />
             </div>

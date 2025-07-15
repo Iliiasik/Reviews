@@ -5,7 +5,9 @@ export interface ExploreResult {
     name: string;
     type: 'specialist' | 'organization';
     rating: number;
+    review_count: number;
 }
+
 
 export interface ExploreResponse {
     results: ExploreResult[];

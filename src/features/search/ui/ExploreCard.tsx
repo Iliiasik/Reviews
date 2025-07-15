@@ -6,10 +6,11 @@ interface Props {
     type: 'specialist' | 'organization';
     rating: number;
     is_confirmed?: boolean;
+    review_count: number;
 }
 
 
-export const ExploreCard = ({ id, name, type, rating, is_confirmed }: Props) => (
+export const ExploreCard = ({ id, name, type, rating, is_confirmed,review_count }: Props) => (
     <Link to={`/${type}/${id}`} className="card w-full bg-base-100 shadow-md hover:shadow-lg transition">
         <div className="card-body flex flex-col">
             <div className="avatar placeholder mb-4">
@@ -35,7 +36,7 @@ export const ExploreCard = ({ id, name, type, rating, is_confirmed }: Props) => 
             </h2>
 
             <p className="text-sm text-gray-500">
-                {type === 'specialist' ? 'Специалист' : 'Организация'}
+                {type === 'specialist' ? 'Специалист' : 'Организация'} · {review_count} отзывов
             </p>
 
             <div className="rating rating-md mt-2">

@@ -9,6 +9,7 @@ import { AspectCheckboxList } from "@features/review/ui/AspectCheckBoxList.tsx";
 import { CommentTextarea } from "@features/review/ui/CommentTextArea.tsx";
 import { AnonymousCheckbox } from "@features/review/ui/AnonymousChechBox.tsx";
 import { useUser } from "@shared/context/UserContext";
+import { useToast } from "@shared/context/ToastContext";
 
 interface ReviewFormProps {
     profileUserId: number;
@@ -29,7 +30,7 @@ export const ReviewForm = ({
     const [aspects, setAspects] = useState<ReviewAspect[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
+    const { showToast } = useToast();
     useEffect(() => {
         getReviewAspects().then(setAspects).catch(() => setAspects([]));
     }, []);
@@ -61,18 +62,23 @@ export const ReviewForm = ({
             setIsAnonymous(false);
             setPros([]);
             setCons([]);
+            showToast("Отзыв отправлен", "success");
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.error || "Ошибка отправки отзыва");
+                const appError = err.response?.data;
+                const message = appError?.message || appError?.error || "Ошибка отправки отзыва";
+                const details = typeof appError?.details === "string" ? appError.details : "";
+                showToast(`${message}${details ? `: ${details}` : ""}`, "error");
             } else if (err instanceof Error) {
-                setError(err.message);
+                showToast(err.message, "error");
             } else {
-                setError("Неизвестная ошибка");
+                showToast("Неизвестная ошибка", "error");
             }
         } finally {
             setLoading(false);
         }
     };
+
 
     if (userLoading) return <p>Загрузка...</p>;
 
@@ -93,7 +99,7 @@ export const ReviewForm = ({
                 />
 
                 <AspectCheckboxList
-                    label="Что стоит улучшить?"
+                    label="Что оставило неприятное впечатление?"
                     aspects={aspects.filter((a) => !a.positive)}
                     selectedIds={cons}
                     onToggle={(id) => toggleAspect(id, "cons")}

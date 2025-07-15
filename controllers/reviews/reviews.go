@@ -1,10 +1,10 @@
 package reviews
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"reviews-back/error_types"
 	"reviews-back/models"
 	"time"
 )
@@ -14,15 +14,16 @@ type CreateReviewRequest struct {
 	Rating        int    `json:"rating" binding:"required,min=1,max=5"`
 	Text          string `json:"text" binding:"required"`
 	IsAnonymous   bool   `json:"is_anonymous"`
-	Pros          []uint `json:"pros"` // ID аспектов
-	Cons          []uint `json:"cons"` // ID аспектов
+	Pros          []uint `json:"pros"`
+	Cons          []uint `json:"cons"`
 }
 
 func CreateReview(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req CreateReviewRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			appErr := error_types.ValidationError(err.Error())
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 
@@ -33,7 +34,6 @@ func CreateReview(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
-		fmt.Println("Middleware user:", userID)
 		isAnonymous := req.IsAnonymous
 		if userID == nil {
 			isAnonymous = true
@@ -50,37 +50,49 @@ func CreateReview(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		if err := db.Create(&review).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create review"})
+			appErr := error_types.InternalServerError(err)
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 
 		if len(req.Pros) > 0 {
 			var pros []models.ReviewAspect
-			if err := db.Where("id IN ?", req.Pros).Find(&pros).Error; err == nil {
-				if err := db.Model(&review).Association("Pros").Append(pros); err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add pros"})
-					return
-				}
+			if err := db.Where("id IN ?", req.Pros).Find(&pros).Error; err != nil {
+				appErr := error_types.InternalServerError(err)
+				c.JSON(appErr.HttpStatusCode, appErr)
+				return
+			}
+			if err := db.Model(&review).Association("Pros").Append(pros); err != nil {
+				appErr := error_types.InternalServerError(err)
+				c.JSON(appErr.HttpStatusCode, appErr)
+				return
 			}
 		}
+
 		if len(req.Cons) > 0 {
 			var cons []models.ReviewAspect
-			if err := db.Where("id IN ?", req.Cons).Find(&cons).Error; err == nil {
-				if err := db.Model(&review).Association("Cons").Append(cons); err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add cons"})
-					return
-				}
+			if err := db.Where("id IN ?", req.Cons).Find(&cons).Error; err != nil {
+				appErr := error_types.InternalServerError(err)
+				c.JSON(appErr.HttpStatusCode, appErr)
+				return
+			}
+			if err := db.Model(&review).Association("Cons").Append(cons); err != nil {
+				appErr := error_types.InternalServerError(err)
+				c.JSON(appErr.HttpStatusCode, appErr)
+				return
 			}
 		}
 
 		c.JSON(http.StatusCreated, review)
 	}
 }
+
 func GetReviews(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		profileUserID := c.Query("profile_user_id")
 		if profileUserID == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "profile_user_id is required"})
+			appErr := error_types.ValidationError("profile_user_id is required")
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 
@@ -91,7 +103,8 @@ func GetReviews(db *gorm.DB) gin.HandlerFunc {
 			Where("profile_user_id = ?", profileUserID).
 			Order("created_at DESC").
 			Find(&reviews).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch reviews"})
+			appErr := error_types.InternalServerError(err)
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 

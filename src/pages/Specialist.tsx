@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSpecialistById } from "@features/specialist/api/getSpecialistById.ts";
 import type { SpecialistProfile } from "@features/specialist/types/SpecialistProfile.ts";
 import { SpecialistProfileView } from "@features/specialist/ui/SpecialistProfileView.tsx";
-import { Reviews } from "@shared/Reviews.tsx";
+import { Reviews } from "@features/review/ui/Reviews.tsx";
 import { useToast } from "@shared/context/ToastContext.tsx";
 
 export const Specialist = () => {

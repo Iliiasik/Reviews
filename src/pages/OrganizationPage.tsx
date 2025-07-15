@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getOrganizationById } from "@features/organisation/api/getOrganizationById";
 import type { OrganizationProfile } from "@features/organisation/types/OrganizationProfile";
 import { OrganizationProfileView } from "@features/organisation/ui/OrganizationProfileView";
-import { Reviews } from "@shared/Reviews.tsx"; // можно переименовать
+import { Reviews } from "@features/review/ui/Reviews.tsx"; // можно переименовать
 import { useToast } from "@shared/context/ToastContext";
 
 export const OrganizationPage = () => {

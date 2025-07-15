@@ -1,4 +1,5 @@
-import type {SpecialistProfile} from "@features/specialist/types/SpecialistProfile";
+import { FiAward, FiInfo } from 'react-icons/fi';
+import type { SpecialistProfile } from "@features/specialist/types/SpecialistProfile";
 
 interface Props {
     data: SpecialistProfile;
@@ -31,13 +32,19 @@ export const SpecialistProfileView = ({ data }: Props) => (
                     )}
                 </h1>
 
-                <p className="text-gray-600">Рейтинг: {data.rating.toFixed(1)}</p>
-                <p className="text-gray-600">Опыт: {data.experience_years} лет</p>
+                <p className="text-lg flex items-center gap-2">
+                    <FiAward className="text-gray-500" size={18} />
+                    Опыт: {data.experience_years} {data.experience_years === 1 ? 'год' : data.experience_years < 5 ? 'года' : 'лет'}
+                </p>
+
             </div>
         </div>
 
         <div className="mb-4">
-            <h2 className="font-semibold text-lg mb-1">О специалисте</h2>
+            <h2 className="font-semibold text-lg mb-1 flex items-center gap-2">
+                <FiInfo className="text-gray-500" size={18} />
+                О специалисте
+            </h2>
             <p>{data.about || 'Нет описания'}</p>
         </div>
     </div>

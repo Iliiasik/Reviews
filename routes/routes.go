@@ -59,6 +59,8 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		public.POST("/unverified-profile", profile.CreateUnverifiedProfile(database.DB))
 		public.GET("/organization/:id", profile.GetOrganizationProfile(database.DB))
 		public.GET("/reviews/summary/:id", profile.GetUserReviewsSummary)
+		public.POST("/reviews/:id/like", reviews.LikeReview(database.DB))
+		public.DELETE("/reviews/:id/like", reviews.UnlikeReview(database.DB))
 
 	}
 

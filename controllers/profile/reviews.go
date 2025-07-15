@@ -5,6 +5,7 @@ import (
 	"reviews-back/database"
 	"reviews-back/error_types"
 	"reviews-back/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -23,30 +24,61 @@ func GetUserReviews(c *gin.Context) {
 		return
 	}
 
-	var reviews []models.Review
-	if err := database.DB.
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "6"))
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 6
+	}
+	offset := (page - 1) * limit
+
+	role := c.Query("role")
+
+	query := database.DB.
 		Preload("ProfileUser").
 		Preload("ProfileUser.Role").
 		Preload("Pros").
 		Preload("Cons").
-		Where("author_id = ?", userIDUint).
+		Where("author_id = ?", userIDUint)
+
+	if role != "" {
+		query = query.Joins("JOIN users ON reviews.profile_user_id = users.id").
+			Joins("JOIN roles ON users.role_id = roles.id").
+			Where("roles.name = ?", role)
+	}
+
+	var reviews []models.Review
+	if err := query.
+		Offset(offset).
+		Limit(limit).
 		Find(&reviews).Error; err != nil {
 		c.Error(error_types.InternalServerError(err))
 		return
 	}
 
-	var count int64
-	if err := database.DB.
+	var total int64
+	countQuery := database.DB.
 		Model(&models.Review{}).
-		Where("author_id = ?", userIDUint).
-		Count(&count).Error; err != nil {
+		Where("author_id = ?", userIDUint)
+
+	if role != "" {
+		countQuery = countQuery.Joins("JOIN users ON reviews.profile_user_id = users.id").
+			Joins("JOIN roles ON users.role_id = roles.id").
+			Where("roles.name = ?", role)
+	}
+
+	if err := countQuery.Count(&total).Error; err != nil {
 		c.Error(error_types.InternalServerError(err))
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data":               reviews,
-		"user_reviews_count": count,
+		"data":  reviews,
+		"total": total,
+		"page":  page,
+		"limit": limit,
 	})
 }
 
@@ -131,16 +163,6 @@ func GetUserReviewsSummary(c *gin.Context) {
 			"rating":        rating,
 			"pros_count":    prosCount,
 			"cons_count":    consCount,
-			"total_pros":    sumCounts(prosCount),
-			"total_cons":    sumCounts(consCount),
 		},
 	})
-}
-
-func sumCounts(aspects []AspectCount) int64 {
-	var total int64
-	for _, a := range aspects {
-		total += a.Count
-	}
-	return total
 }

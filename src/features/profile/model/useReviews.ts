@@ -14,6 +14,7 @@ export const useReviews = () => {
         cons_count: [],
     });
     const [loading, setLoading] = useState(false);
+    const [reviewsLoading, setReviewsLoading] = useState(false);
     const [pagination, setPagination] = useState({
         page: 1,
         limit: 6,
@@ -28,7 +29,7 @@ export const useReviews = () => {
 
     const loadUserReviews = async (page: number = 1, limit: number = 6, role: string = '') => {
         try {
-            setLoading(true);
+            setReviewsLoading(true);
             const response = await ReviewsApi.getUserReviews(page, limit, role);
             setUserReviews(response.data);
             setPagination(prev => ({
@@ -38,15 +39,11 @@ export const useReviews = () => {
                 totalPages: Math.ceil(response.total / limit),
                 totalItems: response.total,
             }));
-            setSummary(prev => ({
-                ...prev,
-                user_reviews_count: response.total || 0
-            }));
         } catch (error) {
             console.error('Ошибка загрузки отзывов:', error);
             showToast('Ошибка загрузки ваших отзывов', 'error');
         } finally {
-            setLoading(false);
+            setReviewsLoading(false);
         }
     };
 
@@ -57,7 +54,9 @@ export const useReviews = () => {
             setSummary(data || {
                 total_reviews: 0,
                 user_reviews_count: 0,
-                rating: 0
+                rating: 0,
+                pros_count: [],
+                cons_count: [],
             });
         } catch (error) {
             console.error('Ошибка загрузки сводки:', error);
@@ -97,6 +96,7 @@ export const useReviews = () => {
         userReviews,
         summary,
         loading,
+        reviewsLoading,
         pagination,
         filters,
         refreshUserReviews: loadUserReviews,

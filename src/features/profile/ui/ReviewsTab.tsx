@@ -1,8 +1,9 @@
 import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
-import {FiExternalLink, FiStar, FiCornerRightDown} from 'react-icons/fi';
-import {ReviewCard} from './reviews/ReviewCard';
-import {AspectSection} from './reviews/AspectSection';
+import { FiExternalLink, FiStar, FiCornerRightDown, FiFilter } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ReviewCard } from './reviews/ReviewCard';
+import { AspectSection } from './reviews/AspectSection';
 
 interface ReviewsTabProps {
     profile: {
@@ -27,8 +28,8 @@ interface ReviewsTabProps {
             count: number;
         }>;
     };
-
     loading: boolean;
+    reviewsLoading: boolean;
     pagination: {
         page: number;
         limit: number;
@@ -43,7 +44,20 @@ interface ReviewsTabProps {
 }
 
 export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
-    ({ profile, userReviews, summary, loading, pagination, filters, handlePageChange, handleFilterChange }, ref) => {
+    (
+        {
+            profile,
+            userReviews,
+            summary,
+            loading,
+            reviewsLoading,
+            pagination,
+            filters,
+            handlePageChange,
+            handleFilterChange,
+        },
+        ref
+    ) => {
         const renderRatingStars = (rating: number) => {
             const stars = [];
             const fullStars = Math.floor(rating);
@@ -100,12 +114,14 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                                                     {renderRatingStars(summary.rating || 0)}
                                                 </div>
                                                 <span className="text-sm text-base-content/60">
-                                                    {summary.total_reviews} {summary.total_reviews === 1 ? 'отзыв' :
-                                                    summary.total_reviews > 1 && summary.total_reviews < 5 ? 'отзыва' : 'отзывов'}
+                                                    {summary.total_reviews}{' '}
+                                                    {summary.total_reviews === 1
+                                                        ? 'отзыв'
+                                                        : summary.total_reviews > 1 && summary.total_reviews < 5
+                                                            ? 'отзыва'
+                                                            : 'отзывов'}
                                                 </span>
                                             </div>
-
-
 
                                             <AspectSection
                                                 title="Сильные стороны"
@@ -130,7 +146,7 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <h3 className="text-lg font-medium">Оставленные вами отзывы</h3>
 
-                                <div className="flex items-center gap-3">
+                                <div className="hidden sm:flex items-center gap-3">
                                     <div className="form-control">
                                         <label className="label cursor-pointer gap-2">
                                             <span className="label-text">Специалисты</span>
@@ -162,72 +178,150 @@ export const ReviewsTab = forwardRef<HTMLDivElement, ReviewsTabProps>(
                                         Сбросить
                                     </button>
                                 </div>
+
+                                <div className="sm:hidden dropdown dropdown-end">
+                                    <div tabIndex={0} role="button" className="btn btn-sm btn-ghost">
+                                        <FiFilter className="mr-1" />
+                                        Фильтры
+                                    </div>
+                                    <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-1">
+                                        <li>
+                                            <label className="label cursor-pointer justify-start gap-2">
+                                                <input
+                                                    type="radio"
+                                                    name="role-mobile"
+                                                    className="radio radio-sm"
+                                                    checked={filters.role === 'specialist'}
+                                                    onChange={() => handleFilterChange('specialist')}
+                                                />
+                                                <span className="label-text">Специалисты</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label className="label cursor-pointer justify-start gap-2">
+                                                <input
+                                                    type="radio"
+                                                    name="role-mobile"
+                                                    className="radio radio-sm"
+                                                    checked={filters.role === 'organization'}
+                                                    onChange={() => handleFilterChange('organization')}
+                                                />
+                                                <span className="label-text">Организации</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <button
+                                                className="btn btn-sm btn-ghost justify-start"
+                                                onClick={() => handleFilterChange('')}
+                                            >
+                                                Сбросить фильтры
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
 
-                            <span className="text-sm text-base-content/60 block">
-                                {pagination.totalItems} {pagination.totalItems === 1
-                                ? 'отзыв'
-                                : pagination.totalItems > 1 && pagination.totalItems < 5
-                                    ? 'отзыва'
-                                    : 'отзывов'}
-                            </span>
+                            <AnimatePresence mode="wait">
+                                {reviewsLoading ? (
+                                    <motion.div
+                                        key="loading"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="flex justify-center py-8"
+                                    >
+                                        <span className="loading loading-spinner loading-lg text-primary"></span>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="content"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="space-y-4"
+                                    >
+                                        <span className="text-sm text-base-content/60 block">
+                                            {pagination.totalItems}{' '}
+                                            {pagination.totalItems === 1
+                                                ? 'отзыв'
+                                                : pagination.totalItems > 1 && pagination.totalItems < 5
+                                                    ? 'отзыва'
+                                                    : 'отзывов'}
+                                        </span>
 
-                            {userReviews.length > 0 ? (
-                                <>
-                                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                                        {userReviews.map(review => (
-                                            <ReviewCard key={review.id} review={review} />
-                                        ))}
-                                    </div>
+                                        {userReviews.length > 0 ? (
+                                            <>
+                                                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                                    {userReviews.map((review) => (
+                                                        <ReviewCard key={review.id} review={review} />
+                                                    ))}
+                                                </div>
 
-                                    <div className="flex justify-center mt-6">
-                                        <div className="join">
-                                            <button
-                                                className="join-item btn btn-sm"
-                                                disabled={pagination.page === 1}
-                                                onClick={() => handlePageChange(pagination.page - 1)}
-                                            >
-                                                «
-                                            </button>
-                                            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                                                let pageNum;
-                                                if (pagination.totalPages <= 5) {
-                                                    pageNum = i + 1;
-                                                } else if (pagination.page <= 3) {
-                                                    pageNum = i + 1;
-                                                } else if (pagination.page >= pagination.totalPages - 2) {
-                                                    pageNum = pagination.totalPages - 4 + i;
-                                                } else {
-                                                    pageNum = pagination.page - 2 + i;
-                                                }
+                                                <div className="flex justify-center mt-6">
+                                                    <div className="join">
+                                                        <button
+                                                            className="join-item btn btn-sm"
+                                                            disabled={pagination.page === 1}
+                                                            onClick={() => handlePageChange(pagination.page - 1)}
+                                                        >
+                                                            «
+                                                        </button>
+                                                        {Array.from(
+                                                            { length: Math.min(5, pagination.totalPages) },
+                                                            (_, i) => {
+                                                                let pageNum;
+                                                                if (pagination.totalPages <= 5) {
+                                                                    pageNum = i + 1;
+                                                                } else if (pagination.page <= 3) {
+                                                                    pageNum = i + 1;
+                                                                } else if (
+                                                                    pagination.page >=
+                                                                    pagination.totalPages - 2
+                                                                ) {
+                                                                    pageNum = pagination.totalPages - 4 + i;
+                                                                } else {
+                                                                    pageNum = pagination.page - 2 + i;
+                                                                }
 
-                                                return (
-                                                    <button
-                                                        key={pageNum}
-                                                        className={`join-item btn btn-sm ${pagination.page === pageNum ? 'btn-active' : ''}`}
-                                                        onClick={() => handlePageChange(pageNum)}
-                                                    >
-                                                        {pageNum}
-                                                    </button>
-                                                );
-                                            })}
-                                            <button
-                                                className="join-item btn btn-sm"
-                                                disabled={pagination.page === pagination.totalPages}
-                                                onClick={() => handlePageChange(pagination.page + 1)}
-                                            >
-                                                »
-                                            </button>
-                                        </div>
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="bg-base-200 text-base-content/60 p-6 rounded-box text-center">
-                                    {filters.role
-                                        ? `Вы ещё не оставляли отзывов для ${filters.role === 'specialist' ? 'специалистов' : 'организаций'}`
-                                        : 'Вы ещё не оставляли отзывов'}
-                                </div>
-                            )}
+                                                                return (
+                                                                    <button
+                                                                        key={pageNum}
+                                                                        className={`join-item btn btn-sm ${
+                                                                            pagination.page === pageNum
+                                                                                ? 'btn-active'
+                                                                                : ''
+                                                                        }`}
+                                                                        onClick={() => handlePageChange(pageNum)}
+                                                                    >
+                                                                        {pageNum}
+                                                                    </button>
+                                                                );
+                                                            }
+                                                        )}
+                                                        <button
+                                                            className="join-item btn btn-sm"
+                                                            disabled={pagination.page === pagination.totalPages}
+                                                            onClick={() => handlePageChange(pagination.page + 1)}
+                                                        >
+                                                            »
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="bg-base-200 text-base-content/60 p-6 rounded-box text-center">
+                                                {filters.role
+                                                    ? `Вы ещё не оставляли отзывов для ${
+                                                        filters.role === 'specialist'
+                                                            ? 'специалистов'
+                                                            : 'организаций'
+                                                    }`
+                                                    : 'Вы ещё не оставляли отзывов'}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>

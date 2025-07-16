@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        global: ['TildaSans', 'sans-serif'],
+        global: ['Nunito', 'sans-serif'],
       },
     },
   },

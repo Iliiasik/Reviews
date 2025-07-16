@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useProfile } from '../model/useProfile';
 import { useProfileActions } from '../model/useProfileActions';
 import { useQrCode } from '../model/useQrCode';
@@ -73,6 +74,68 @@ export const ProfileContent = () => {
             : []),
     ];
 
+    const renderActiveTab = () => {
+        switch (activeTab) {
+            case 'profile':
+                return (
+                    <ProfileTab
+                        ref={profileRef}
+                        profile={profile}
+                        isLoading={isLoading}
+                        onEdit={() => setShowEditModal(true)}
+                        onChangePassword={() => setShowChangePasswordModal(true)}
+                        onLogout={handleLogout}
+                    />
+                );
+            case 'reviews':
+                return (
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key="reviews"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <ReviewsTab
+                                ref={reviewsRef}
+                                profile={profile}
+                                userReviews={userReviews}
+                                summary={summary}
+                                loading={reviewsLoading}
+                                reviewsLoading={reviewsLoading}
+                                pagination={pagination}
+                                filters={filters}
+                                handlePageChange={handlePageChange}
+                                handleFilterChange={handleFilterChange}
+                            />
+                        </motion.div>
+                    </AnimatePresence>
+                );
+            case 'qr':
+                return (
+                    <QrTab
+                        ref={qrRef}
+                        qrCode={qrUrl}
+                        onGenerate={generate}
+                        onDownload={download}
+                    />
+                );
+            case 'verifications':
+                return (
+                    <VerificationsTab
+                        ref={verificationsRef}
+                        requests={requests}
+                        loading={verificationsLoading}
+                        onApprove={approveRequest}
+                        onReject={rejectRequest}
+                    />
+                );
+            default:
+                return null;
+        }
+    };
+
     return (
         <div className="max-w-6xl mx-auto">
             <ProfileHeader
@@ -83,68 +146,42 @@ export const ProfileContent = () => {
             />
 
             <div className="bg-base-200 rounded-lg shadow overflow-hidden">
-                {activeTab === 'profile' && (
-                    <ProfileTab
-                        ref={profileRef}
-                        profile={profile}
-                        isLoading={isLoading}
-                        onEdit={() => setShowEditModal(true)}
-                        onChangePassword={() => setShowChangePasswordModal(true)}
-                        onLogout={handleLogout}
-                    />
-                )}
-
-                {activeTab === 'reviews' && (
-                    <ReviewsTab
-                        ref={reviewsRef}
-                        profile={profile}
-                        userReviews={userReviews}
-                        summary={summary}
-                        loading={reviewsLoading}
-                        pagination={pagination}
-                        filters={filters}
-                        handlePageChange={handlePageChange}
-                        handleFilterChange={handleFilterChange}
-                    />
-                )}
-
-                {activeTab === 'qr' && (
-                    <QrTab
-                        ref={qrRef}
-                        qrCode={qrUrl}
-                        onGenerate={generate}
-                        onDownload={download}
-                    />
-                )}
-
-                {activeTab === 'verifications' && (
-                    <VerificationsTab
-                        ref={verificationsRef}
-                        requests={requests}
-                        loading={verificationsLoading}
-                        onApprove={approveRequest}
-                        onReject={rejectRequest}
-                    />
-                )}
+                {renderActiveTab()}
             </div>
 
-            {showChangePasswordModal && (
-                <ChangePasswordModal
-                    onClose={() => setShowChangePasswordModal(false)}
-                    onSuccess={() => setShowChangePasswordModal(false)}
-                />
-            )}
+            <AnimatePresence>
+                {showChangePasswordModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <ChangePasswordModal
+                            onClose={() => setShowChangePasswordModal(false)}
+                            onSuccess={() => setShowChangePasswordModal(false)}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {showEditModal && profile && (
-                <EditProfileModal
-                    profile={profile}
-                    onClose={() => setShowEditModal(false)}
-                    onSuccess={() => {
-                        handleProfileUpdate();
-                        setShowEditModal(false);
-                    }}
-                />
-            )}
+            <AnimatePresence>
+                {showEditModal && profile && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <EditProfileModal
+                            profile={profile}
+                            onClose={() => setShowEditModal(false)}
+                            onSuccess={() => {
+                                handleProfileUpdate();
+                                setShowEditModal(false);
+                            }}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

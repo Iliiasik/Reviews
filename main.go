@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reviews-back/controllers/auth"
+	"reviews-back/cron"
 	"reviews-back/database"
 	"reviews-back/middlewares"
 	"reviews-back/rbac"
@@ -24,6 +25,8 @@ func main() {
 	}
 
 	database.InitDB()
+	// Запускаем CRON
+	cron.StartRatingCron(database.DB)
 	//storage.InitMinio()
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery(), middlewares.ErrorHandler())

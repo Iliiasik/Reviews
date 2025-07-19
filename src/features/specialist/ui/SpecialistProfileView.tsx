@@ -31,7 +31,9 @@ export const SpecialistProfileView = ({ data }: Props) => (
                         </svg>
                     )}
                 </h1>
-
+                <p className="text-lg flex items-center gap-2">
+                    Рейтинг: {data.rating.toFixed(1)}
+                </p>
                 <p className="text-lg flex items-center gap-2">
                     <FiAward className="text-gray-500" size={18} />
                     Опыт: {data.experience_years} {data.experience_years === 1 ? 'год' : data.experience_years < 5 ? 'года' : 'лет'}

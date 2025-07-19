@@ -1,4 +1,4 @@
-import { FiAward, FiInfo } from 'react-icons/fi';
+import { FiInfo } from 'react-icons/fi';
 import type { OrganizationProfile } from '../types/OrganizationProfile';
 
 interface Props {
@@ -33,7 +33,6 @@ export const OrganizationProfileView = ({ data }: Props) => (
                 </h1>
 
                 <p className="text-lg flex items-center gap-2">
-                    <FiAward className="text-gray-500" size={18} />
                     Рейтинг: {data.rating.toFixed(1)}
                 </p>
 

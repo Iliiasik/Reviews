@@ -4,6 +4,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	"github.com/qor5/web/v3"
 	"net/http"
 	"reviews-back/admin_panel"
@@ -17,7 +18,7 @@ import (
 	"reviews-back/middlewares"
 )
 
-func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elasticsearch.Client) {
+func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elasticsearch.Client, asynqClient *asynq.Client) {
 
 	adminHandler := admin_panel.Initialize()
 
@@ -53,7 +54,7 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elastics
 		public.GET("/search", search.ElasticSearch(esClient, search.SearchHandler(database.DB)))
 		public.GET("/explore", search.ExploreHandler(database.DB))
 		public.POST("/resend-confirmation", auth.ResendConfirmationHandler(database.DB))
-		public.POST("/reviews", reviews.CreateReview(database.DB))
+		public.POST("/reviews", reviews.CreateReview(database.DB, asynqClient))
 		public.GET("/reviews", reviews.GetReviews(database.DB))
 		public.GET("/aspects", reviews.GetReviewAspects(database.DB))
 		public.GET("/specialist/:id", profile.GetSpecialistProfile(database.DB))

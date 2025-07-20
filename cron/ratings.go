@@ -77,7 +77,7 @@ func recalculateRatingForUser(db *gorm.DB, userID uint) error {
 		return orgRes.Error
 	}
 	if orgRes.RowsAffected == 0 {
-		log.Printf("⚠️ Пользователь %d не является ни специалистом, ни организацией", userID)
+		log.Printf("Пользователь %d не является ни специалистом, ни организацией", userID)
 	}
 
 	return nil

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -46,12 +47,23 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery(), middlewares.ErrorHandler())
 
+	var asynqClient *asynq.Client
+	redisAddr := os.Getenv("REDIS_ADDR")
+	if redisAddr == "" {
+		log.Println("REDIS_ADDR не задан — Asynq будет отключен")
+	} else {
+		asynqClient = asynq.NewClient(asynq.RedisClientOpt{
+			Addr: redisAddr,
+		})
+		defer asynqClient.Close()
+	}
+
 	r.RedirectTrailingSlash = false
 	enforcer, err := rbac.NewEnforcer(database.DB)
 	if err != nil {
 		log.Fatalf("Failed to initialize Casbin: %v", err)
 	}
-	routes.RegisterRoutes(r, enforcer, esClient)
+	routes.RegisterRoutes(r, enforcer, esClient, asynqClient)
 	if err := r.Run(":8000"); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}

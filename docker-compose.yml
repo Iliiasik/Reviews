@@ -12,6 +12,7 @@ services:
     depends_on:
       - minio
       - postgres
+      - redis
     restart: always
     extra_hosts:
       - "localhost:host-gateway"
@@ -69,7 +70,16 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    restart: always
+    volumes:
+      - redis_data:/data
+
 volumes:
   minio_data:
   pg_data:
   es_data:
+  redis_data:

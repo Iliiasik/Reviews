@@ -2,10 +2,13 @@ package reviews
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"reviews-back/error_types"
 	"reviews-back/models"
+	"reviews-back/tasks"
 	"time"
 )
 
@@ -18,7 +21,7 @@ type CreateReviewRequest struct {
 	Cons          []uint `json:"cons"`
 }
 
-func CreateReview(db *gorm.DB) gin.HandlerFunc {
+func CreateReview(db *gorm.DB, asynqClient *asynq.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req CreateReviewRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -60,6 +63,16 @@ func CreateReview(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
+		//  Asynq task
+		if asynqClient != nil {
+			if err := tasks.EnqueueRatingUpdateTask(asynqClient, req.ProfileUserID); err != nil {
+				log.Printf("Ошибка постановки задачи в очередь: %v", err)
+			}
+		} else {
+			log.Printf(" Asynq клиент не инициализирован — задача на пересчёт рейтинга не поставлена")
+		}
+
+		// ассоциации:
 		if len(req.Pros) > 0 {
 			var pros []models.ReviewAspect
 			if err := db.Where("id IN ?", req.Pros).Find(&pros).Error; err != nil {

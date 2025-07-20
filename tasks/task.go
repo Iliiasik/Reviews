@@ -39,7 +39,7 @@ func NewRatingUpdateHandler(db *gorm.DB) asynq.HandlerFunc {
 	}
 }
 
-// Функция пересчёта рейтинга (вынеси сюда или импортируй из своего пакета)
+// Функция пересчёта рейтинга
 func recalculateRatingForUser(db *gorm.DB, userID uint) error {
 	var total int64
 	var count int64

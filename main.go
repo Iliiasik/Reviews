@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"reviews-back/controllers/auth"
+	"reviews-back/controllers/search"
 	"reviews-back/cron"
 	"reviews-back/database"
 	"reviews-back/middlewares"
@@ -25,6 +28,18 @@ func main() {
 	}
 
 	database.InitDB()
+	var esClient *elasticsearch.Client
+	esClient, err = search.InitES()
+	if err != nil {
+		log.Printf("Elasticsearch не доступен: %v. Работаем в fallback режиме.", err)
+		// esClient останется nil
+	} else {
+		ctx := context.Background()
+		if err := search.LoadDataToES(ctx, esClient, database.DB); err != nil {
+			log.Printf("Ошибка загрузки данных в Elasticsearch: %v. Работаем в fallback режиме.", err)
+		}
+	}
+
 	// Запускаем CRON
 	cron.StartRatingCron(database.DB)
 	//storage.InitMinio()
@@ -36,7 +51,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize Casbin: %v", err)
 	}
-	routes.RegisterRoutes(r, enforcer)
+	routes.RegisterRoutes(r, enforcer, esClient)
 	if err := r.Run(":8000"); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}

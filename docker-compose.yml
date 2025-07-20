@@ -51,6 +51,25 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  elasticsearch:
+    image: elasticsearch:8.13.4
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - http.cors.enabled=true
+      - http.cors.allow-origin='*'
+    restart: always
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: curl -s http://localhost:9200 >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   minio_data:
   pg_data:
+  es_data:

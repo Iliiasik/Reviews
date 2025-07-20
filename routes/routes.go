@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/casbin/casbin/v2"
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-gonic/gin"
 	"github.com/qor5/web/v3"
 	"net/http"
@@ -16,7 +17,7 @@ import (
 	"reviews-back/middlewares"
 )
 
-func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
+func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elasticsearch.Client) {
 
 	adminHandler := admin_panel.Initialize()
 
@@ -49,7 +50,7 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer) {
 		public.GET("/auth/google/callback", auth.GoogleCallback)
 		public.GET("/confirm-email", auth.ConfirmEmailHandler(database.DB))
 		public.POST("/register", auth.RegisterHandler(database.DB))
-		public.GET("/search", search.SearchHandler(database.DB))
+		public.GET("/search", search.ElasticSearch(esClient, search.SearchHandler(database.DB)))
 		public.GET("/explore", search.ExploreHandler(database.DB))
 		public.POST("/resend-confirmation", auth.ResendConfirmationHandler(database.DB))
 		public.POST("/reviews", reviews.CreateReview(database.DB))

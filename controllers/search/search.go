@@ -12,7 +12,10 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		query := strings.TrimSpace(c.Query("q"))
 		if query == "" {
-			c.JSON(http.StatusOK, []interface{}{})
+			c.JSON(http.StatusOK, gin.H{
+				"total":   0,
+				"results": []interface{}{},
+			})
 			return
 		}
 
@@ -20,12 +23,12 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 		offset := 0
 
 		if l := c.Query("limit"); l != "" {
-			if val, err := strconv.Atoi(l); err == nil {
+			if val, err := strconv.Atoi(l); err == nil && val > 0 {
 				limit = val
 			}
 		}
 		if o := c.Query("offset"); o != "" {
-			if val, err := strconv.Atoi(o); err == nil {
+			if val, err := strconv.Atoi(o); err == nil && val >= 0 {
 				offset = val
 			}
 		}
@@ -38,6 +41,29 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 
 		var results []SearchResult
 
+		searchTerm := "%" + query + "%"
+
+		// 1) Получаем общее количество результатов
+		var total int64
+		countQuery := `
+			SELECT COUNT(*) FROM (
+				(SELECT users.id
+				 FROM users
+				 JOIN specialist_profiles ON users.id = specialist_profiles.user_id
+				 WHERE users.name ILIKE ? OR users.username ILIKE ?)
+				UNION ALL
+				(SELECT users.id
+				 FROM users
+				 JOIN organization_profiles ON users.id = organization_profiles.user_id
+				 WHERE users.name ILIKE ?)
+			) AS combined
+		`
+		if err := db.Raw(countQuery, searchTerm, searchTerm, searchTerm).Scan(&total).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка подсчёта результатов: " + err.Error()})
+			return
+		}
+
+		// 2) Получаем саму страницу с данными
 		searchQuery := `
 			(SELECT users.id, users.name, 'specialist' AS type
 			 FROM users
@@ -55,7 +81,6 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 			LIMIT ? OFFSET ?
 		`
 
-		searchTerm := "%" + query + "%"
 		args := []interface{}{searchTerm, searchTerm, searchTerm, limit, offset}
 
 		if err := db.Raw(searchQuery, args...).Scan(&results).Error; err != nil {
@@ -63,6 +88,10 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, results)
+		// 3) Возвращаем объект с total и results
+		c.JSON(http.StatusOK, gin.H{
+			"total":   total,
+			"results": results,
+		})
 	}
 }

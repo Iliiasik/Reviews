@@ -18,10 +18,10 @@ export const useSearch = () => {
     const fetchInitial = useCallback(async () => {
         setLoading(true);
         try {
-            const newResults = await fetchSearchResults(debounced, LIMIT, 0);
+            const { results: newResults, total } = await fetchSearchResults(debounced, LIMIT, 0);
             setResults(newResults);
             setOffset(newResults.length);
-            setHasMore(newResults.length === LIMIT);
+            setHasMore(newResults.length < total);
         } catch {
             setResults([]);
             setHasMore(false);
@@ -34,16 +34,17 @@ export const useSearch = () => {
         if (loading || !hasMore) return;
         setLoading(true);
         try {
-            const moreResults = await fetchSearchResults(debounced, LIMIT, offset);
+            const { results: moreResults, total } = await fetchSearchResults(debounced, LIMIT, offset);
             setResults(prev => [...prev, ...moreResults]);
             setOffset(prev => prev + moreResults.length);
-            if (moreResults.length < LIMIT) setHasMore(false);
+            setHasMore(offset + moreResults.length < total);
         } catch {
             // handle error silently
         } finally {
             setLoading(false);
         }
     }, [debounced, offset, hasMore, loading]);
+
 
     useEffect(() => {
         if (!debounced.trim()) {

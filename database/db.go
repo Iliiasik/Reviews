@@ -125,6 +125,8 @@ func SeedCasbinPolicies() {
 		{"admin", "/api/verification-requests/:id/approve", "POST"},
 		{"admin", "/api/verification-requests/:id/reject", "POST"},
 		{"admin", "/api/reviews/user", "GET"},
+		{"admin", "/api/users/:user_id/avatar", "POST"},
+		{"admin", "/api/users/:user_id/avatar", "DELETE"},
 
 		// Модераторские права
 		{"moderator", "/api/profile", "GET"},
@@ -145,6 +147,8 @@ func SeedCasbinPolicies() {
 		{"specialist", "/api/verification-requests", "POST"},
 		{"specialist", "/api/verification-requests/status", "GET"},
 		{"specialist", "/api/reviews/user", "GET"},
+		{"specialist", "/api/users/:user_id/avatar", "POST"},
+		{"specialist", "/api/users/:user_id/avatar", "DELETE"},
 
 		// Права организации
 		{"organization", "/api/profile", "GET"},
@@ -157,6 +161,8 @@ func SeedCasbinPolicies() {
 		{"organization", "/api/verification-requests", "POST"},
 		{"organization", "/api/verification-requests/status", "GET"},
 		{"organization", "/api/reviews/user", "GET"},
+		{"organization", "/api/users/:user_id/avatar", "POST"},
+		{"organization", "/api/users/:user_id/avatar", "DELETE"},
 
 		// Базовые права пользователя
 		{"user", "/api/profile", "GET"},
@@ -164,6 +170,8 @@ func SeedCasbinPolicies() {
 		{"user", "/api/change-password", "POST"},
 		{"user", "/api/profile/update", "POST"},
 		{"user", "/api/reviews/user", "GET"},
+		{"user", "/api/users/:user_id/avatar", "POST"},
+		{"user", "/api/users/:user_id/avatar", "DELETE"},
 	}
 
 	for _, policy := range policies {
@@ -182,6 +190,7 @@ func SeedCasbinPolicies() {
 
 	log.Println("Casbin policies seeded successfully")
 }
+
 func SeedReviewAspects() {
 	aspects := []models.ReviewAspect{
 		{Description: "Вежливость", Positive: true},

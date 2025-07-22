@@ -75,6 +75,8 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elastics
 		protected.POST("/change-password", auth.ChangePassword)
 		protected.GET("/profile", profile.GetProfileHandler(database.DB))
 		protected.POST("/profile/update", profile.UpdateProfileHandler(database.DB))
+		protected.POST("/users/:user_id/avatar", profile.UploadAvatarHandler(database.DB))
+		protected.DELETE("/users/:user_id/avatar", profile.DeleteAvatarHandler(database.DB))
 		protected.GET("/generate-qr", qr.GenerateQR(database.DB))
 		protected.POST("/verification-requests", verifications.CreateVerificationRequest)
 		protected.GET("/verification-requests/pending", verifications.GetPendingVerificationRequests)

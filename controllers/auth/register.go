@@ -2,16 +2,12 @@ package auth
 
 import (
 	"fmt"
-	"github.com/minio/minio-go/v7"
 	"net/http"
 	"os"
-	"path/filepath"
 	"reviews-back/error_types"
 	"reviews-back/models"
-	"reviews-back/storage"
 	"reviews-back/utils/email"
 	"reviews-back/validation"
-	"strconv"
 	"strings"
 	"time"
 
@@ -75,93 +71,6 @@ func RegisterHandler(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(http.StatusCreated, gin.H{
 			"message": "Пользователь создан. Письмо с подтверждением отправлено",
 			"user_id": user.ID,
-		})
-	}
-}
-
-func UploadAvatarHandler(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userID, err := strconv.Atoi(c.Param("user_id"))
-		if err != nil {
-			c.Error(error_types.CustomError(
-				http.StatusBadRequest,
-				error_types.CodeValidationError,
-				"Некорректный ID пользователя",
-				nil,
-			))
-			return
-		}
-
-		accountType := c.Query("account_type")
-		if accountType == "" {
-			c.Error(error_types.CustomError(
-				http.StatusBadRequest,
-				error_types.CodeValidationError,
-				"Не указан тип аккаунта",
-				nil,
-			))
-			return
-		}
-
-		userType := storage.UserTypeUser
-		switch accountType {
-		case "specialist":
-			userType = storage.UserTypeSpecialist
-		case "organization":
-			userType = storage.UserTypeOrganization
-		}
-
-		file, header, err := c.Request.FormFile("avatar")
-		if err != nil {
-			c.Error(error_types.CustomError(
-				http.StatusBadRequest,
-				error_types.CodeFileUploadError,
-				"Ошибка получения файла аватара",
-				nil,
-			))
-			return
-		}
-		defer file.Close()
-
-		ext := strings.ToLower(filepath.Ext(header.Filename))
-		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
-			c.Error(error_types.CustomError(
-				http.StatusBadRequest,
-				error_types.CodeUnsupportedImageFormat,
-				"Неподдерживаемый формат изображения",
-				nil,
-			))
-			return
-		}
-
-		objectName := fmt.Sprintf("%s/%d/avatar%s", userType, userID, ext)
-		_, err = storage.MinioClient.PutObject(
-			c.Request.Context(),
-			storage.BucketName,
-			objectName,
-			file,
-			header.Size,
-			minio.PutObjectOptions{ContentType: header.Header.Get("Content-Type")},
-		)
-		if err != nil {
-			c.Error(error_types.CustomError(
-				http.StatusInternalServerError,
-				error_types.CodeFileUploadError,
-				"Ошибка загрузки аватара в хранилище",
-				nil,
-			))
-			return
-		}
-
-		avatarURL := storage.GetAvatarURL(userType, uint(userID), ext)
-		if err := db.Model(&models.User{}).Where("id = ?", userID).Update("avatar_url", avatarURL).Error; err != nil {
-			c.Error(error_types.InternalServerError(err))
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"message":    "Аватар успешно загружен",
-			"avatar_url": avatarURL,
 		})
 	}
 }

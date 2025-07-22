@@ -13,7 +13,7 @@ import (
 var (
 	MinioClient    *minio.Client
 	MinioPublicURL string
-	BucketName     = "user-media"
+	BucketName     = "jDnks1nkf2nDkKddn23jjffrwsdfvWifnsd"
 	location       = "us-east-1"
 )
 

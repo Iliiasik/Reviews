@@ -9,11 +9,10 @@ import (
 	"os"
 )
 
-// посложнее надо поставить бакет
 var (
 	MinioClient    *minio.Client
 	MinioPublicURL string
-	BucketName     = "jDnks1nkf2nDkKddn23jjffrwsdfvWifnsd"
+	BucketName     = "jdnks1nkf2ndkkddn23jjffrwsdfvwifnsd"
 	location       = "us-east-1"
 )
 

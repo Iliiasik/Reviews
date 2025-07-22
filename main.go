@@ -15,6 +15,7 @@ import (
 	"reviews-back/middlewares"
 	"reviews-back/rbac"
 	"reviews-back/routes"
+	"reviews-back/storage"
 )
 
 func main() {
@@ -43,7 +44,7 @@ func main() {
 
 	// Запускаем CRON
 	cron.StartRatingCron(database.DB)
-	//storage.InitMinio()
+	storage.InitMinio()
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery(), middlewares.ErrorHandler())
 

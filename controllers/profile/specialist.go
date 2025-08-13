@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"reviews-back/error_types"
 )
 
 type SpecialistProfileResponse struct {
@@ -19,8 +20,12 @@ type SpecialistProfileResponse struct {
 func GetSpecialistProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		var result SpecialistProfileResponse
+		if id == "" {
+			c.Error(error_types.ValidationError("id parameter is required"))
+			return
+		}
 
+		var result SpecialistProfileResponse
 		err := db.Table("users").
 			Select(`
 				users.id,
@@ -36,12 +41,12 @@ func GetSpecialistProfile(db *gorm.DB) gin.HandlerFunc {
 			Scan(&result).Error
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 
 		if result.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			c.Error(error_types.NotFoundError(error_types.CodeUserNotFound, "Specialist"))
 			return
 		}
 

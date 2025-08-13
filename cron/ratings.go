@@ -11,8 +11,7 @@ import (
 func StartRatingCron(db *gorm.DB) {
 	c := cron.New()
 
-	// Каждую минуту
-	_, err := c.AddFunc("0 2 * * *", func() { // каждый день в 2:00 ночи обновление
+	_, err := c.AddFunc("0 2 * * *", func() {
 		log.Println("[CRON] Обновление рейтингов...")
 		updateRatings(db)
 	})
@@ -56,7 +55,6 @@ func recalculateRatingForUser(db *gorm.DB, userID uint) error {
 	}
 	avg := float64(total) / float64(count)
 
-	// Сначала пробуем обновить рейтинг специалиста
 	res := db.Model(&models.SpecialistProfile{}).
 		Where("user_id = ?", userID).
 		Update("rating", avg)
@@ -68,7 +66,6 @@ func recalculateRatingForUser(db *gorm.DB, userID uint) error {
 		return nil // Специалист найден и обновлён
 	}
 
-	// Если нет — пробуем обновить организацию
 	orgRes := db.Model(&models.OrganizationProfile{}).
 		Where("user_id = ?", userID).
 		Update("rating", avg)

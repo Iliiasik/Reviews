@@ -43,7 +43,6 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 
 		searchTerm := "%" + query + "%"
 
-		// 1) Получаем общее количество результатов
 		var total int64
 		countQuery := `
 			SELECT COUNT(*) FROM (
@@ -63,7 +62,6 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// 2) Получаем саму страницу с данными
 		searchQuery := `
 			(SELECT users.id, users.name, 'specialist' AS type
 			 FROM users
@@ -88,7 +86,6 @@ func SearchHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// 3) Возвращаем объект с total и results
 		c.JSON(http.StatusOK, gin.H{
 			"total":   total,
 			"results": results,

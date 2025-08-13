@@ -25,8 +25,7 @@ func CreateReview(db *gorm.DB, asynqClient *asynq.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req CreateReviewRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			appErr := error_types.ValidationError(err.Error())
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.ValidationError(err.Error()))
 			return
 		}
 
@@ -38,10 +37,10 @@ func CreateReview(db *gorm.DB, asynqClient *asynq.Client) gin.HandlerFunc {
 		}
 
 		if userID != nil && *userID == req.ProfileUserID {
-			appErr := error_types.ForbiddenError("Нельзя оставить отзыв самому себе")
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.ForbiddenError("Нельзя оставить отзыв самому себе"))
 			return
 		}
+
 		isAnonymous := req.IsAnonymous
 		if userID == nil {
 			isAnonymous = true
@@ -58,31 +57,26 @@ func CreateReview(db *gorm.DB, asynqClient *asynq.Client) gin.HandlerFunc {
 		}
 
 		if err := db.Create(&review).Error; err != nil {
-			appErr := error_types.InternalServerError(err)
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 
-		//  Asynq task
 		if asynqClient != nil {
 			if err := tasks.EnqueueRatingUpdateTask(asynqClient, req.ProfileUserID); err != nil {
 				log.Printf("Ошибка постановки задачи в очередь: %v", err)
 			}
 		} else {
-			log.Printf(" Asynq клиент не инициализирован — задача на пересчёт рейтинга не поставлена")
+			log.Printf("Asynq клиент не инициализирован — задача на пересчёт рейтинга не поставлена")
 		}
 
-		// ассоциации:
 		if len(req.Pros) > 0 {
 			var pros []models.ReviewAspect
 			if err := db.Where("id IN ?", req.Pros).Find(&pros).Error; err != nil {
-				appErr := error_types.InternalServerError(err)
-				c.JSON(appErr.HttpStatusCode, appErr)
+				c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 				return
 			}
 			if err := db.Model(&review).Association("Pros").Append(pros); err != nil {
-				appErr := error_types.InternalServerError(err)
-				c.JSON(appErr.HttpStatusCode, appErr)
+				c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 				return
 			}
 		}
@@ -90,13 +84,11 @@ func CreateReview(db *gorm.DB, asynqClient *asynq.Client) gin.HandlerFunc {
 		if len(req.Cons) > 0 {
 			var cons []models.ReviewAspect
 			if err := db.Where("id IN ?", req.Cons).Find(&cons).Error; err != nil {
-				appErr := error_types.InternalServerError(err)
-				c.JSON(appErr.HttpStatusCode, appErr)
+				c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 				return
 			}
 			if err := db.Model(&review).Association("Cons").Append(cons); err != nil {
-				appErr := error_types.InternalServerError(err)
-				c.JSON(appErr.HttpStatusCode, appErr)
+				c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 				return
 			}
 		}
@@ -109,8 +101,7 @@ func GetReviews(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		profileUserID := c.Query("profile_user_id")
 		if profileUserID == "" {
-			appErr := error_types.ValidationError("profile_user_id is required")
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.ValidationError("profile_user_id is required"))
 			return
 		}
 
@@ -121,12 +112,10 @@ func GetReviews(db *gorm.DB) gin.HandlerFunc {
 			Where("profile_user_id = ?", profileUserID).
 			Order("created_at DESC").
 			Find(&reviews).Error; err != nil {
-			appErr := error_types.InternalServerError(err)
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 
-		// Получаем текущего пользователя, если есть
 		var currentUserID *uint
 		if val, exists := c.Get("user_id"); exists {
 			if id, ok := val.(uint); ok {
@@ -145,7 +134,6 @@ func GetReviews(db *gorm.DB) gin.HandlerFunc {
 				}
 			}
 
-			// Подсчёт количества лайков
 			var likeCount int64
 			db.Model(&models.ReviewLike{}).
 				Where("review_id = ?", r.ID).
@@ -183,16 +171,14 @@ func LikeReview(db *gorm.DB) gin.HandlerFunc {
 
 		val, exists := c.Get("user_id")
 		if !exists {
-			appErr := error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация")
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация"))
 			return
 		}
 		userID := val.(uint)
 
 		var review models.Review
 		if err := db.First(&review, reviewID).Error; err != nil {
-			appErr := error_types.NotFoundError(error_types.CodeNotFound, "Отзыв")
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.NotFoundError(error_types.CodeNotFound, "Отзыв"))
 			return
 		}
 
@@ -202,25 +188,22 @@ func LikeReview(db *gorm.DB) gin.HandlerFunc {
 			Order("created_at DESC").
 			First(&existing).Error
 		if err == nil {
-			// Проверяем таймаут между лайками (5 секунд)
 			if time.Since(existing.CreatedAt) < 5*time.Second {
-				appErr := error_types.CustomError(
+				c.Error(error_types.CustomError(
 					http.StatusTooManyRequests,
-					"TOO_MANY_REQUESTS",
+					error_types.CodeTooManyRequests,
 					"Слишком частые запросы. Попробуйте через несколько секунд.",
 					nil,
-				)
-				c.JSON(appErr.HttpStatusCode, appErr)
+				))
 				return
 			}
 
-			appErr := error_types.CustomError(
+			c.Error(error_types.CustomError(
 				http.StatusBadRequest,
-				"REVIEW_ALREADY_LIKED",
+				error_types.CodeReviewAlreadyLiked,
 				"Вы уже отметили этот отзыв как полезный",
 				nil,
-			)
-			c.JSON(appErr.HttpStatusCode, appErr)
+			))
 			return
 		}
 
@@ -230,8 +213,7 @@ func LikeReview(db *gorm.DB) gin.HandlerFunc {
 			CreatedAt: time.Now(),
 		}
 		if err := db.Create(&like).Error; err != nil {
-			appErr := error_types.InternalServerError(err)
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 
@@ -245,15 +227,13 @@ func UnlikeReview(db *gorm.DB) gin.HandlerFunc {
 
 		val, exists := c.Get("user_id")
 		if !exists {
-			appErr := error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация")
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация"))
 			return
 		}
 		userID := val.(uint)
 
 		if err := db.Where("review_id = ? AND user_id = ?", reviewID, userID).Delete(&models.ReviewLike{}).Error; err != nil {
-			appErr := error_types.InternalServerError(err)
-			c.JSON(appErr.HttpStatusCode, appErr)
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 

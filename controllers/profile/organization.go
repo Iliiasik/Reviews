@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
+	"reviews-back/error_types"
 )
 
 type OrganizationProfileResponse struct {
@@ -20,8 +21,12 @@ type OrganizationProfileResponse struct {
 func GetOrganizationProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
-		var result OrganizationProfileResponse
+		if id == "" {
+			c.Error(error_types.ValidationError("id is required"))
+			return
+		}
 
+		var result OrganizationProfileResponse
 		err := db.Table("users").
 			Select(`
 				users.id,
@@ -38,12 +43,12 @@ func GetOrganizationProfile(db *gorm.DB) gin.HandlerFunc {
 			Scan(&result).Error
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка сервера"})
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 
 		if result.ID == 0 {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Организация не найдена"})
+			c.Error(error_types.NotFoundError(error_types.CodeUserNotFound, "Организация"))
 			return
 		}
 

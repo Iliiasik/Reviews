@@ -9,14 +9,12 @@ import (
 	"reviews-back/models"
 )
 
-// Имя типа задачи
 const TypeUpdateRating = "update:rating"
 
 type RatingUpdatePayload struct {
 	UserID uint `json:"user_id"`
 }
 
-// Отправка задачи в очередь (вызывается при создании/обновлении отзыва)
 func EnqueueRatingUpdateTask(client *asynq.Client, userID uint) error {
 	payload, err := json.Marshal(RatingUpdatePayload{UserID: userID})
 	if err != nil {
@@ -27,7 +25,6 @@ func EnqueueRatingUpdateTask(client *asynq.Client, userID uint) error {
 	return err
 }
 
-// Обработчик задачи — вызывается воркером
 func NewRatingUpdateHandler(db *gorm.DB) asynq.HandlerFunc {
 	return func(ctx context.Context, t *asynq.Task) error {
 		var p RatingUpdatePayload
@@ -39,7 +36,6 @@ func NewRatingUpdateHandler(db *gorm.DB) asynq.HandlerFunc {
 	}
 }
 
-// Функция пересчёта рейтинга
 func recalculateRatingForUser(db *gorm.DB, userID uint) error {
 	var total int64
 	var count int64

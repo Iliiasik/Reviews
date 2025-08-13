@@ -16,7 +16,6 @@ import (
 )
 
 func InitES() (*elasticsearch.Client, error) {
-	// Читаем адрес из переменной окружения с дефолтом
 	esURL := os.Getenv("ES_URL")
 	if esURL == "" {
 		esURL = "http://localhost:9200"
@@ -29,7 +28,6 @@ func InitES() (*elasticsearch.Client, error) {
 		return nil, fmt.Errorf("ошибка подключения к Elasticsearch: %w", err)
 	}
 
-	// Проверка ping
 	res, err := es.Info()
 	if err != nil || res.IsError() {
 		return nil, fmt.Errorf("Elasticsearch ping failed: %w", err)
@@ -40,7 +38,7 @@ func InitES() (*elasticsearch.Client, error) {
 type Document struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
-	Type string `json:"type"` // "specialist" или "organization"
+	Type string `json:"type"`
 }
 
 func ElasticSearch(es *elasticsearch.Client, fallback gin.HandlerFunc) gin.HandlerFunc {
@@ -56,7 +54,6 @@ func ElasticSearch(es *elasticsearch.Client, fallback gin.HandlerFunc) gin.Handl
 			return
 		}
 
-		// Читаем limit и offset из запроса, с дефолтами
 		limit := 10
 		offset := 0
 
@@ -134,7 +131,6 @@ func ElasticSearch(es *elasticsearch.Client, fallback gin.HandlerFunc) gin.Handl
 			results = append(results, hit.Source)
 		}
 
-		// Возвращаем результаты и общее количество для пагинации
 		c.JSON(http.StatusOK, gin.H{
 			"total":   r.Hits.Total.Value,
 			"results": results,
@@ -142,9 +138,7 @@ func ElasticSearch(es *elasticsearch.Client, fallback gin.HandlerFunc) gin.Handl
 	}
 }
 
-// LoadDataToES загружает данные из Postgres через GORM в Elasticsearch
 func LoadDataToES(ctx context.Context, es *elasticsearch.Client, db *gorm.DB) error {
-	// Создание индекса с маппингом
 	indexMapping := `{
 		"mappings": {
 			"properties": {
@@ -165,7 +159,6 @@ func LoadDataToES(ctx context.Context, es *elasticsearch.Client, db *gorm.DB) er
 		log.Printf("Ответ при создании индекса: %s\n", res.String())
 	}
 
-	// Объявляем срез для результата выборки
 	var results []Document
 
 	rawSQL := `
@@ -187,7 +180,6 @@ func LoadDataToES(ctx context.Context, es *elasticsearch.Client, db *gorm.DB) er
 		return nil
 	}
 
-	// Формируем bulk-запрос
 	bulkBody := &strings.Builder{}
 
 	for _, doc := range results {

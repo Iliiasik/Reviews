@@ -12,7 +12,7 @@ import (
 
 	"github.com/fogleman/gg"
 	"github.com/gin-gonic/gin"
-	qrcode "github.com/skip2/go-qrcode"
+	"github.com/skip2/go-qrcode"
 	"golang.org/x/image/draw"
 	"gorm.io/gorm"
 	"reviews-back/models"

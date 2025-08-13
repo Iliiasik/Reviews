@@ -34,6 +34,8 @@ const (
 	CodeVerificationRequestNotFound = "VERIFICATION_REQUEST_NOT_FOUND"
 	CodeVerificationRequestExists   = "VERIFICATION_REQUEST_EXISTS"
 	CodeProfileAlreadyConfirmed     = "PROFILE_ALREADY_CONFIRMED"
+	CodeReviewAlreadyLiked          = "REVIEW_ALREADY_LIKED"
+	CodeTooManyRequests             = "TOO_MANY_REQUESTS"
 )
 
 type AppError struct {

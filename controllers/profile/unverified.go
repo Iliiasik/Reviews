@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"net/http"
+	"reviews-back/error_types"
 	"reviews-back/models"
 	"strings"
 	"time"
@@ -21,7 +22,7 @@ func CreateUnverifiedProfile(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req CreateUnverifiedRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные: " + err.Error()})
+			c.Error(error_types.ValidationError(err.Error()))
 			return
 		}
 
@@ -32,12 +33,12 @@ func CreateUnverifiedProfile(db *gorm.DB) gin.HandlerFunc {
 			Username:     fmt.Sprintf("unv_%s", uuid.New().String()[:10]),
 			Phone:        fmt.Sprintf("unv-%d", now%1_000_000_000),
 			PasswordHash: "unverified",
-			RoleID:       2, // можно использовать одну роль для упрощения
+			RoleID:       2,
 			CreatedAt:    time.Now(),
 		}
 
 		if err := db.Create(&user).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при создании пользователя"})
+			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return
 		}
 
@@ -50,7 +51,9 @@ func CreateUnverifiedProfile(db *gorm.DB) gin.HandlerFunc {
 				CreatedAt:   time.Now(),
 			}
 			if err := db.Create(&profile).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при создании профиля специалиста"})
+				c.Error(error_types.InternalServerError(err).
+					WithCode(error_types.CodeDatabaseError).
+					WithMessage("Ошибка при создании профиля специалиста"))
 				return
 			}
 		case "organization":
@@ -61,11 +64,18 @@ func CreateUnverifiedProfile(db *gorm.DB) gin.HandlerFunc {
 				CreatedAt:   time.Now(),
 			}
 			if err := db.Create(&profile).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при создании профиля организации"})
+				c.Error(error_types.InternalServerError(err).
+					WithCode(error_types.CodeDatabaseError).
+					WithMessage("Ошибка при создании профиля организации"))
 				return
 			}
 		default:
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Неизвестный тип профиля"})
+			c.Error(error_types.CustomError(
+				http.StatusBadRequest,
+				error_types.CodeValidationError,
+				"Неизвестный тип профиля",
+				nil,
+			))
 			return
 		}
 

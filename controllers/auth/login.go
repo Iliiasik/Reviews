@@ -17,7 +17,7 @@ import (
 
 var (
 	JwtKey          []byte
-	AccessTokenExp  = 15 * time.Minute
+	AccessTokenExp  = 2 * time.Minute
 	RefreshTokenExp = 7 * 24 * time.Hour
 )
 

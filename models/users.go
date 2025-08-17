@@ -53,11 +53,10 @@ type Confirmation struct {
 }
 
 type RefreshToken struct {
-	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	UserID    uint      `json:"user_id" gorm:"not null;index"`
-	Token     string    `json:"token" gorm:"type:varchar(36);uniqueIndex;not null"`
-	ExpiresAt time.Time `json:"expires_at" gorm:"not null;type:timestamptz"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	Token     string    `gorm:"primaryKey;type:varchar(36)" json:"token"`
+	UserID    uint      `gorm:"not null;index" json:"user_id"`
+	ExpiresAt time.Time `gorm:"not null;type:timestamptz" json:"expires_at"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
 	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE" json:"-"`
 }
 

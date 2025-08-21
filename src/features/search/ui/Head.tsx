@@ -1,5 +1,6 @@
 import React from "react"
-import ReviewsSvg from "@assets/home.jpg"
+import ReviewsSvg from "@assets/images/logo.svg"
+import HeadBgSvg from "@assets/images/background.svg"
 
 interface HeadProps {
     title: string
@@ -11,19 +12,28 @@ export const Head: React.FC<HeadProps> = ({ title, subtitle, children }) => {
     return (
         <section className="w-full flex justify-center px-4 pt-2 pb-6">
             <div className="relative w-full max-w-5xl">
-                <div className="rounded-xl overflow-hidden h-48 sm:h-56 md:h-64 lg:h-72">
+                <div
+                    className="rounded-xl overflow-hidden w-full"
+                    style={{ height: 200 }}
+                >
                     <img
-                        src={ReviewsSvg}
+                        src={HeadBgSvg}
                         alt="background"
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <div className="absolute inset-0 p-3 sm:p-4 md:p-6 flex flex-col gap-1 sm:gap-2 md:gap-3 text-left z-20">
-                    <h1 className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold text-black mb-1">
+                <img
+                    src={ReviewsSvg}
+                    alt="logo"
+                    className="absolute top-1/2 left-[62%] transform -translate-y-1/2"
+                    style={{ height: 140 }}
+                />
+                <div className="absolute inset-0 px-4 sm:px-6 md:px-8 flex flex-col justify-center gap-2 sm:gap-3 md:gap-4 z-20">
+                    <h1 className="text-black text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold">
                         {title}
                     </h1>
                     {subtitle && (
-                        <p className="text-xs sm:text-sm md:text-base lg:text-lg text-black/80 mb-2">
+                        <p className="text-black text-xs sm:text-sm md:text-base lg:text-lg">
                             {subtitle}
                         </p>
                     )}

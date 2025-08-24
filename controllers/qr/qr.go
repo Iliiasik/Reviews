@@ -15,6 +15,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"golang.org/x/image/draw"
 	"gorm.io/gorm"
+	"reviews-back/error_types"
 	"reviews-back/models"
 )
 
@@ -24,22 +25,24 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 
 		var user models.User
 		if err := db.Preload("Role").First(&user, userID).Error; err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
+			appErr := error_types.NotFoundError(error_types.CodeUserNotFound, "Пользователь")
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 
 		roleName := strings.ToLower(user.Role.Name)
 		url := fmt.Sprintf("http://localhost:5173/%s/%d/add-review", roleName, user.ID)
 
-		qr, err := qrcode.New(url, qrcode.Low)
+		qr, err := qrcode.New(url, qrcode.Highest)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания QR"})
+			appErr := error_types.InternalServerError(err).WithMessage("Ошибка создания QR")
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 		qr.DisableBorder = true
 
 		const (
-			canvasSize   = 800
+			canvasSize   = 1000
 			moduleSize   = 20
 			overlapShift = 1
 		)
@@ -52,8 +55,8 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 		bgHeight := float64(canvasSize) - 2*bgMargin
 
 		grad := gg.NewLinearGradient(bgMargin, bgMargin, bgMargin+bgWidth, bgMargin+bgHeight)
-		grad.AddColorStop(0, color.RGBA{150, 230, 255, 255})
-		grad.AddColorStop(1, color.RGBA{150, 255, 230, 255})
+		grad.AddColorStop(0, color.RGBA{255, 255, 255, 255})
+		grad.AddColorStop(1, color.RGBA{73, 153, 223, 255})
 
 		dc.SetFillStyle(grad)
 		dc.DrawRoundedRectangle(bgMargin, bgMargin, bgWidth, bgHeight, cornerRadius)
@@ -67,6 +70,11 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 		qrHeight := rows*moduleSize - overlapShift*(rows-1)
 		offsetX := (canvasSize - qrWidth) / 2
 		offsetY := (canvasSize - qrHeight) / 2
+
+		logoSize := 100
+		logoX := canvasSize/2 - logoSize/2
+		logoY := canvasSize/2 - logoSize/2
+		logoRect := image.Rect(logoX, logoY, logoX+logoSize, logoY+logoSize)
 
 		dc.SetColor(color.Black)
 		radius := float64(moduleSize) * 0.3
@@ -85,6 +93,11 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 					py := float64(offsetY + y*(moduleSize-overlapShift))
 					width := float64(length*moduleSize - (length-1)*overlapShift)
 					height := float64(moduleSize)
+
+					rect := image.Rect(int(px), int(py), int(px+width), int(py+height))
+					if rect.Overlaps(logoRect) {
+						continue
+					}
 
 					dc.DrawRoundedRectangle(px, py, width, height, radius)
 					dc.Fill()
@@ -109,6 +122,11 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 					width := float64(moduleSize)
 					height := float64(length*moduleSize - (length-1)*overlapShift)
 
+					rect := image.Rect(int(px), int(py), int(px+width), int(py+height))
+					if rect.Overlaps(logoRect) {
+						continue
+					}
+
 					dc.DrawRoundedRectangle(px, py, width, height, radius)
 					dc.Fill()
 				} else {
@@ -124,7 +142,6 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 				defer logoFile.Close()
 				logoImg, _, err := image.Decode(logoFile)
 				if err == nil {
-					logoSize := 100
 					logoRect := image.Rect(0, 0, logoSize, logoSize)
 					resizedLogo := image.NewRGBA(logoRect)
 
@@ -134,15 +151,14 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 						draw.Over, nil,
 					)
 
-					logoX := canvasSize/2 - logoSize/2
-					logoY := canvasSize/2 - logoSize/2
 					dc.DrawImage(resizedLogo, logoX, logoY)
 				}
 			}
 		}
 
 		if err := dc.LoadFontFace("assets/Montserrat-SemiBold.ttf", 48); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось загрузить шрифт для имени"})
+			appErr := error_types.InternalServerError(err).WithMessage("Не удалось загрузить шрифт для имени")
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 		dc.SetColor(color.Black)
@@ -150,7 +166,8 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 
 		buf := new(bytes.Buffer)
 		if err := png.Encode(buf, dc.Image()); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка кодирования изображения"})
+			appErr := error_types.InternalServerError(err).WithMessage("Ошибка кодирования изображения")
+			c.JSON(appErr.HttpStatusCode, appErr)
 			return
 		}
 

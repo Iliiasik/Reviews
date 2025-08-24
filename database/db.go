@@ -200,7 +200,7 @@ func SeedReviewAspects() {
 		{Description: "Умение слушать", Positive: true},
 		{Description: "Грубость", Positive: false},
 		{Description: "Слишком долго ждать", Positive: false},
-		{Description: "Некомпетентность", Positive: false},
+		{Description: "Некомпетентен", Positive: false},
 		{Description: "Неопрятность", Positive: false},
 		{Description: "Игнорирование жалоб", Positive: false},
 	}
@@ -219,23 +219,4 @@ func SeedReviewAspects() {
 			}
 		}
 	}
-}
-
-// триграммы для ускорения поиска пока реализацию оставлю здесь, в дальнейшем решим подключать или нет
-func SetupSearchIndexes(db *gorm.DB) {
-	// Включаем расширение pg_trgm
-	if err := db.Exec(`CREATE EXTENSION IF NOT EXISTS pg_trgm`).Error; err != nil {
-		log.Printf("Ошибка при создании расширения pg_trgm: %v", err)
-	}
-
-	// Индексы по триграммам для поиска
-	if err := db.Exec(`CREATE INDEX IF NOT EXISTS idx_users_name_trgm ON users USING gin (name gin_trgm_ops)`).Error; err != nil {
-		log.Printf("Ошибка при создании индекса name_trgm: %v", err)
-	}
-
-	if err := db.Exec(`CREATE INDEX IF NOT EXISTS idx_users_username_trgm ON users USING gin (username gin_trgm_ops)`).Error; err != nil {
-		log.Printf("Ошибка при создании индекса username_trgm: %v", err)
-	}
-
-	log.Println("Поисковые индексы pg_trgm созданы (если не существовали)")
 }

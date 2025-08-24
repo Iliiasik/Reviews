@@ -21,11 +21,18 @@ export const MainHomeCards = () => {
     return (
         <div className="w-full max-w-6xl flex flex-col gap-6 transition-all duration-300 ease-in-out">
 
-            <div className="flex flex-wrap items-center justify-start gap-4 transition-all duration-200">
+            <div className="flex flex-wrap items-center justify-center gap-4 transition-all duration-200">
                 <FilterType
                     type={type}
                     onChange={(newType) => {
                         setType(newType);
+                        setPage(1);
+                    }}
+                />
+                <FilterRating
+                    rating={rating}
+                    onChange={(newRating) => {
+                        setRating(newRating);
                         setPage(1);
                     }}
                 />
@@ -48,13 +55,6 @@ export const MainHomeCards = () => {
 
             <div className="flex justify-between items-end mt-4 flex-wrap gap-4 transition-all duration-200">
                 <Pagination page={page} totalPages={totalPages} onChange={setPage} />
-                <FilterRating
-                    rating={rating}
-                    onChange={(newRating) => {
-                        setRating(newRating);
-                        setPage(1);
-                    }}
-                />
             </div>
         </div>
     );

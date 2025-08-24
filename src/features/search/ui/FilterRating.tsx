@@ -7,21 +7,32 @@ export const FilterRating = ({ rating, onChange }: Props) => {
     const roundedRating = Math.round(rating ?? 0);
 
     return (
-        <div className="flex flex-col items-end">
-            <span className="mb-1 text-sm text-gray-600">Рейтинг</span>
-            <form className="filter gap-2">
-                <input className="btn btn-square" type="reset" value="×" onClick={() => onChange(null)} />
+        <div className="flex items-center gap-2">
+            <span className="badge bg-yellow-500 text-white text-xs sm:text-sm">
+                Рейтинг
+            </span>
+
+            <div className="rating rating-md">
                 {[1, 2, 3, 4, 5].map((r) => (
                     <input
                         key={r}
-                        className={`btn ${roundedRating === r ? 'btn-active' : ''}`}
                         type="radio"
-                        name="rating"
-                        aria-label={String(r)}
-                        onClick={() => onChange(r)}
+                        name="rating-filter"
+                        className="mask mask-star bg-yellow-400"
+                        aria-label={`${r} star`}
+                        checked={roundedRating === r}
+                        onChange={() => onChange(r)}
                     />
                 ))}
-            </form>
+            </div>
+
+            <button
+                type="button"
+                className="btn btn-xs px-2"
+                onClick={() => onChange(null)}
+            >
+                ×
+            </button>
         </div>
     );
 };

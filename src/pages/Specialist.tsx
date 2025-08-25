@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { getSpecialistById } from "@features/specialist/api/getSpecialistById.ts";
 import type { SpecialistProfile } from "@features/specialist/types/SpecialistProfile.ts";
-import { SpecialistProfileView } from "@features/specialist/ui/SpecialistProfileView.tsx";
+import { SpecialistView } from "@features/specialist/ui/SpecialistView.tsx";
 import { Reviews } from "@features/review/ui/Reviews.tsx";
 import { useToast } from "@shared/context/ToastContext.tsx";
 
@@ -17,7 +17,6 @@ export const Specialist = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // ✅ Показ тоста один раз и сброс состояния безопасным способом
     useEffect(() => {
         const toast = location.state?.toast;
         if (toast) {
@@ -25,7 +24,7 @@ export const Specialist = () => {
 
             setTimeout(() => {
                 navigate(location.pathname, { replace: true });
-            }, 100); // достаточно короткой задержки
+            }, 100);
         }
     }, []);
 
@@ -37,13 +36,25 @@ export const Specialist = () => {
             .finally(() => setLoading(false));
     }, [id]);
 
-    if (loading) return <div className="p-6 text-center">Загрузка...</div>;
-    if (error) return <div className="p-6 text-red-500 text-center">Ошибка: {error}</div>;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                <span className="loading loading-spinner loading-lg text-primary"></span>
+            </div>
+        )
+    }
+    if (error) {
+        return (
+            <div role="alert" className="alert alert-error alert-soft max-w-md mx-auto mt-6">
+                <span>Ошибка: {error}</span>
+            </div>
+        );
+    }
     if (!data) return null;
 
     return (
         <main className="flex-grow p-6 flex flex-col items-center">
-            <SpecialistProfileView data={data} />
+            <SpecialistView data={data} />
             <Reviews type="specialist" />
         </main>
     );

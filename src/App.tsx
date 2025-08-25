@@ -5,7 +5,7 @@ import { Profile } from '@pages/Profile';
 import NotFound from '@pages/NotFound';
 import { Register } from "@pages/Register.tsx";
 import ConfirmEmail from "@pages/ConfirmEmail.tsx";
-import {OrganizationPage} from "@pages/OrganizationPage.tsx";
+import {Organization} from "@pages/Organization.tsx";
 import {AddReview} from "@pages/AddReview.tsx";
 import {MainLayout} from "@widgets/layout/MainLayout.tsx";
 import {Specialist} from "@pages/Specialist.tsx";
@@ -21,7 +21,7 @@ function App() {
                     <Route path="/specialist/:id/add-review" element={<AddReview />} />
                     <Route path="/organization/:id/add-review" element={<AddReview />} />
                     <Route path="/new-unverified" element={<UnverifiedProfileCreation />} />
-                    <Route path="/organization/:id" element={<OrganizationPage />} />
+                    <Route path="/organization/:id" element={<Organization />} />
                 </Route>
 
                 <Route path="/login" element={<Login />} />

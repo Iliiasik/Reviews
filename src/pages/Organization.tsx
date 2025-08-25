@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 import { getOrganizationById } from "@features/organisation/api/getOrganizationById";
 import type { OrganizationProfile } from "@features/organisation/types/OrganizationProfile";
-import { OrganizationProfileView } from "@features/organisation/ui/OrganizationProfileView";
-import { Reviews } from "@features/review/ui/Reviews.tsx"; // можно переименовать
+import { OrganizationView } from "@features/organisation/ui/OrganizationView.tsx";
+import { Reviews } from "@features/review/ui/Reviews.tsx";
 import { useToast } from "@shared/context/ToastContext";
 
-export const OrganizationPage = () => {
+export const Organization = () => {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -41,7 +41,7 @@ export const OrganizationPage = () => {
 
     return (
         <main className="flex-grow p-6 flex flex-col items-center">
-            <OrganizationProfileView data={data} />
+            <OrganizationView data={data} />
             <Reviews type="organization" />
         </main>
     );

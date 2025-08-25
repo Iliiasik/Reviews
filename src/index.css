@@ -5,6 +5,13 @@
 @tailwind utilities;
 
 @layer base {
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
     body {
         font-family: 'Nunito', sans-serif;
     }

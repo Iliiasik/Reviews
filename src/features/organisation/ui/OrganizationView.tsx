@@ -5,7 +5,7 @@ interface Props {
     data: OrganizationProfile;
 }
 
-export const OrganizationProfileView = ({ data }: Props) => (
+export const OrganizationView = ({ data }: Props) => (
     <div className="w-full max-w-3xl">
         <div className="flex items-center gap-6 mb-6">
             <img

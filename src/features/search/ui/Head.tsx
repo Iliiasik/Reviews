@@ -1,5 +1,5 @@
 import React from "react"
-import ReviewsSvg from "@assets/images/logo.svg"
+import ReviewsSvg from "@assets/images/head.svg"
 import HeadBgSvg from "@assets/images/background.svg"
 
 interface HeadProps {
@@ -25,7 +25,7 @@ export const Head: React.FC<HeadProps> = ({ title, subtitle, children }) => {
                 <img
                     src={ReviewsSvg}
                     alt="logo"
-                    className="absolute top-1/2 left-[62%] transform -translate-y-1/2"
+                    className="absolute top-1/2 right-8 transform -translate-y-1/2"
                     style={{ height: 140 }}
                 />
                 <div className="absolute inset-0 px-4 sm:px-6 md:px-8 flex flex-col justify-center gap-2 sm:gap-3 md:gap-4 z-20">

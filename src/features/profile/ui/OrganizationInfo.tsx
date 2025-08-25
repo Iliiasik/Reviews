@@ -12,9 +12,9 @@ interface OrganizationInfoProps {
 const InfoItem = ({ icon: Icon, label, value }: { icon: IconType; label: string; value: React.ReactNode }) => (
     <div className="flex items-start gap-3 py-2">
         <Icon className="flex-shrink-0 mt-1 text-base-content/70" />
-        <div>
+        <div className="min-w-0">
             <div className="text-sm font-medium text-base-content/70">{label}</div>
-            <div className="mt-1">{value || '-'}</div>
+            <div className="mt-1 break-words whitespace-normal">{value || '-'}</div>
         </div>
     </div>
 );
@@ -30,7 +30,7 @@ export const OrganizationInfo = ({ website, address, about, is_confirmed }: Orga
                         href={website.startsWith('http') ? website : `https://${website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="link link-primary"
+                        className="link link-primary break-words whitespace-normal"
                     >
                         {website}
                     </a>

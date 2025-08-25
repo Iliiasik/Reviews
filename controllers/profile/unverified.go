@@ -27,13 +27,30 @@ func CreateUnverifiedProfile(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		now := time.Now().UnixNano()
+
+		var roleID uint
+		switch req.Type {
+		case "specialist":
+			roleID = 2
+		case "organization":
+			roleID = 3
+		default:
+			c.Error(error_types.CustomError(
+				http.StatusBadRequest,
+				error_types.CodeValidationError,
+				"Неизвестный тип профиля",
+				nil,
+			))
+			return
+		}
+
 		user := models.User{
 			Name:         strings.TrimSpace(req.Name),
 			Email:        fmt.Sprintf("unverified-%d@example.com", now),
 			Username:     fmt.Sprintf("unv_%s", uuid.New().String()[:10]),
 			Phone:        fmt.Sprintf("unv-%d", now%1_000_000_000),
 			PasswordHash: "unverified",
-			RoleID:       2,
+			RoleID:       roleID,
 			CreatedAt:    time.Now(),
 		}
 
@@ -69,14 +86,6 @@ func CreateUnverifiedProfile(db *gorm.DB) gin.HandlerFunc {
 					WithMessage("Ошибка при создании профиля организации"))
 				return
 			}
-		default:
-			c.Error(error_types.CustomError(
-				http.StatusBadRequest,
-				error_types.CodeValidationError,
-				"Неизвестный тип профиля",
-				nil,
-			))
-			return
 		}
 
 		c.JSON(http.StatusCreated, gin.H{

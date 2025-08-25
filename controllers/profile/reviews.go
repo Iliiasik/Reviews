@@ -99,7 +99,7 @@ func GetUserReviewsSummary(c *gin.Context) {
 	var user models.User
 	if err := database.DB.Preload("Role").First(&user, userID).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.Error(error_types.UnauthorizedError(error_types.CodeUnauthorized, "Требуется авторизация"))
+			c.Error(error_types.NotFoundError(error_types.CodeUserNotFound, "Пользователь не найден"))
 			return
 		}
 		c.Error(error_types.InternalServerError(err))
@@ -119,7 +119,7 @@ func GetUserReviewsSummary(c *gin.Context) {
 	case "specialist":
 		var profile models.SpecialistProfile
 		if err := database.DB.Select("rating").Where("user_id = ?", userID).First(&profile).Error; err != nil {
-			c.Error(error_types.NotFoundError(error_types.CodeNotFound, "Профиль специалиста"))
+			c.Error(error_types.NotFoundError(error_types.CodeNotFound, "Профиль специалиста не найден"))
 			return
 		}
 		rating = profile.Rating
@@ -127,7 +127,7 @@ func GetUserReviewsSummary(c *gin.Context) {
 	case "organization":
 		var profile models.OrganizationProfile
 		if err := database.DB.Select("rating").Where("user_id = ?", userID).First(&profile).Error; err != nil {
-			c.Error(error_types.NotFoundError(error_types.CodeNotFound, "Профиль организации"))
+			c.Error(error_types.NotFoundError(error_types.CodeNotFound, "Профиль организации не найден"))
 			return
 		}
 		rating = profile.Rating

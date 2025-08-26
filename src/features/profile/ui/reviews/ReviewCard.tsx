@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FiStar, FiThumbsUp, FiThumbsDown, FiChevronDown } from 'react-icons/fi';
-import {ReviewAspectCard} from './ReviewAspectCard';
+import {ReviewAspectCard} from '@features/profile/ui/reviews/ReviewAspectCard.tsx';
 
 export const ReviewCard = ({ review }: { review: any }) => {
     const formattedDate = new Date(review.created_at).toLocaleDateString('ru-RU', {

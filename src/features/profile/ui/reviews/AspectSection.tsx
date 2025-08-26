@@ -1,4 +1,4 @@
-import {AspectCard} from './AspectCard';
+import {AspectCard} from '@features/profile/ui/reviews/AspectCard.tsx';
 import type {JSX} from "react";
 
 export const AspectSection = ({ title, aspects, icon, color }: { title: string; aspects: any[]; icon: JSX.Element; color: string }) => {

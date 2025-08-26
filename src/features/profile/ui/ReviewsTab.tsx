@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiExternalLink, FiStar, FiCornerRightDown, FiFilter } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReviewCard } from './reviews/ReviewCard';
-import { AspectSection } from './reviews/AspectSection';
+import { AspectSection } from '@features/profile/ui/reviews/AspectSection.tsx';
 
 interface ReviewsTabProps {
     profile: {

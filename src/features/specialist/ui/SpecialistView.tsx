@@ -1,45 +1,9 @@
-import { FiAward, FiInfo, FiThumbsUp, FiThumbsDown } from 'react-icons/fi'
-import { BsPatchCheckFill } from 'react-icons/bs'
-import { FaRegCommentDots } from 'react-icons/fa'
+import { FiAward, FiInfo, FiThumbsUp, FiThumbsDown } from "react-icons/fi"
+import { BsPatchCheckFill } from "react-icons/bs"
+import { FaRegCommentDots } from "react-icons/fa"
 import type { SpecialistProfile } from "@features/specialist/types/SpecialistProfile"
-import type { ReactNode } from "react"
 import { renderRatingStars, getReviewWord, getExperienceText } from "../lib/specialist"
-
-interface AspectSectionProps {
-    title: string
-    aspects: any[]
-    icon: ReactNode
-    color: string
-    showEmptyMessage?: boolean
-}
-
-const AspectSectionLarge = ({ title, aspects, icon, color, showEmptyMessage }: AspectSectionProps) => {
-    const total = aspects?.reduce((acc, a) => acc + a.count, 0) ?? 0
-    if (showEmptyMessage && (!aspects || aspects.length === 0)) {
-        return (
-            <div className="flex flex-col items-center justify-center p-6 rounded-lg border border-gray-200 bg-base-200/60 text-center h-full">
-                <FaRegCommentDots className="text-4xl text-primary mb-2 animate-pulse" />
-                <p className="text-gray-500 text-sm">Пользователи пока не делились впечатлениями</p>
-            </div>
-        )
-    }
-    return (
-        <div className="mb-4">
-            <h4 className="font-medium flex items-center gap-2 mb-2 text-sm">
-                {icon}
-                <span>{title} ({total})</span>
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {aspects.map(aspect => (
-                    <div key={aspect.id} className={`rounded-lg border p-3 bg-${color}/5 border-${color}/20 flex justify-between items-center`}>
-                        <span className="text-sm">{aspect.description}</span>
-                        <span className={`font-semibold text-${color}`}>{aspect.count}</span>
-                    </div>
-                ))}
-            </div>
-        </div>
-    )
-}
+import { AspectSectionLarge } from "./AspectSectionLarge"
 
 interface Props {
     data: SpecialistProfile
@@ -95,7 +59,7 @@ export const SpecialistView = ({ data }: Props) => {
                                     <span>О специалисте</span>
                                 </div>
                                 <p className="leading-relaxed break-words whitespace-normal">
-                                    {data.about || 'Нет описания'}
+                                    {data.about || "Нет описания"}
                                 </p>
                             </div>
                         </div>

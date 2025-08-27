@@ -9,6 +9,7 @@ import (
 	"reviews-back/error_types"
 	"reviews-back/models"
 	"reviews-back/tasks"
+	"strconv"
 	"time"
 )
 
@@ -105,12 +106,34 @@ func GetReviews(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
+		limitStr := c.DefaultQuery("limit", "10")
+		offsetStr := c.DefaultQuery("offset", "0")
+		sort := c.DefaultQuery("sort", "newest")
+
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil || limit <= 0 {
+			c.Error(error_types.ValidationError("invalid limit"))
+			return
+		}
+		offset, err := strconv.Atoi(offsetStr)
+		if err != nil || offset < 0 {
+			c.Error(error_types.ValidationError("invalid offset"))
+			return
+		}
+
+		order := "created_at DESC"
+		if sort == "oldest" {
+			order = "created_at ASC"
+		}
+
 		var reviews []models.Review
 		if err := db.Preload("Author").
 			Preload("Pros").
 			Preload("Cons").
 			Where("profile_user_id = ?", profileUserID).
-			Order("created_at DESC").
+			Order(order).
+			Limit(limit).
+			Offset(offset).
 			Find(&reviews).Error; err != nil {
 			c.Error(error_types.InternalServerError(err).WithCode(error_types.CodeDatabaseError))
 			return

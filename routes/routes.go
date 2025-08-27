@@ -5,9 +5,6 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
-	"github.com/qor5/web/v3"
-	"net/http"
-	"reviews-back/admin_panel"
 	"reviews-back/controllers/auth"
 	"reviews-back/controllers/profile"
 	"reviews-back/controllers/qr"
@@ -19,29 +16,6 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elasticsearch.Client, asynqClient *asynq.Client) {
-
-	adminHandler := admin_panel.Initialize()
-
-	adminGroup := r.Group("/api/admin")
-	{
-		adminGroup.GET("/packs/*filepath", gin.WrapH(web.PacksHandler(string(web.JSComponentsPack()))))
-
-		panelGroup := adminGroup.Group("/panel")
-		{
-			panelGroup.GET("", gin.WrapH(adminHandler))
-			panelGroup.Any("/*path", gin.WrapH(adminHandler))
-		}
-
-		adminGroup.GET("/", func(c *gin.Context) {
-			if c.Request.URL.Path == "/admin" || c.Request.URL.Path == "/admin/" {
-				c.Redirect(http.StatusFound, "/admin/panel/")
-			} else {
-				c.Next()
-			}
-		})
-	}
-
-	// Публичные роуты, не требующие авторизации
 	public := r.Group("/api")
 	public.Use(middlewares.AuthMiddleware(database.DB))
 	{
@@ -66,7 +40,6 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elastics
 
 	}
 
-	// Защищенные роуты
 	protected := r.Group("/api")
 	protected.Use(middlewares.AuthMiddleware(database.DB))
 	protected.Use(middlewares.CasbinMiddleware(enforcer))

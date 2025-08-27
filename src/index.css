@@ -1,0 +1,23 @@
+@import './assets/fonts/fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+    body {
+        font-family: 'Nunito', sans-serif;
+    }
+}
+
+html, body, #root {
+    width: 100%;
+    overflow-x: hidden;
+}

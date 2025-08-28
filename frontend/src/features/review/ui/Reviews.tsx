@@ -38,7 +38,6 @@ export const Reviews = ({ type }: ReviewsProps) => {
     const [isPageReset, setIsPageReset] = useState(false)
     const limit = 5
 
-    // Fetch logic
     const fetchReviews = async (reset = false) => {
         try {
             setLoading(true)

@@ -92,7 +92,7 @@ export const ProfileTab = forwardRef<HTMLDivElement, ProfileTabProps>(({
             <div className="px-6 py-4 bg-base-300/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h3 className="font-medium">Управление аккаунтом</h3>
-                    <p className="text-sm text-base-content/70">Измените пароль или выйдите из системы</p>
+                    <p className="text-sm text-gray-600">Смена пароля, выход из системы</p>
                 </div>
                 <div className="flex gap-3">
                     <button

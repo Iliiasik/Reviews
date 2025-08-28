@@ -1,6 +1,8 @@
 import { useEditProfile } from '@features/profile/model/useEditProfile';
 import { IMaskInput } from 'react-imask';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useOverlayClose } from '@shared/lib/useOverlayClose';
+import React from 'react';
 
 interface EditProfileModalProps {
     profile: any;
@@ -19,6 +21,8 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
         handleNumberChange,
         handleSubmit,
     } = useEditProfile(profile, onSuccess);
+
+    const handleOverlayClick = useOverlayClose(onClose);
 
     const renderField = (
         name: string,
@@ -87,8 +91,15 @@ export const EditProfileModal = ({ profile, onClose, onSuccess }: EditProfileMod
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="bg-base-100/70 backdrop-blur-md p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40 flex flex-col">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal modal-open"
+            onClick={handleOverlayClick}
+        >
+            <div
+                className="modal-box bg-base-100/70 p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40 mx-4 sm:mx-0 sm:my-0 my-auto"
+                style={{ marginTop: 'auto', marginBottom: 'auto' }}
+                onClick={e => e.stopPropagation()}
+            >
                 <h3 className="text-xl font-bold mb-4">Редактирование профиля</h3>
 
                 <form

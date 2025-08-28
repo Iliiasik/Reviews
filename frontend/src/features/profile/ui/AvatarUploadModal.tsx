@@ -1,6 +1,7 @@
 import { useState, useRef, type ChangeEvent } from 'react';
 import { CheckCircleIcon, ArrowUpIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useAvatarActions } from '../model/useAvatarActions';
+import { useOverlayClose } from '@shared/lib/useOverlayClose';
 
 interface AvatarUploadModalProps {
     userId: number;
@@ -27,6 +28,8 @@ export const AvatarUploadModal = ({
 
     const hasAvatar = !!previewUrl || !!currentAvatarUrl;
     const showDeleteButton = !!currentAvatarUrl && !selectedFile;
+
+    const handleOverlayClick = useOverlayClose(onClose);
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -58,8 +61,15 @@ export const AvatarUploadModal = ({
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="bg-base-100/70 backdrop-blur-md p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40 flex flex-col relative">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal modal-open"
+            onClick={handleOverlayClick}
+        >
+            <div
+                className="modal-box bg-base-100/70 p-6 rounded-2xl w-full max-w-md shadow-xl border border-base-200 border-opacity-40 mx-4 sm:mx-0 sm:my-0 my-auto relative"
+                style={{ marginTop: 'auto', marginBottom: 'auto' }}
+                onClick={e => e.stopPropagation()}
+            >
                 {showDeleteButton && (
                     <button
                         type="button"
@@ -125,7 +135,7 @@ export const AvatarUploadModal = ({
                     <div className="flex justify-end gap-3 pt-4">
                         <button
                             type="button"
-                            className="btn btn-ghost"
+                            className="btn btn-ghost bg-opacity-5 hover:bg-opacity-10"
                             onClick={onClose}
                             disabled={isLoading || isDeleting}
                         >
@@ -133,7 +143,7 @@ export const AvatarUploadModal = ({
                         </button>
                         <button
                             type="submit"
-                            className="btn btn-primary"
+                            className="btn bg-opacity-10 hover:bg-opacity-20"
                             disabled={isLoading || isDeleting || !selectedFile}
                         >
                             {isLoading ? (

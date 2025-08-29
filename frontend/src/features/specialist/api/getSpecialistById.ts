@@ -1,10 +1,10 @@
-import axios from "axios";
-import type {SpecialistProfile} from "@features/specialist/types/SpecialistProfile";
+import api from "@shared/axios/axios";
+import type { SpecialistProfile } from "@features/specialist/types/SpecialistProfile";
 
 export const getSpecialistById = async (id: string | number): Promise<SpecialistProfile> => {
     const [profileRes, summaryRes] = await Promise.all([
-        axios.get(`/api/specialist/${id}`),
-        axios.get(`/api/reviews/summary/${id}`)
+        api.get(`/specialist/${id}`),
+        api.get(`/reviews/summary/${id}`)
     ]);
 
     return {

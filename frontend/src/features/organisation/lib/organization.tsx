@@ -28,10 +28,3 @@ export const getReviewWord = (count: number): string => {
     if (lastDigit >= 2 && lastDigit <= 4) return "отзыва"
     return "отзывов"
 }
-
-export const getExperienceText = (years: number): string => {
-    if (years === 0) return "Нет опыта"
-    if (years === 1) return "Опыт работы 1 год"
-    if (years >= 2 && years <= 4) return `Опыт работы ${years} года`
-    return `Опыт работы ${years} лет`
-}

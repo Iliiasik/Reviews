@@ -39,7 +39,7 @@ export const ProfileHeader = ({
                         className="avatar cursor-pointer"
                         onClick={() => setShowAvatarModal(true)}
                     >
-                        <div className="w-24 md:w-32 rounded-full overflow-hidden ring ring-primary ring-offset-base-100 ring-offset-2">
+                        <div className="w-24 md:w-32 rounded-xl overflow-hidden">
                             <img
                                 src={profile?.avatar_url || "https://api.dicebear.com/7.x/initials/svg?seed=user"}
                                 alt="Аватар"

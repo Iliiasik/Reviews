@@ -3,7 +3,7 @@ import { BsPatchCheckFill } from "react-icons/bs"
 import { FaRegCommentDots } from "react-icons/fa"
 import type { SpecialistProfile } from "@features/specialist/types/SpecialistProfile"
 import { renderRatingStars, getReviewWord, getExperienceText } from "../lib/specialist"
-import { AspectSectionLarge } from "./AspectSectionLarge"
+import { AspectSectionLarge } from "@shared/ui/AspectSectionLarge.tsx"
 
 interface Props {
     data: SpecialistProfile
@@ -49,19 +49,20 @@ export const SpecialistView = ({ data }: Props) => {
                             </div>
 
                             <div className="flex items-center gap-2 mb-4">
-                                <FiAward className="w-5 h-5" />
+                                <FiAward className="w-5 h-5 text-yellow-500"/>
                                 <span>{getExperienceText(data.experience_years)}</span>
                             </div>
 
                             <div className="mb-4">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <FiInfo className="w-5 h-5" />
+                                    <FiInfo className="w-5 h-5 text-gray-600"/>
                                     <span>О специалисте</span>
                                 </div>
                                 <p className="leading-relaxed break-words whitespace-normal">
                                     {data.about || "Нет описания"}
                                 </p>
                             </div>
+
                         </div>
                     </div>
 

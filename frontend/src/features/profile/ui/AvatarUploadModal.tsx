@@ -95,7 +95,7 @@ export const AvatarUploadModal = ({
                         >
                             <label className="cursor-pointer" onClick={handleUploadClick}>
                                 <div className="avatar">
-                                    <div className="w-28 h-28 rounded-full ring-2 ring-primary flex items-center justify-center overflow-hidden">
+                                    <div className="w-28 h-28 rounded-xl flex items-center justify-center overflow-hidden">
                                         {hasAvatar ? (
                                             <img
                                                 src={previewUrl || currentAvatarUrl}

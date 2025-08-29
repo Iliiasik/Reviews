@@ -199,11 +199,17 @@ export const Reviews = ({ type }: ReviewsProps) => {
                                                                     [review.id]: prev[review.id] === 'pros' ? null : 'pros'
                                                                 }))
                                                             }}
-                                                            className={`btn btn-xs sm:btn-sm flex items-center gap-2 transition ${openAspects[review.id] === 'pros' ? 'btn-success' : 'btn-outline btn-success'}`}
+                                                            className={`btn btn-xs flex items-center gap-1 rounded-full transition ${
+                                                                openAspects[review.id] === 'pros'
+                                                                    ? 'btn-success'
+                                                                    : 'btn-outline btn-success'
+                                                            }`}
                                                         >
-                                                            <FiThumbsUp size={16} />
-                                                            <span>{review.pros.length}</span>
-                                                            <FiChevronDown size={14} className={`transition-transform ${openAspects[review.id] === 'pros' ? 'rotate-180' : ''}`} />
+                                                            <FiThumbsUp size={12} />
+                                                            <span className="text-xs">{review.pros.length}</span>
+                                                            <FiChevronDown size={10} className={`transition-transform ${
+                                                                openAspects[review.id] === 'pros' ? 'rotate-180' : ''
+                                                            }`} />
                                                         </button>
                                                     )}
                                                     {review.cons.length > 0 && (
@@ -215,11 +221,17 @@ export const Reviews = ({ type }: ReviewsProps) => {
                                                                     [review.id]: prev[review.id] === 'cons' ? null : 'cons'
                                                                 }))
                                                             }}
-                                                            className={`btn btn-xs sm:btn-sm flex items-center gap-2 transition ${openAspects[review.id] === 'cons' ? 'btn-error' : 'btn-outline btn-error'}`}
+                                                            className={`btn btn-xs flex items-center gap-1 rounded-full transition ${
+                                                                openAspects[review.id] === 'cons'
+                                                                    ? 'btn-error'
+                                                                    : 'btn-outline btn-error'
+                                                            }`}
                                                         >
-                                                            <FiThumbsDown size={16} />
-                                                            <span>{review.cons.length}</span>
-                                                            <FiChevronDown size={14} className={`transition-transform ${openAspects[review.id] === 'cons' ? 'rotate-180' : ''}`} />
+                                                            <FiThumbsDown size={12} />
+                                                            <span className="text-xs">{review.cons.length}</span>
+                                                            <FiChevronDown size={10} className={`transition-transform ${
+                                                                openAspects[review.id] === 'cons' ? 'rotate-180' : ''
+                                                            }`} />
                                                         </button>
                                                     )}
                                                 </div>

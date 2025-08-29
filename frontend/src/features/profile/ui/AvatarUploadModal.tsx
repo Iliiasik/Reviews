@@ -75,7 +75,7 @@ export const AvatarUploadModal = ({
                         type="button"
                         onClick={handleDelete}
                         disabled={isDeleting}
-                        className="btn btn-sm btn-ghost absolute top-2 right-4 text-error hover:bg-error/10"
+                        className="btn btn-sm btn-ghost absolute right-4 text-error hover:bg-error/10"
                     >
                         {isDeleting ? (
                             <span className="loading loading-spinner loading-sm"></span>

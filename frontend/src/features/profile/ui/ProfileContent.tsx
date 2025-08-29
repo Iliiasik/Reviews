@@ -149,39 +149,24 @@ export const ProfileContent = () => {
                 {renderActiveTab()}
             </div>
 
-            <AnimatePresence>
-                {showChangePasswordModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <ChangePasswordModal
-                            onClose={() => setShowChangePasswordModal(false)}
-                            onSuccess={() => setShowChangePasswordModal(false)}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {showChangePasswordModal && (
+                <ChangePasswordModal
+                    onClose={() => setShowChangePasswordModal(false)}
+                    onSuccess={() => setShowChangePasswordModal(false)}
+                />
+            )}
 
-            <AnimatePresence>
-                {showEditModal && profile && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        <EditProfileModal
-                            profile={profile}
-                            onClose={() => setShowEditModal(false)}
-                            onSuccess={() => {
-                                handleProfileUpdate();
-                                setShowEditModal(false);
-                            }}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {showEditModal && profile && (
+                <EditProfileModal
+                    profile={profile}
+                    onClose={() => setShowEditModal(false)}
+                    onSuccess={() => {
+                        handleProfileUpdate();
+                        setShowEditModal(false);
+                    }}
+                />
+            )}
+
         </div>
     );
 };

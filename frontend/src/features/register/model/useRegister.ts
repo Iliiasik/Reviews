@@ -5,7 +5,8 @@ import { useWarnToast } from '../lib/useWarnToast';
 import * as yup from 'yup';
 
 const step1Schema = yup.object().shape({
-    name: yup.string().required('Обязательное поле'),
+    name: yup.string().required('Обязательное поле')
+    .max(20, 'Имя не должно превышать 20 символов'),
     email: yup.string().email('Некорректный email').required('Обязательное поле'),
     phone: yup.string()
         .required('Обязательное поле')
@@ -28,14 +29,16 @@ const specialistSchema = yup.object().shape({
         .typeError('Обязательное поле')
         .required('Обязательное поле')
         .min(0, 'Не может быть отрицательным'),
-    about: yup.string().required('Обязательное поле'),
+    about: yup.string().required('Обязательное поле')
+        .max(200, 'Описание не должно превышать 200 символов'),
 });
 
 
 const organizationSchema = yup.object().shape({
     website: yup.string().url('Некорректный URL').nullable(),
     address: yup.string().required('Обязательное поле'),
-    about: yup.string().required('Обязательное поле'),
+    about: yup.string().required('Обязательное поле')
+        .max(200, 'Описание не должно превышать 200 символов'),
 });
 
 export const useRegister = () => {

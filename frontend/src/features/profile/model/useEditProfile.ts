@@ -5,13 +5,19 @@ import { useLogout } from '@features/profile/model/useLogout';
 import { useNavigate } from 'react-router-dom';
 
 const baseSchema = yup.object().shape({
-    name: yup.string().required('Обязательное поле'),
-    email: yup.string().email('Некорректный email').required('Обязательное поле'),
-    about: yup.string().when('role', {
-        is: (role: string) => ['specialist', 'organization'].includes(role),
-        then: (schema) => schema.required('Обязательное поле'),
-        otherwise: (schema) => schema.notRequired(),
-    }),
+    name: yup.string()
+        .required('Обязательное поле')
+        .max(20, 'Максимум 20 символов'),
+    email: yup.string()
+        .email('Некорректный email')
+        .required('Обязательное поле'),
+    about: yup.string()
+        .max(200, 'Максимум 200 символов')
+        .when('role', {
+            is: (role: string) => ['specialist', 'organization'].includes(role),
+            then: (schema) => schema.required('Обязательное поле'),
+            otherwise: (schema) => schema.notRequired(),
+        }),
     phone: yup.string()
         .required('Обязательное поле')
         .test('phone-format', 'Неверный формат телефона', (value) => {
@@ -19,6 +25,7 @@ const baseSchema = yup.object().shape({
             return phoneRegex.test(value || '');
         }),
 });
+
 
 const specialistSchema = yup.object().shape({
     experience_years: yup

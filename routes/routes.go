@@ -5,6 +5,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
+	"reviews-back/controllers/about"
 	"reviews-back/controllers/auth"
 	"reviews-back/controllers/profile"
 	"reviews-back/controllers/qr"
@@ -37,6 +38,9 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elastics
 		public.GET("/reviews/summary/:id", profile.GetUserReviewsSummary)
 		public.POST("/reviews/:id/like", reviews.LikeReview(database.DB))
 		public.DELETE("/reviews/:id/like", reviews.UnlikeReview(database.DB))
+
+		public.GET("/team", about.GetTeam)
+		public.GET("/partners", about.GetPartners)
 
 	}
 

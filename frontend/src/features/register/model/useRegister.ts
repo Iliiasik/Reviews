@@ -75,7 +75,6 @@ export const useRegister = () => {
         setStep(1);
         setAccountType(null);
     };
- // нужно найти решение получше
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 

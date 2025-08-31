@@ -9,6 +9,7 @@ import {Organization} from "@pages/Organization.tsx";
 import {AddReview} from "@pages/AddReview.tsx";
 import {MainLayout} from "@widgets/layout/MainLayout.tsx";
 import {Specialist} from "@pages/Specialist.tsx";
+import {About} from "@pages/About.tsx"
 import {UnverifiedProfileCreation} from "@features/unverified/ui/UnverifiedProfileCreation.tsx";
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/confirm-email" element={<ConfirmEmail />} />
+                <Route path="/about" element={<About />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>

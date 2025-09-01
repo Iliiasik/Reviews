@@ -11,6 +11,7 @@ import {MainLayout} from "@widgets/layout/MainLayout.tsx";
 import {Specialist} from "@pages/Specialist.tsx";
 import {About} from "@pages/About.tsx"
 import {UnverifiedProfileCreation} from "@features/unverified/ui/UnverifiedProfileCreation.tsx";
+import {Contacts} from "@pages/Contacts.tsx";
 
 function App() {
     return (
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/confirm-email" element={<ConfirmEmail />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/contacts" element={<Contacts />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>

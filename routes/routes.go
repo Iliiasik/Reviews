@@ -7,6 +7,7 @@ import (
 	"github.com/hibiken/asynq"
 	"reviews-back/controllers/about"
 	"reviews-back/controllers/auth"
+	"reviews-back/controllers/contacts"
 	"reviews-back/controllers/profile"
 	"reviews-back/controllers/qr"
 	"reviews-back/controllers/reviews"
@@ -41,7 +42,7 @@ func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elastics
 
 		public.GET("/team", about.GetTeam)
 		public.GET("/partners", about.GetPartners)
-
+		public.POST("/contact", contacts.CreateContact)
 	}
 
 	protected := r.Group("/api")

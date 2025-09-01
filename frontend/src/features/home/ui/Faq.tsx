@@ -10,7 +10,7 @@ const faqData = [
     { question: 'Можно ли найти отзывы по определённой теме или подборке?', answer: 'Да, в системе есть удобный поиск и фильтры, позволяющие быстро находить отзывы по нужным критериям и подборкам.' },
     { question: 'Могу ли я редактировать или удалять свой отзыв?', answer: 'Вы можете редактировать или удалить свой отзыв в личном кабинете в любое время после публикации.' },
     { question: 'Как обеспечивается анонимность отзывов?', answer: 'Отзывы можно оставлять анонимно — система не раскрывает вашу личную информацию без вашего согласия.' },
-    { question: 'Как быстро появляются новые отзывы в системе?', answer: 'Отзывы проходят модерацию и обычно становятся доступными в течение нескольких часов после отправки.' },
+    { question: 'Как быстро появляются новые отзывы в системе?', answer: 'Отзывы становятся доступны сразу после публикации.' },
 ];
 
 const FaqItem: React.FC<{ question: string; answer: string; isOpen: boolean; onClick: () => void; }> = ({ question, answer, isOpen, onClick }) => {
@@ -168,7 +168,7 @@ const MainComponent: React.FC = () => {
             <div className="card rounded-box grow p-6 bg-base-200 md:max-w-md">
                 <LeftContent />
             </div>
-            <div className="divider md:divider-horizontal">OR</div>
+            <div className="divider md:divider-horizontal"></div>
             <div className="card rounded-box p-6 bg-base-200 md:flex-1 min-w-0">
                 <Faq />
             </div>

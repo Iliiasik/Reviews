@@ -41,7 +41,7 @@ export const Team = () => {
 
     return (
         <section className="py-16 px-6 sm:px-10 lg:px-20 bg-base-200">
-            <h2 className="text-3xl font-bold mb-8 text-center">Наша команда</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center">Команда</h2>
             <div
                 ref={containerRef}
                 className="flex gap-6 overflow-x-auto scrollbar-hidden scroll-smooth px-2"

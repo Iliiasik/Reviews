@@ -1,5 +1,5 @@
-import Navbar  from '@shared/ui/Navbar';
-import  Footer  from '@shared/ui/Footer';
+import Navbar from '@shared/ui/Navbar';
+import Footer from '@shared/ui/Footer';
 
 export const AuthLayout = ({
                                children,
@@ -11,7 +11,7 @@ export const AuthLayout = ({
     return (
         <div className="flex flex-col min-h-screen bg-base-100 text-base-content">
             <Navbar />
-            <main className="flex-grow flex flex-col items-center justify-center px-4 mt-12">
+            <main className="flex-grow flex flex-col items-center justify-center px-4 pt-20 pb-8">
                 <div className="w-full max-w-md shadow-lg rounded-box bg-base-200 p-8">
                     <h1 className="text-3xl font-bold mb-6 text-center">{title}</h1>
                     {children}

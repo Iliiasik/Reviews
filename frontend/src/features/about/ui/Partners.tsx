@@ -11,8 +11,9 @@ export const Partners = () => {
 
     return (
         <section className="py-16 px-6 sm:px-10 lg:px-20 bg-base-100">
-            <h2 className="text-3xl font-bold mb-12 text-center">Наши партнеры</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center justify-items-center">
+            <h2 className="text-3xl font-bold mb-4 text-center">Партнёры</h2>
+            <div className="divider mx-auto w-1/4"></div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center justify-items-center mt-8">
                 {partners.map((partner) => (
                     <a
                         key={partner.ID}
@@ -23,7 +24,7 @@ export const Partners = () => {
                     >
                         <img
                             src={partner.LogoURL || "https://via.placeholder.com/150x80?text=Logo"}
-                            className="h-20 object-contain"
+                            className="h-20 object-contain grayscale hover:grayscale-0 transition duration-300"
                         />
                     </a>
                 ))}

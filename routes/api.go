@@ -18,6 +18,9 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine, enforcer *casbin.Enforcer, esClient *elasticsearch.Client, asynqClient *asynq.Client) {
+
+	RegisterAdminRoutes(r)
+
 	public := r.Group("/api")
 	public.Use(middlewares.AuthMiddleware(database.DB))
 	{

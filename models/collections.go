@@ -2,9 +2,6 @@ package models
 
 import "time"
 
-// Переработанные подборки, теперь я правильно их настроил с отзывов на спецов и организации.
-// Более гибкая структура с явным отделением спецов и организаций, лучше для сортировки и тд
-
 type CollectionAccess struct {
 	ID           uint       `gorm:"primaryKey"`
 	CollectionID uint       `gorm:"not null"`

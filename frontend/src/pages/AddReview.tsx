@@ -19,7 +19,7 @@ export const AddReview = () => {
 
         axios
             .get(`/api/${type}/${id}`)
-            .then(res => setName(res.data.name))
+            .then((res) => setName(res.data.name))
             .catch(() =>
                 setError(`Не удалось загрузить данные для ${type === 'organization' ? 'организации' : 'специалиста'}`)
             )
@@ -27,20 +27,21 @@ export const AddReview = () => {
     }, [id, type]);
 
     return (
-        <div className="max-w-2xl mx-auto p-6">
+        <div className="max-w-2xl mx-auto w-full px-4 pb-6 pt-2">
             {loading ? (
-                <p className="mb-4 text-gray-500">Загрузка данных...</p>
+                <div className="flex justify-center py-8">
+                    <span className="loading loading-spinner loading-lg"></span>
+                </div>
             ) : error ? (
-                <p className="mb-4 text-red-500">{error}</p>
-            ) : (
-                <h1 className="text-2xl font-bold mb-4">
-                    Отзыв для: <span className="text-primary">{name}</span>
-                </h1>
-            )}
+                <div className="alert alert-error shadow-sm mt-4 rounded-xl p-4 text-sm">
+                    {error}
+                </div>
+            ) : null}
 
-            {!loading && !error && id && (
+            {!loading && !error && id && name && (
                 <ReviewForm
                     profileUserId={Number(id)}
+                    profileName={name}
                     onSubmitSuccess={() =>
                         navigate(`/${type}/${id}`, {
                             state: {

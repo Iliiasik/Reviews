@@ -6,22 +6,23 @@ import axios from "axios";
 import { toggleItemInList } from "@features/review/lib/toggleItemInList.ts";
 import { RatingInput } from "@features/review/ui/RatingInput.tsx";
 import { AspectCheckboxList } from "@features/review/ui/AspectCheckBoxList.tsx";
-import { CommentTextarea } from "@features/review/ui/CommentTextArea.tsx";
-import { AnonymousCheckbox } from "@features/review/ui/AnonymousChechBox.tsx";
+import { CommentInput } from "@features/review/ui/CommentInput.tsx";
+import { AnonymousCheckbox } from "@features/review/ui/AnonymousCheckBox.tsx";
 import { useUser } from "@shared/context/UserContext";
 import { useToast } from "@shared/context/ToastContext";
 
 interface ReviewFormProps {
     profileUserId: number;
+    profileName: string;
     onSubmitSuccess: () => void;
 }
 
 export const ReviewForm = ({
                                profileUserId,
+                               profileName,
                                onSubmitSuccess,
                            }: ReviewFormProps) => {
     const { user, loading: userLoading } = useUser();
-
     const [rating, setRating] = useState(5);
     const [text, setText] = useState("");
     const [isAnonymous, setIsAnonymous] = useState(false);
@@ -29,8 +30,8 @@ export const ReviewForm = ({
     const [cons, setCons] = useState<number[]>([]);
     const [aspects, setAspects] = useState<ReviewAspect[]>([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const { showToast } = useToast();
+
     useEffect(() => {
         getReviewAspects().then(setAspects).catch(() => setAspects([]));
     }, []);
@@ -44,8 +45,6 @@ export const ReviewForm = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
-
         try {
             await createReview({
                 profile_user_id: profileUserId,
@@ -55,7 +54,6 @@ export const ReviewForm = ({
                 pros,
                 cons,
             });
-
             onSubmitSuccess();
             setRating(5);
             setText("");
@@ -79,42 +77,41 @@ export const ReviewForm = ({
         }
     };
 
-
-    if (userLoading) return <p>Загрузка...</p>;
+    if (userLoading) return <p className="py-4 text-center text-base-content/70">Загрузка...</p>;
 
     return (
-        <div className="w-full px-4">
-            <form onSubmit={handleSubmit} className="mb-6 space-y-4">
-                {error && <div className="alert alert-error">{error}</div>}
-
-                <RatingInput value={rating} onChange={setRating} />
-
-                {user && <AnonymousCheckbox value={isAnonymous} onChange={setIsAnonymous} />}
-
-                <AspectCheckboxList
-                    label="Что вам больше всего понравилось?"
-                    aspects={aspects.filter((a) => a.positive)}
-                    selectedIds={pros}
-                    onToggle={(id) => toggleAspect(id, "pros")}
-                />
-
-                <AspectCheckboxList
-                    label="Что оставило неприятное впечатление?"
-                    aspects={aspects.filter((a) => !a.positive)}
-                    selectedIds={cons}
-                    onToggle={(id) => toggleAspect(id, "cons")}
-                />
-
-                <CommentTextarea value={text} onChange={setText} required />
-
-                <button
-                    type="submit"
-                    className="btn btn-primary w-full sm:w-auto self-center"
-                    disabled={loading}
-                >
-                    {loading ? "Отправка..." : "Оставить отзыв"}
-                </button>
-            </form>
+        <div className="w-full max-w-full min-w-0 px-4 md:px-6">
+            <fieldset className="fieldset bg-base-200 border-base-300 rounded-box border p-4 w-full min-w-0">
+                <legend className="badge badge-soft badge-primary font-semibold px-4 py-2 text-xl">
+                    {profileName}
+                </legend>
+                <form onSubmit={handleSubmit} className="space-y-5 min-w-0">
+                    <div className="flex flex-col items-center space-y-4 pt-2">
+                        <RatingInput value={rating} onChange={setRating} />
+                    </div>
+                    <AspectCheckboxList
+                        label="Что понравилось?"
+                        aspects={aspects.filter((a) => a.positive)}
+                        selectedIds={pros}
+                        onToggle={(id) => toggleAspect(id, "pros")}
+                    />
+                    <AspectCheckboxList
+                        label="Что не понравилось?"
+                        aspects={aspects.filter((a) => !a.positive)}
+                        selectedIds={cons}
+                        onToggle={(id) => toggleAspect(id, "cons")}
+                    />
+                    {user && <AnonymousCheckbox value={isAnonymous} onChange={setIsAnonymous} />}
+                    <CommentInput value={text} onChange={setText} required />
+                    <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+                        {loading ? (
+                            <span className="loading loading-spinner loading-sm"></span>
+                        ) : (
+                            "Оставить отзыв"
+                        )}
+                    </button>
+                </form>
+            </fieldset>
         </div>
     );
 };

@@ -1,16 +1,19 @@
 import type { ReviewAspect } from "@features/review/types/ReviewAspect";
 import {
-    Smile,
-    Clock,
-    GraduationCap,
-    Sparkles,
-    Mic,
-    Angry,
-    Hourglass,
-    ShieldAlert,
-    Trash2,
-    EarOff,
-} from "lucide-react";
+    FiSmile,
+    FiClock,
+    FiAward,
+    FiShield,
+    FiMessageSquare,
+    FiFrown,
+    FiCalendar,
+    FiHelpCircle,
+    FiFeather,
+    FiVolumeX,
+    FiStar,
+} from 'react-icons/fi';
+import type { JSX } from "react";
+
 interface AspectCheckboxListProps {
     label: string;
     aspects: ReviewAspect[];
@@ -18,22 +21,18 @@ interface AspectCheckboxListProps {
     onToggle: (id: number) => void;
 }
 
-
-import type {JSX} from "react";
-
 const aspectIcons: Record<number, JSX.Element> = {
-    1: <Smile size={24} />,            // 😊 — Вежливость
-    2: <Clock size={24} />,            // ⏰ — Пунктуальность
-    3: <GraduationCap size={24} />,    // 🎓 — Компетентность
-    4: <Sparkles size={24} />,         // 🧼 — Чистота помещения
-    5: <Mic size={24} />,              // 🗣️ — Умение слушать
-    6: <Angry size={24} />,            // 😠 — Грубость
-    7: <Hourglass size={24} />,        // ⌛ — Слишком долго ждать
-    8: <ShieldAlert size={24} />,      // 🤷 — Некомпетентность
-    9: <Trash2 size={24} />,           // 🧹 — Неопрятность
-    10: <EarOff size={24} />,          // 🙉 — Игнорирование жалоб
+    1: <FiSmile size={24} className="text-green-500" />,
+    2: <FiClock size={24} className="text-blue-500" />,
+    3: <FiAward size={24} className="text-yellow-500" />,
+    4: <FiShield size={24} className="text-purple-500" />,
+    5: <FiMessageSquare size={24} className="text-cyan-500" />,
+    6: <FiFrown size={24} className="text-red-500" />,
+    7: <FiCalendar size={24} className="text-orange-500" />,
+    8: <FiHelpCircle size={24} className="text-gray-500" />,
+    9: <FiFeather size={24} className="text-pink-500" />,
+    10: <FiVolumeX size={24} className="text-indigo-500" />,
 };
-
 
 export const AspectCheckboxList = ({
                                        label,
@@ -42,33 +41,35 @@ export const AspectCheckboxList = ({
                                        onToggle,
                                    }: AspectCheckboxListProps) => {
     return (
-        <div className="form-control">
-            <label className="label">
-                <span className="label-text">{label}</span>
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 py-1">
-            {aspects.map((a) => {
-                    const selected = selectedIds.includes(a.id);
-                    const icon = aspectIcons[a.id] ?? '⭐';
-
-                    return (
-                        <button
-                            key={a.id}
-                            type="button"
-                            onClick={() => onToggle(a.id)}
-                            className={`w-full sm:w-auto sm:min-w-[120px] px-3 py-3 border rounded-xl flex flex-col items-center justify-center transition text-center
-            ${selected
-                                ? "bg-primary/10 border-primary text-primary"
-                                : "bg-base-100 border-base-300 text-base-content hover:bg-base-200"
-                            }`}
-                        >
-                            <span className="text-2xl mb-1">{icon}</span>
-                            <span className="text-sm text-center break-words">{a.description}</span>
-                        </button>
-                    );
-                })}
+        <div className="w-full">
+            <div className="mb-2">
+                <div className="text-lg text-center font-medium">{label}</div>
+            </div>
+            <div className="overflow-x-auto w-full scrollbar-hidden">
+                <div className="inline-flex gap-3 px-4 py-2 min-w-max">
+                    {aspects.map((a) => {
+                        const selected = selectedIds.includes(a.id);
+                        const icon = aspectIcons[a.id] || <FiStar size={24} className="text-yellow-500" />;
+                        return (
+                            <button
+                                key={a.id}
+                                type="button"
+                                onClick={() => onToggle(a.id)}
+                                className={`flex flex-col items-center justify-center w-24 h-24 rounded-xl border-2 transition-all duration-200
+                                    ${selected
+                                    ? 'border-blue-300 bg-base-200 shadow-md'
+                                    : 'bg-base-100 border-base-300 text-base-content hover:bg-base-200 hover:border-base-400 dark:bg-base-200 dark:border-base-500 dark:hover:bg-base-300'
+                                }`}
+                            >
+                                <div className="mb-1">{icon}</div>
+                                <span className="text-xs font-medium text-center leading-tight px-1">
+                                    {a.description}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
         </div>
-
     );
 };

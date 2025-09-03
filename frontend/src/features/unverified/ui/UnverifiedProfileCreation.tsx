@@ -1,7 +1,7 @@
 import { RatingInput } from '@features/review/ui/RatingInput.tsx';
 import { AspectCheckboxList } from '@features/review/ui/AspectCheckBoxList.tsx';
-import { AnonymousCheckbox } from '@features/review/ui/AnonymousChechBox.tsx';
-import { CommentTextarea } from '@features/review/ui/CommentTextArea.tsx';
+import { AnonymousCheckbox } from '@features/review/ui/AnonymousCheckBox.tsx';
+import { CommentInput } from '@features/review/ui/CommentInput.tsx';
 import { useUnverifiedProfileForm } from '../model/useUnverifiedProfileForm';
 
 export const UnverifiedProfileCreation = () => {
@@ -91,7 +91,7 @@ export const UnverifiedProfileCreation = () => {
                             onToggle={(id) => handleToggleAspect(id, 'cons')}
                         />
 
-                        <CommentTextarea value={text} onChange={setText} required={leaveReview} />
+                        <CommentInput value={text} onChange={setText} required={leaveReview} />
                     </div>
                 </div>
 

@@ -16,7 +16,7 @@ import (
 type CreateReviewRequest struct {
 	ProfileUserID uint   `json:"profile_user_id" binding:"required"`
 	Rating        int    `json:"rating" binding:"required,min=1,max=5"`
-	Text          string `json:"text" binding:"required"`
+	Text          string `json:"text"`
 	IsAnonymous   bool   `json:"is_anonymous"`
 	Pros          []uint `json:"pros"`
 	Cons          []uint `json:"cons"`

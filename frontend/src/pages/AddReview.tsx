@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
-import { ReviewForm } from "@features/review/ui/ReviewForm.tsx";
+import { ReviewForm } from "@features/review/ui/ReviewForm";
+import { useProfileName } from "@features/review/models/useProfileName";
 
 export const AddReview = () => {
     const { id } = useParams();
@@ -10,21 +9,7 @@ export const AddReview = () => {
 
     const type = location.pathname.includes("/organization") ? "organization" : "specialist";
 
-    const [name, setName] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        if (!id || !type) return;
-
-        axios
-            .get(`/api/${type}/${id}`)
-            .then((res) => setName(res.data.name))
-            .catch(() =>
-                setError(`Не удалось загрузить данные для ${type === 'organization' ? 'организации' : 'специалиста'}`)
-            )
-            .finally(() => setLoading(false));
-    }, [id, type]);
+    const { name, loading, error } = useProfileName(type, id);
 
     return (
         <div className="max-w-2xl mx-auto w-full px-4 pb-6 pt-2">
@@ -46,8 +31,8 @@ export const AddReview = () => {
                         navigate(`/${type}/${id}`, {
                             state: {
                                 toast: {
-                                    message: 'Отзыв успешно добавлен',
-                                    type: 'success',
+                                    message: "Отзыв успешно добавлен",
+                                    type: "success",
                                 },
                             },
                         })

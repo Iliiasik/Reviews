@@ -111,5 +111,5 @@ func GoogleCallback(c *gin.Context) {
 	c.SetCookie("access_token", accessToken, int(AccessTokenExp.Seconds()), "/", "localhost", false, true)
 	c.SetCookie("refresh_token", refreshToken, int(RefreshTokenExp.Seconds()), "/", "localhost", false, true)
 
-	c.Redirect(http.StatusTemporaryRedirect, "http://localhost:5173/profile")
+	c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000/profile")
 }

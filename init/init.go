@@ -13,6 +13,7 @@ import (
 	"reviews-back/cron"
 	"reviews-back/database"
 	"reviews-back/rbac"
+	"reviews-back/storage"
 )
 
 // Инициализация всех сервисов (minio, redis, cron, db..)
@@ -45,7 +46,7 @@ func InitServices() *Services {
 
 	cron.StartRatingCron(database.DB)
 
-	//storage.InitMinio()
+	storage.InitMinio()
 
 	var asynqClient *asynq.Client
 	if redisAddr := config.GetEnv("REDIS_ADDR"); redisAddr != "" {

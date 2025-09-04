@@ -165,7 +165,7 @@ func CreateConfirmation(db *gorm.DB, userID uint) (*models.Confirmation, *error_
 }
 
 func SendConfirmationEmail(user models.User, token string) {
-	link := fmt.Sprintf("http://localhost:5173/confirm-email?token=%s", token)
+	link := fmt.Sprintf("http://localhost:3000/confirm-email?token=%s", token)
 	err := email.SendEmail(email.EmailData{
 		To:       user.Email,
 		From:     os.Getenv("SMTP_USER"),

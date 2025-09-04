@@ -31,7 +31,7 @@ func GenerateQR(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		roleName := strings.ToLower(user.Role.Name)
-		url := fmt.Sprintf("http://localhost:5173/%s/%d/add-review", roleName, user.ID)
+		url := fmt.Sprintf("http://localhost:3000/%s/%d/add-review", roleName, user.ID)
 
 		qr, err := qrcode.New(url, qrcode.Highest)
 		if err != nil {

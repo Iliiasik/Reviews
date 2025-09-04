@@ -11,6 +11,7 @@ import { ProfileTab } from './ProfileTab';
 import { ReviewsTab } from './ReviewsTab';
 import { QrTab } from './QrTab';
 import { VerificationsTab } from './VerificationsTab';
+import { AdministrationTab } from './AdministrationTab';
 import { ChangePasswordModal } from '@features/profile/ui/ChangePasswordModal';
 import { EditProfileModal } from './EditProfileModal';
 
@@ -23,6 +24,8 @@ export const ProfileContent = () => {
     const reviewsRef = useRef<HTMLDivElement>(null);
     const qrRef = useRef<HTMLDivElement>(null);
     const verificationsRef = useRef<HTMLDivElement>(null);
+    const administrationRef = useRef<HTMLDivElement>(null);
+
 
     const { profile, isLoading, handleProfileUpdate } = useProfile();
     const { handleLogout } = useProfileActions();
@@ -70,7 +73,9 @@ export const ProfileContent = () => {
             ? [{ id: 'qr', label: 'QR-код' }]
             : []),
         ...(profile?.role === 'admin'
-            ? [{ id: 'verifications', label: 'Заявки' }]
+            ? [{ id: 'verifications', label: 'Заявки' },
+                { id: 'administration', label: 'Администрирование' },
+            ]
             : []),
     ];
 
@@ -131,6 +136,8 @@ export const ProfileContent = () => {
                         onReject={rejectRequest}
                     />
                 );
+            case 'administration':
+                return <AdministrationTab ref={administrationRef} />;
             default:
                 return null;
         }

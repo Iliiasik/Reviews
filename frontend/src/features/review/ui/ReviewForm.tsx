@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import type { ReviewAspect } from "@features/review/types/ReviewAspect"
 import { getReviewAspects } from "@features/review/api/getReviewAspects"
 import { toggleItemInList } from "@features/review/lib/toggleItemInList"
-import { RatingInput } from "@features/review/ui/RatingInput"
-import { AspectCheckboxList } from "@features/review/ui/AspectCheckBoxList"
-import { CommentInput } from "@features/review/ui/CommentInput"
-import { AnonymousCheckbox } from "@features/review/ui/AnonymousCheckBox"
+import { RatingInput } from "@shared/ui/review/RatingInput.tsx"
+import { AspectCheckboxList } from "@shared/ui/review/AspectCheckBoxList.tsx"
+import { CommentInput } from "@shared/ui/review/CommentInput.tsx"
+import { AnonymousCheckbox } from "@shared/ui/review/AnonymousCheckBox.tsx"
 import { useUser } from "@shared/context/UserContext"
 import { useToast } from "@shared/context/ToastContext"
 import { useReviewForm } from "@features/review/models/useReviewForm"
@@ -86,12 +86,10 @@ export const ReviewForm = ({
                         <CommentInput
                             value={text}
                             onChange={setText}
-                            required={false}
+                            className={errors.text ? "input input-bordered w-full border-error" : "input input-bordered w-full"}
                         />
                         {errors.text && (
-                            <span className="text-error text-sm mt-1">
-                                {errors.text}
-                            </span>
+                            <span className="text-error text-sm mt-1">{errors.text}</span>
                         )}
                     </div>
                     <button

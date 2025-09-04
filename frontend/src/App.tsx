@@ -10,7 +10,7 @@ import {AddReview} from "@pages/AddReview.tsx";
 import {MainLayout} from "@widgets/layout/MainLayout.tsx";
 import {Specialist} from "@pages/Specialist.tsx";
 import {About} from "@pages/About.tsx"
-import {UnverifiedProfileCreation} from "@features/unverified/ui/UnverifiedProfileCreation.tsx";
+import {UnverifiedProfileCreation} from "@pages/UnverifiedProfileCreation.tsx";
 import {Contacts} from "@pages/Contacts.tsx";
 
 function App() {

@@ -1,4 +1,4 @@
-import type { ReviewAspect } from "@features/review/types/ReviewAspect";
+import type { ReviewAspect } from "@features/review/types/ReviewAspect.ts";
 import {
     FiSmile,
     FiClock,
